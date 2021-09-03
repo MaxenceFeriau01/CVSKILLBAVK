@@ -2,6 +2,7 @@ package com.ensemble.entreprendre.exception;
 
 import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.ensemble.entreprendre.dto.ApiExceptionResponse;
+import com.ensemble.entreprendre.dto.MultipleApiExceptionResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,6 +50,23 @@ public class ExceptionManager {
 		ApiExceptionResponse error = new ApiExceptionResponse();
 		error.setStatus(status.value());
 		error.setMessage(message);
+		Arrays.asList(exception.getStackTrace()).stream().map(StackTraceElement::toString).forEach(ExceptionManager.log::info);
+		ExceptionManager.log.info(exception.getMessage());
+		
+		return new ResponseEntity<>(error, status);
+	}
+
+	@ExceptionHandler(value = BusinessException.class)
+	public ResponseEntity<MultipleApiExceptionResponse> manageMultipleApiException(final BusinessException e) {
+		return this.getMultipleExceptionResponse(e, e.getStatus(), e.getInternalMessages());
+	}
+
+	private ResponseEntity<MultipleApiExceptionResponse> getMultipleExceptionResponse(final Exception exception,
+			final HttpStatus status, final Collection<String> messages) {
+		MultipleApiExceptionResponse error = new MultipleApiExceptionResponse();
+		error.setStatus(status.value());
+		error.setMessage("Multiple Errors Have Occured");
+		error.setInternalMessages(messages);
 		Arrays.asList(exception.getStackTrace()).stream().map(StackTraceElement::toString).forEach(ExceptionManager.log::info);
 		ExceptionManager.log.info(exception.getMessage());
 		

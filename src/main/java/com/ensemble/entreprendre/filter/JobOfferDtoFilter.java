@@ -1,11 +1,11 @@
-package com.ensemble.entreprendre.dto;
+package com.ensemble.entreprendre.filter;
 
 import java.time.LocalDate;
 
 import lombok.Data;
 
 @Data
-public class JobOfferDto {
+public class JobOfferDtoFilter {
 
 	Long id;
 	String title;

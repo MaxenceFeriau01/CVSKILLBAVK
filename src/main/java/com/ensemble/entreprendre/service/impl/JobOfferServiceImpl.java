@@ -1,15 +1,19 @@
 package com.ensemble.entreprendre.service.impl;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.JobOffer;
 import com.ensemble.entreprendre.dto.JobOfferDto;
 import com.ensemble.entreprendre.exception.ApiException;
+import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.exception.BusinessException;
+import com.ensemble.entreprendre.exception.TechnicalException;
+import com.ensemble.entreprendre.filter.JobOfferDtoFilter;
 import com.ensemble.entreprendre.repository.IJobOfferRepository;
 import com.ensemble.entreprendre.service.IJobOfferService;
 
@@ -23,13 +27,92 @@ public class JobOfferServiceImpl implements IJobOfferService {
 	GenericConverter<JobOffer, JobOfferDto> jobOfferConverter;
 	
 	@Override
-	public Collection<JobOfferDto> getAll() {
-		return this.jobOfferConverter.entitiesToDtos(this.jobOfferRepo.findAll(),JobOfferDto.class);
+	public Page<JobOfferDto> getAll(Pageable pageable, JobOfferDtoFilter filter) {
+		Specification<JobOffer> specification = null;
+		if(filter!=null) {
+			if (filter.getActive() != null) {
+				specification = addActiveCriteria(filter,specification);
+			}
+			if (filter.getDescription() != null) {
+				specification = addDescriptionCriteria(filter,specification);
+			}
+			if (filter.getTitle() != null) {
+				specification = addTitleCriteria(filter,specification);
+			}
+			if (filter.getId() != null) {
+				specification = addIdCriteria(filter,specification);
+			}
+			if (filter.getStart() != null) {
+				specification = addStartCriteria(filter,specification);
+			}
+		}
+		if(specification == null) {
+			return this.jobOfferConverter.entitiesToDtos(this.jobOfferRepo.findAll(pageable),JobOfferDto.class);
+		} else {
+			return this.jobOfferConverter.entitiesToDtos(this.jobOfferRepo.findAll(specification, pageable),JobOfferDto.class);
+		}
+	}
+
+
+	private Specification<JobOffer> ensureSpecification(Specification<JobOffer> origin,	Specification<JobOffer> target) {
+		if(origin == null)
+			return target;
+		if(target == null)
+			return origin;
+		return Specification.where(origin).and(target);
+	}
+
+	private Specification<JobOffer> addStartCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
+		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(jobOffer.get("start"), filter.getStart()); 
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<JobOffer> addIdCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
+		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(jobOffer.get("id"), filter.getId()); 
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<JobOffer> addTitleCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
+		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(jobOffer.get("title")), "%" + filter.getTitle().toUpperCase() + "%"); 
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<JobOffer> addDescriptionCriteria(JobOfferDtoFilter filter,
+			Specification<JobOffer> origin) {
+		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(jobOffer.get("description")), "%" + filter.getTitle().toUpperCase() + "%"); 
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<JobOffer> addActiveCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
+		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(jobOffer.get("active"), filter.getActive()); 
+		return ensureSpecification(origin, target);
 	}
 
 	@Override
 	public JobOfferDto getById(long id) throws ApiException {
-		return this.jobOfferConverter.entityToDto(this.jobOfferRepo.findById(id).orElseThrow(()-> new ApiException("Cette Offre n'existe pas !",HttpStatus.NOT_FOUND)),JobOfferDto.class);
+		return this.jobOfferConverter.entityToDto(this.jobOfferRepo.findById(id).orElseThrow(()-> new ApiNotFoundException("Cette Offre n'existe pas !")),JobOfferDto.class);
+	}
+
+
+	@Override
+	public JobOfferDto create(JobOfferDto toCreate) throws ApiException {
+		if (toCreate == null) {
+			throw new TechnicalException("joboffer.post.not.null");
+		}
+		BusinessException businessException = new BusinessException();
+		if(toCreate.getTitle() == null || toCreate.getTitle().isBlank()) {
+			businessException.addMessage("joboffer.post.title.not.empty");
+		}
+		if (toCreate.getDescription() == null || toCreate.getDescription().isBlank()) {
+			businessException.addMessage("joboffer.post.description.not.empty");
+		}
+		if(businessException.isNotEmpty()) {
+			throw businessException;
+		}
+		if(toCreate.getActive() == null) {
+			toCreate.setActive(true);
+		}
+		return this.jobOfferConverter.entityToDto(this.jobOfferRepo.save(this.jobOfferConverter.dtoToEntity(toCreate, JobOffer.class)), JobOfferDto.class);
 	}
 
 }

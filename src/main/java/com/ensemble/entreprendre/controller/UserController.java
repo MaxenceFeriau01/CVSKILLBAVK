@@ -29,7 +29,7 @@ public class UserController {
 	private UserDetailsService userDetailsService;
 	
 	
-	@PostMapping(path="/authenticate/")
+	@PostMapping(path="/authenticate")
 	public UserDto createAuthenticationToken(@RequestBody CredentialsDto authenticationRequest) throws ApiNotFoundException {
 		authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());

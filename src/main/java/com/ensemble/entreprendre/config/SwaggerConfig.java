@@ -1,6 +1,7 @@
 package com.ensemble.entreprendre.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +28,8 @@ public class SwaggerConfig {
 	 @Bean
 	public Docket api() {
 	return new Docket(DocumentationType.SWAGGER_2).pathMapping(this.context)
-	/* .securitySchemes(Collections.singletonList(this.apiKey()))
-	.securityContexts(Collections.singletonList(this.securityContext())) */
+	.securitySchemes(Collections.singletonList(this.apiKey()))
+	.securityContexts(Collections.singletonList(this.securityContext()))
 	.select()
 	.apis(RequestHandlerSelectors.basePackage("com.ensemble.entreprendre")).paths(PathSelectors.any()).build();
 	}

@@ -25,7 +25,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
-		grantedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
+		grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_TEST"));
 		UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(username).password(bCryptPasswordEncoder.encode(username))
 				.authorities(grantedAuthorities).build();
 		return userDetails;

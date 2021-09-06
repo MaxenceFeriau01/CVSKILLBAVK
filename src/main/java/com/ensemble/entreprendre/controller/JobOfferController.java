@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ public class JobOfferController {
 	private IJobOfferService jobOfferService;
 	
 	@PostMapping(path = "/")
+	@Secured({"ROLE_ADMIN"})
 	public JobOfferDto create(JobOfferDto toCreate) throws ApiException{ 
 		return this.jobOfferService.create(toCreate);
 	}
@@ -48,6 +50,7 @@ public class JobOfferController {
 		"Multiple sort criteria are supported.")
 	})
 	@GetMapping(path = "/")
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	public  Page<JobOfferDto> getAll(
 			@ApiIgnore(
 					"Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params"

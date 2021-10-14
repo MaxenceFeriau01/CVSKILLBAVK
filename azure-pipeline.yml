@@ -11,7 +11,7 @@ pool:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'EntreprendreEnsemble-Mecenat'
+  dockerRegistryServiceConnection: 'EntreprendreEnsemble-Mecena-acr'
   imageRepository: 'aduges-back'
   containerRegistry: 'EntreprendreEnsembleMecenatasr.azurecr.io'
   dockerfilePath: '**/Dockerfile'

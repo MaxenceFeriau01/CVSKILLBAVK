@@ -27,6 +27,30 @@ public class CompanyServiceImpl implements ICompanyService {
 	GenericConverter<Company, CompanyDto> companyConverter;
 	
 	@Override
+	public CompanyDto getById(long id) throws ApiException {
+		return this.companyConverter.entityToDto(this.companyRepository.findById(id).orElseThrow(()-> new ApiNotFoundException("Cette Entreprise n'existe pas !")), CompanyDto.class);
+	}
+
+
+	@Override
+	public CompanyDto create(CompanyDto toCreate) throws ApiException {
+		if (toCreate == null) {
+			throw new TechnicalException("company.post.not.null");
+		}
+		BusinessException businessException = new BusinessException();
+		if(toCreate.getName() == null || toCreate.getName().isBlank()) {
+			businessException.addMessage("company.post.name.not.empty");
+		}
+		if (toCreate.getContact() == null || toCreate.getContact().isBlank()) {
+			businessException.addMessage("company.post.contact.not.empty");
+		}
+		if(businessException.isNotEmpty()) {
+			throw businessException;
+		}
+		return this.companyConverter.entityToDto(this.companyRepository.save(this.companyConverter.dtoToEntity(toCreate, Company.class)), CompanyDto.class);
+	}
+	
+	@Override
 	public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
 		Specification<Company> specification = null;
 		if(filter!=null) {
@@ -46,6 +70,18 @@ public class CompanyServiceImpl implements ICompanyService {
 		return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),CompanyDto.class);
 	}
 
+	@Override
+	public CompanyDto update (CompanyDto updatedDto) throws ApiException {
+		this.companyRepository.findById(updatedDto.getId()).orElseThrow(()-> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+		return this.companyConverter.entityToDto(this.companyRepository.save(this.companyConverter.dtoToEntity(updatedDto, Company.class)), CompanyDto.class);
+	}
+	
+	@Override
+	public CompanyDto delete (long id) throws ApiException {
+		Company toDelete = this.companyRepository.findById(id).orElseThrow(()-> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+		this.companyRepository.delete(toDelete);
+		return this.companyConverter.entityToDto(toDelete, CompanyDto.class);
+	}
 
 	private Specification<Company> ensureSpecification(Specification<Company> origin,	Specification<Company> target) {
 		if(origin == null)
@@ -70,27 +106,4 @@ public class CompanyServiceImpl implements ICompanyService {
 		return ensureSpecification(origin, target);
 	}
 
-	@Override
-	public CompanyDto getById(long id) throws ApiException {
-		return this.companyConverter.entityToDto(this.companyRepository.findById(id).orElseThrow(()-> new ApiNotFoundException("Cette Offre n'existe pas !")),CompanyDto.class);
-	}
-
-
-	@Override
-	public CompanyDto create(CompanyDto toCreate) throws ApiException {
-		if (toCreate == null) {
-			throw new TechnicalException("company.post.not.null");
-		}
-		BusinessException businessException = new BusinessException();
-		if(toCreate.getName() == null || toCreate.getName().isBlank()) {
-			businessException.addMessage("company.post.name.not.empty");
-		}
-		if (toCreate.getContact() == null || toCreate.getContact().isBlank()) {
-			businessException.addMessage("company.post.contact.not.empty");
-		}
-		if(businessException.isNotEmpty()) {
-			throw businessException;
-		}
-		return this.companyConverter.entityToDto(this.companyRepository.save(this.companyConverter.dtoToEntity(toCreate, Company.class)), CompanyDto.class);
-	}
 }

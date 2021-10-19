@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class CompanyController {
 	private ICompanyService companyService;
 	
 	@PostMapping(path = "/")
-	@Secured({"ROLE_ADMIN"})
+	@Secured({"ROLE_ADMIN", "ROLE_TEST"})
 	public CompanyDto create(CompanyDto toCreate) throws ApiException{ 
 		return this.companyService.create(toCreate);
 	}
@@ -61,5 +62,18 @@ public class CompanyController {
 	@ResponseStatus(HttpStatus.OK)
 	public  CompanyDto getById(@PathVariable(name = "id") long id) throws ApiException{ 
 		return this.companyService.getById(id);
+	}
+	
+	@PostMapping(path = "/update/")
+	@Secured({"ROLE_ADMIN", "ROLE_TEST"})
+	public  CompanyDto update(CompanyDto toUpdate) throws ApiException{ 
+		return this.companyService.update(toUpdate);
+	}
+	
+	@DeleteMapping(path = "/{id}/")
+	@ResponseStatus(HttpStatus.OK)
+	@Secured({"ROLE_ADMIN", "ROLE_TEST"})
+	public  CompanyDto delete(@PathVariable(name = "id") long id) throws ApiException{ 
+		return this.companyService.delete(id);
 	}
 }

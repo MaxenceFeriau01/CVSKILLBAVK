@@ -1,0 +1,1 @@
+create table companies_activities (company_id bigserial not null, activity_id bigserial not null, primary key (company_id, activity_id));

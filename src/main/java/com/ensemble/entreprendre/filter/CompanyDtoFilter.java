@@ -9,4 +9,5 @@ public class CompanyDtoFilter {
 	Long id;
 	String name;
 	String contact;
+	String siret;
 }

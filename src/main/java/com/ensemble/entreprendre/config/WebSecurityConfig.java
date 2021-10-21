@@ -84,7 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
 		.authorizeRequests()
-		.antMatchers( "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**","/users/authenticate")  //TODO Remove the /**
+		.antMatchers( "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/users/authenticate", "/companies/**", "/activities/**")  //TODO Remove the /**
 		.permitAll().
 		anyRequest().
 		authenticated().

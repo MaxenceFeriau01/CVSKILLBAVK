@@ -14,32 +14,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ensemble.entreprendre.dto.CompanyDto;
+import com.ensemble.entreprendre.dto.ActivityDto;
 import com.ensemble.entreprendre.exception.ApiException;
-import com.ensemble.entreprendre.filter.CompanyDtoFilter;
-import com.ensemble.entreprendre.service.ICompanyService;
+import com.ensemble.entreprendre.service.IActivityService;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-@RequestMapping(path="/companies")
+@RequestMapping(path="/activities")
 @RestController
 @CrossOrigin("*")
-public class CompanyController {
+public class ActivityController {
 
 	@Autowired
-	private ICompanyService companyService;
+	private IActivityService activityService;
 	
 	@PostMapping(path = "/")
 	//TODO Remove ROLE_TEST
 	@Secured({"ROLE_ADMIN", "ROLE_TEST"})
-	public CompanyDto create(CompanyDto toCreate) throws ApiException{ 
-		return this.companyService.create(toCreate);
+	public ActivityDto create(ActivityDto toCreate) throws ApiException{ 
+		return this.activityService.create(toCreate);
 	}
 	
-	@ApiOperation(value = "Company getAll endpoint", response = CompanyDto.class)
+	@ApiOperation(value = "Activity getAll endpoint", response = ActivityDto.class)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 		value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
@@ -51,33 +50,32 @@ public class CompanyController {
 		"Multiple sort criteria are supported.")
 	})
 	@GetMapping(path = "/")
-	public  Page<CompanyDto> getAll(
+	public  Page<ActivityDto> getAll(
 			@ApiIgnore(
 					"Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params"
-			) Pageable pageable,
-			CompanyDtoFilter filter)
+			) Pageable pageable)
 	{ 
-		return this.companyService.getAll(pageable, filter);
+		return this.activityService.getAll(pageable);
 	}
 	
 	@GetMapping(path = "/{id}/")
 	@ResponseStatus(HttpStatus.OK)
-	public  CompanyDto getById(@PathVariable(name = "id") long id) throws ApiException{ 
-		return this.companyService.getById(id);
+	public  ActivityDto getById(@PathVariable(name = "id") long id) throws ApiException{ 
+		return this.activityService.getById(id);
 	}
 	
 	@PostMapping(path = "/update/")
 	//TODO Remove ROLE_TEST
 	@Secured({"ROLE_ADMIN", "ROLE_TEST"})
-	public  CompanyDto update(CompanyDto toUpdate) throws ApiException{ 
-		return this.companyService.update(toUpdate);
+	public  ActivityDto update(ActivityDto toUpdate) throws ApiException{ 
+		return this.activityService.update(toUpdate);
 	}
 	
 	@DeleteMapping(path = "/{id}/")
 	@ResponseStatus(HttpStatus.OK)
 	//TODO Remove ROLE_TEST
 	@Secured({"ROLE_ADMIN", "ROLE_TEST"})
-	public  CompanyDto delete(@PathVariable(name = "id") long id) throws ApiException{ 
-		return this.companyService.delete(id);
+	public  ActivityDto delete(@PathVariable(name = "id") long id) throws ApiException{ 
+		return this.activityService.delete(id);
 	}
 }

@@ -11,5 +11,7 @@ public class CompanyDto {
 	String name;
 	String contact;
 	String siret;
+	String description;
+	byte[] logo;
 	Set<ActivityDto> activities;
 }

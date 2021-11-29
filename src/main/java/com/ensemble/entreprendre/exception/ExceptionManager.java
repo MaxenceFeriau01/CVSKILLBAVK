@@ -1,6 +1,6 @@
 package com.ensemble.entreprendre.exception;
 
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Collection;
 

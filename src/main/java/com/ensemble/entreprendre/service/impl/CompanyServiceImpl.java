@@ -38,9 +38,6 @@ public class CompanyServiceImpl implements ICompanyService {
 			throw new TechnicalException("company.post.not.null");
 		}
 		BusinessException businessException = new BusinessException();
-		if (toCreate.getName() == null || toCreate.getName().isBlank()) {
-			businessException.addMessage("company.post.name.not.empty");
-		}
 		if (toCreate.getContactFirstName() == null || toCreate.getContactFirstName().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
@@ -50,7 +47,7 @@ public class CompanyServiceImpl implements ICompanyService {
 		if (toCreate.getContactMail() == null || toCreate.getContactMail().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
-		if (toCreate.getContactNum() == null || toCreate.getContactNum().isBlank()) {
+		if (toCreate.getContactNum()== null || toCreate.getContactNum().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
 		if (businessException.isNotEmpty()) {
@@ -70,9 +67,6 @@ public class CompanyServiceImpl implements ICompanyService {
 			}
 			if (filter.getName() != null) {
 				specification = addNameCriteria(filter, specification);
-			}
-			if (filter.getContact() != null) {
-				specification = addContactCriteria(filter, specification);
 			}
 		}
 		if (specification == null) {
@@ -119,10 +113,10 @@ public class CompanyServiceImpl implements ICompanyService {
 		return ensureSpecification(origin, target);
 	}
 
-	private Specification<Company> addContactCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-				.greaterThanOrEqualTo(company.get("contact"), filter.getContact());
-		return ensureSpecification(origin, target);
-	}
+//	private Specification<Company> addContactCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+//		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
+//				.greaterThanOrEqualTo(company.get("contact"), filter.getContact());
+//		return ensureSpecification(origin, target);
+//	}
 
 }

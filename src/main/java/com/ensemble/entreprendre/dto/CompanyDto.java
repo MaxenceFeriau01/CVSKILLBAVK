@@ -2,9 +2,11 @@ package com.ensemble.entreprendre.dto;
 
 import java.util.Set;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CompanyDto {
 
 	Long id;

@@ -41,7 +41,7 @@ public class ActivityServiceImpl implements IActivityService {
 			throw new TechnicalException("activity.post.not.null");
 		}
 		BusinessException businessException = new BusinessException();
-		if (toCreate.getName() == null || toCreate.getName().isBlank()) {
+		if (toCreate.getName()== null || toCreate.getName().isBlank()) {
 			businessException.addMessage("activity.post.name.not.empty");
 		}
 		if (businessException.isNotEmpty()) {

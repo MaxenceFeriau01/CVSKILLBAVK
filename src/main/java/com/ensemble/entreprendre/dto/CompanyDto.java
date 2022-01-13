@@ -9,7 +9,10 @@ public class CompanyDto {
 
 	Long id;
 	String name;
-	String contact;
+	String contactFirstName;
+	String contactLastName;
+	String contactMail;
+	String contactNum;
 	String siret;
 	String description;
 	byte[] logo;

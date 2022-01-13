@@ -31,8 +31,17 @@ public class Company {
 	@Column(name = "COMPANY_NAME", nullable = false)
 	String name;
 	
-	@Column(name = "COMPANY_CONTACT", nullable = false)
-	String contact;
+	@Column(name = "COMPANY_CONTACT_FIRSTNAME", nullable = false)
+	String contactFirstName;
+	
+	@Column(name = "COMPANY_CONTACT_LASTNAME", nullable = false)
+	String contactLastName;
+	
+	@Column(name = "COMPANY_CONTACT_MAIL", nullable = false)
+	String contactMail;
+	
+	@Column(name = "COMPANY_CONTACT_NUM", nullable = false)
+	String contactNum;
 	
 	@Column(name = "COMPANY_SIRET", unique = true, length = 14)
 	@Pattern(regexp="[0-9]{14}", message="{company.invalid.siret}")
@@ -42,7 +51,7 @@ public class Company {
 	String description;
 	
 	@Lob
-    @Column(name = "COMPANY_LOGO", columnDefinition="BLOB")
+    @Column(name = "COMPANY_LOGO", columnDefinition="BYTEA")
     private byte[] logo;
 	
 	@ManyToMany

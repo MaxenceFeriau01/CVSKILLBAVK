@@ -41,7 +41,16 @@ public class CompanyServiceImpl implements ICompanyService {
 		if(toCreate.getName() == null || toCreate.getName().isBlank()) {
 			businessException.addMessage("company.post.name.not.empty");
 		}
-		if (toCreate.getContact() == null || toCreate.getContact().isBlank()) {
+		if (toCreate.getContactFirstName() == null || toCreate.getContactFirstName().isBlank()) {
+			businessException.addMessage("company.post.contact.not.empty");
+		}
+		if (toCreate.getContactLastName() == null || toCreate.getContactLastName().isBlank()) {
+			businessException.addMessage("company.post.contact.not.empty");
+		}
+		if (toCreate.getContactMail() == null || toCreate.getContactMail().isBlank()) {
+			businessException.addMessage("company.post.contact.not.empty");
+		}
+		if (toCreate.getContactNum() == null || toCreate.getContactNum().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
 		if(businessException.isNotEmpty()) {

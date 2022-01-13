@@ -15,7 +15,7 @@ public interface ICompanyService {
 
 	CompanyDto create(CompanyDto toCreate) throws ApiException;
 	
-	CompanyDto update (CompanyDto updatedDto) throws ApiException;
+	CompanyDto update (Long id,CompanyDto updatedDto) throws ApiException;
 	
 	CompanyDto delete (long id) throws ApiException;
 }

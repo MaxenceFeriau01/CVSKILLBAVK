@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-@RequestMapping(path="/joboffers")
+@RequestMapping(path="/job-offers")
 @RestController
 @CrossOrigin("*")
 public class JobOfferController {
@@ -31,7 +31,7 @@ public class JobOfferController {
 	@Autowired
 	private IJobOfferService jobOfferService;
 	
-	@PostMapping(path = "/")
+	@PostMapping
 	@Secured({"ROLE_ADMIN"})
 	public JobOfferDto create(JobOfferDto toCreate) throws ApiException{ 
 		return this.jobOfferService.create(toCreate);
@@ -49,7 +49,7 @@ public class JobOfferController {
 		"Default sort order is ascending. " +
 		"Multiple sort criteria are supported.")
 	})
-	@GetMapping(path = "/")
+	@GetMapping
 	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	public  Page<JobOfferDto> getAll(
 			@ApiIgnore(
@@ -60,7 +60,7 @@ public class JobOfferController {
 		return this.jobOfferService.getAll(pageable, filter);
 	}
 	
-	@GetMapping(path = "/{id}/")
+	@GetMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public  JobOfferDto getById(@PathVariable(name = "id") long id) throws ApiException{ 
 		return this.jobOfferService.getById(id);

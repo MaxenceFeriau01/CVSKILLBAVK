@@ -14,7 +14,7 @@ public interface IActivityService {
 
 	ActivityDto create(ActivityDto toCreate) throws ApiException;
 	
-	ActivityDto update (ActivityDto updatedDto) throws ApiException;
+	ActivityDto update (Long id,ActivityDto updatedDto) throws ApiException;
 	
 	ActivityDto delete (long id) throws ApiException;
 }

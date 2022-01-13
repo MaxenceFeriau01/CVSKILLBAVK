@@ -23,7 +23,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "USER")
+@Table(name = "`USER`")
 public class User extends FullAuditable<String>{
 
 	@Id

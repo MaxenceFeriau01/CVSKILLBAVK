@@ -22,15 +22,15 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	@Autowired
 	ICompanyRepository companyRepository;
-	
+
 	@Autowired
 	GenericConverter<Company, CompanyDto> companyConverter;
-	
+
 	@Override
 	public CompanyDto getById(long id) throws ApiException {
-		return this.companyConverter.entityToDto(this.companyRepository.findById(id).orElseThrow(()-> new ApiNotFoundException("Cette Entreprise n'existe pas !")), CompanyDto.class);
+		return this.companyConverter.entityToDto(this.companyRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !")), CompanyDto.class);
 	}
-
 
 	@Override
 	public CompanyDto create(CompanyDto toCreate) throws ApiException {
@@ -38,7 +38,7 @@ public class CompanyServiceImpl implements ICompanyService {
 			throw new TechnicalException("company.post.not.null");
 		}
 		BusinessException businessException = new BusinessException();
-		if(toCreate.getName() == null || toCreate.getName().isBlank()) {
+		if (toCreate.getName() == null || toCreate.getName().isBlank()) {
 			businessException.addMessage("company.post.name.not.empty");
 		}
 		if (toCreate.getContactFirstName() == null || toCreate.getContactFirstName().isBlank()) {
@@ -53,65 +53,75 @@ public class CompanyServiceImpl implements ICompanyService {
 		if (toCreate.getContactNum() == null || toCreate.getContactNum().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
-		if(businessException.isNotEmpty()) {
+		if (businessException.isNotEmpty()) {
 			throw businessException;
 		}
-		return this.companyConverter.entityToDto(this.companyRepository.save(this.companyConverter.dtoToEntity(toCreate, Company.class)), CompanyDto.class);
-	}
-	
-	@Override
-	public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
-		Specification<Company> specification = null;
-		if(filter!=null) {
-			if (filter.getId() != null) {
-				specification = addIdCriteria(filter,specification);
-			}
-			if (filter.getName() != null) {
-				specification = addNameCriteria(filter,specification);
-			}
-			if (filter.getContact() != null) {
-				specification = addContactCriteria(filter,specification);
-			}
-		}
-		if(specification == null) {
-			return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(pageable),CompanyDto.class);
-		} 
-		return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),CompanyDto.class);
+		return this.companyConverter.entityToDto(
+				this.companyRepository.save(this.companyConverter.dtoToEntity(toCreate, Company.class)),
+				CompanyDto.class);
 	}
 
 	@Override
-	public CompanyDto update (CompanyDto updatedDto) throws ApiException {
-		this.companyRepository.findById(updatedDto.getId()).orElseThrow(()-> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
-		return this.companyConverter.entityToDto(this.companyRepository.save(this.companyConverter.dtoToEntity(updatedDto, Company.class)), CompanyDto.class);
+	public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
+		Specification<Company> specification = null;
+		if (filter != null) {
+			if (filter.getId() != null) {
+				specification = addIdCriteria(filter, specification);
+			}
+			if (filter.getName() != null) {
+				specification = addNameCriteria(filter, specification);
+			}
+			if (filter.getContact() != null) {
+				specification = addContactCriteria(filter, specification);
+			}
+		}
+		if (specification == null) {
+			return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(pageable), CompanyDto.class);
+		}
+		return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),
+				CompanyDto.class);
 	}
-	
+
 	@Override
-	public CompanyDto delete (long id) throws ApiException {
-		Company toDelete = this.companyRepository.findById(id).orElseThrow(()-> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+	public CompanyDto update(Long id, CompanyDto updatedDto) throws ApiException {
+		this.companyRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+		return this.companyConverter.entityToDto(
+				this.companyRepository.save(this.companyConverter.dtoToEntity(updatedDto, Company.class)),
+				CompanyDto.class);
+	}
+
+	@Override
+	public CompanyDto delete(long id) throws ApiException {
+		Company toDelete = this.companyRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
 		this.companyRepository.delete(toDelete);
 		return this.companyConverter.entityToDto(toDelete, CompanyDto.class);
 	}
 
-	private Specification<Company> ensureSpecification(Specification<Company> origin,	Specification<Company> target) {
-		if(origin == null)
+	private Specification<Company> ensureSpecification(Specification<Company> origin, Specification<Company> target) {
+		if (origin == null)
 			return target;
-		if(target == null)
+		if (target == null)
 			return origin;
 		return Specification.where(origin).and(target);
 	}
 
 	private Specification<Company> addIdCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(company.get("id"), filter.getId()); 
+		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
+				.equal(company.get("id"), filter.getId());
 		return ensureSpecification(origin, target);
 	}
 
 	private Specification<Company> addNameCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(company.get("name")), "%" + filter.getName().toUpperCase() + "%"); 
+		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
+				.like(criteriaBuilder.upper(company.get("name")), "%" + filter.getName().toUpperCase() + "%");
 		return ensureSpecification(origin, target);
 	}
-	
+
 	private Specification<Company> addContactCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(company.get("contact"), filter.getContact()); 
+		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
+				.greaterThanOrEqualTo(company.get("contact"), filter.getContact());
 		return ensureSpecification(origin, target);
 	}
 

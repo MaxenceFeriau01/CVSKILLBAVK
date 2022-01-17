@@ -68,7 +68,7 @@ public class CompanyServiceImpl implements ICompanyService {
 			if (filter.getName() != null) {
 				specification = addNameCriteria(filter, specification);
 			}
-			if (filter.getActivitie() != null) {
+			if (filter.getActivitieId() != null) {
 				specification = addActivitieCriteria(filter, specification);
 			}
 		}

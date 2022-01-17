@@ -68,6 +68,9 @@ public class CompanyServiceImpl implements ICompanyService {
 			if (filter.getName() != null) {
 				specification = addNameCriteria(filter, specification);
 			}
+			if (filter.getActivitie() != null) {
+				specification = addActivitieCriteria(filter, specification);
+			}
 		}
 		if (specification == null) {
 			return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(pageable), CompanyDto.class);
@@ -112,11 +115,12 @@ public class CompanyServiceImpl implements ICompanyService {
 				.like(criteriaBuilder.upper(company.get("name")), "%" + filter.getName().toUpperCase() + "%");
 		return ensureSpecification(origin, target);
 	}
+	
+	private Specification<Company> addActivitieCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
+				.equal(criteriaBuilder.upper(company.get("activitieId")), filter.getActivitieId());
+		return ensureSpecification(origin, target);
+	}
 
-//	private Specification<Company> addContactCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-//		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-//				.greaterThanOrEqualTo(company.get("contact"), filter.getContact());
-//		return ensureSpecification(origin, target);
-//	}
 
 }

@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -20,7 +21,10 @@ import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Activity;
+import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.domain.Company;
+import com.ensemble.entreprendre.domain.Company_;
+import com.ensemble.entreprendre.domain.JobOffer;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -112,20 +116,12 @@ public class CompanyServiceImpl implements ICompanyService {
 	}
 
 	private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		return new Specification<Company>() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Predicate toPredicate(Root<Company> root, CriteriaQuery<?> cq, CriteriaBuilder cb) {
-				List<Long> list = new ArrayList<>();
-				list.add(filter.getActivityId());
-				Join<Long, Long> join = root.join("activities");
-				return join.get("id").in(list);
-			};
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			criteriaQuery.distinct(true);
+			return criteriaBuilder.equal(root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID),
+					filter.getActivityId());
 		};
+		return ensureSpecification(origin, target);
 	}
 
 }

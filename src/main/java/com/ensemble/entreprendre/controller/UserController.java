@@ -20,17 +20,17 @@ import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
 @RestController
 @CrossOrigin("*")
 public class UserController {
-	
+
 	@Autowired
-	private AuthenticationManager authenticationManager;	
+	private AuthenticationManager authenticationManager;
 	@Autowired
-	private JwtTokenUtilBean jwtTokenUtilBean;	
+	private JwtTokenUtilBean jwtTokenUtilBean;
 	@Autowired
 	private UserDetailsService userDetailsService;
-	
-	
-	@PostMapping(path="/authenticate")
-	public UserDto createAuthenticationToken(@RequestBody CredentialsDto authenticationRequest) throws ApiNotFoundException {
+
+	@PostMapping(path = "/authenticate")
+	public UserDto createAuthenticationToken(@RequestBody CredentialsDto authenticationRequest)
+			throws ApiNotFoundException {
 		authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 		UserDto customer = new UserDto();
@@ -39,9 +39,14 @@ public class UserController {
 		return customer;
 	}
 
+	@PostMapping(path = "/registration")
+	public UserDto registration(@RequestBody UserDto useDto) throws ApiNotFoundException {
+		return useDto;
+
+	}
+
 	private void authenticate(String email, String password) {
-		authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(email, password));
-		
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 	}
 
 }

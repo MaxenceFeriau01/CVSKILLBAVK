@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ensemble.entreprendre.dto.ActivityDto;
 import com.ensemble.entreprendre.exception.ApiException;
+import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.service.IActivityService;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -47,13 +48,15 @@ public class ActivityController {
 					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
 	@GetMapping
 	public Page<ActivityDto> getAll(
-			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable) {
+			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable) throws ApiException {
+		
 		return this.activityService.getAll(pageable);
 	}
 
 	@GetMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public ActivityDto getById(@PathVariable(name = "id") long id) throws ApiException {
+		
 		return this.activityService.getById(id);
 	}
 

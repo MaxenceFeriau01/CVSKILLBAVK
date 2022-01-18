@@ -31,11 +31,14 @@ public class User extends FullAuditable<String>{
 	@Column(name = "USR_ID")
 	private Long id;
 	
-	@Column(name = "USR_LOGIN")
-	private String login;
+	@Column(name = "USR_LOGIN", nullable = false)
+	private String email;
 
-	@Column(name = "USR_PASSWORD")
-	private String pwd;
+	@Column(name = "USR_PASSWORD", nullable = false)
+	private String password;
+	
+	@Column(name = "USR_PHONE", nullable = false)
+	private String phone;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "USR_ROL_TABLE", inverseJoinColumns = @JoinColumn(name = "ROL_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_ROLE"), referencedColumnName = "ROL_ID", nullable = false, updatable = false), joinColumns = @JoinColumn(name = "USR_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_USER"), referencedColumnName = "USR_ID", nullable = false, updatable = false))

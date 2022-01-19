@@ -1,5 +1,18 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,7 +20,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
+import com.ensemble.entreprendre.domain.Activity;
+import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.domain.Company;
+import com.ensemble.entreprendre.domain.Company_;
+import com.ensemble.entreprendre.domain.JobOffer;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -47,7 +64,7 @@ public class CompanyServiceImpl implements ICompanyService {
 		if (toCreate.getContactMail() == null || toCreate.getContactMail().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
-		if (toCreate.getContactNum()== null || toCreate.getContactNum().isBlank()) {
+		if (toCreate.getContactNum() == null || toCreate.getContactNum().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
 		if (businessException.isNotEmpty()) {
@@ -62,11 +79,8 @@ public class CompanyServiceImpl implements ICompanyService {
 	public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
 		Specification<Company> specification = null;
 		if (filter != null) {
-			if (filter.getId() != null) {
-				specification = addIdCriteria(filter, specification);
-			}
-			if (filter.getName() != null) {
-				specification = addNameCriteria(filter, specification);
+			if (filter.getActivityId() != null) {
+				specification = addActivityCriteria(filter, specification);
 			}
 		}
 		if (specification == null) {
@@ -101,22 +115,13 @@ public class CompanyServiceImpl implements ICompanyService {
 		return Specification.where(origin).and(target);
 	}
 
-	private Specification<Company> addIdCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-				.equal(company.get("id"), filter.getId());
+	private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			criteriaQuery.distinct(true);
+			return criteriaBuilder.equal(root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID),
+					filter.getActivityId());
+		};
 		return ensureSpecification(origin, target);
 	}
-
-	private Specification<Company> addNameCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-				.like(criteriaBuilder.upper(company.get("name")), "%" + filter.getName().toUpperCase() + "%");
-		return ensureSpecification(origin, target);
-	}
-
-//	private Specification<Company> addContactCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-//		Specification<Company> target = (company, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-//				.greaterThanOrEqualTo(company.get("contact"), filter.getContact());
-//		return ensureSpecification(origin, target);
-//	}
 
 }

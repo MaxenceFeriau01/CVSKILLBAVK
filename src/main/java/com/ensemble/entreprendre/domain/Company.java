@@ -14,6 +14,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.annotations.Type;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,36 +29,34 @@ public class Company {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "COMPANY_ID")
 	Long id;
-	
+
 	@Column(name = "COMPANY_NAME", nullable = false)
 	String name;
-	
+
 	@Column(name = "COMPANY_CONTACT_FIRSTNAME", nullable = false)
 	String contactFirstName;
-	
+
 	@Column(name = "COMPANY_CONTACT_LASTNAME", nullable = false)
 	String contactLastName;
-	
+
 	@Column(name = "COMPANY_CONTACT_MAIL", nullable = false)
 	String contactMail;
-	
+
 	@Column(name = "COMPANY_CONTACT_NUM", nullable = false)
 	String contactNum;
-	
+
 	@Column(name = "COMPANY_SIRET", unique = true, length = 14)
-	@Pattern(regexp="[0-9]{14}", message="{company.invalid.siret}")
+	@Pattern(regexp = "[0-9]{14}", message = "{company.invalid.siret}")
 	String siret;
-	
+
 	@Column(name = "COMPANY_DESCRIPTION")
 	String description;
-	
+
 	@Lob
-    @Column(name = "COMPANY_LOGO", columnDefinition="BYTEA")
-    private byte[] logo;
-	
+	@Column(name = "COMPANY_LOGO", columnDefinition = "BYTEA")
+	private byte[] logo;
+
 	@ManyToMany
-	@JoinTable(name = "companies_activities",
-		joinColumns=@JoinColumn(name="COMPANY_ID", referencedColumnName="COMPANY_ID"),
-    	inverseJoinColumns=@JoinColumn(name="ACTIVITY_ID", referencedColumnName="ACTIVITY_ID"))
-    Set<Activity> activities;
+	@JoinTable(name = "companies_activities", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
+	Set<Activity> activities;
 }

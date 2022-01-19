@@ -1,7 +1,5 @@
 package com.ensemble.entreprendre.config;
 
-
-
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +28,6 @@ import com.ensemble.entreprendre.security.JwtAuthenticationEntryPoint;
 import com.ensemble.entreprendre.security.JwtAuthenticationFilter;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
 
-
-
-
 @Configuration
 @Order(1)
 @EnableWebSecurity
@@ -42,11 +37,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-	private String key="pass.pass.pass";
+	private String key = "pass.pass.pass";
 
 	private Random random = new SecureRandom();
-
-
 
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -64,9 +57,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return authProvider;
 	}
 
-
 	@Bean
-	public BCryptPasswordEncoder  passwordEncoder() {
+	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
@@ -75,38 +67,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
+
 	@Bean
 	public JwtAuthenticationFilter authenticationTokenFilterBean() {
 		return new JwtAuthenticationFilter();
 	}
+
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
-		.authorizeRequests()
-		.antMatchers( "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/users/authenticate", "/companies/**", "/activities/**")  //TODO Remove the /**
-		.permitAll().
-		anyRequest().
-		authenticated().
-		and().exceptionHandling()
-		.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
+				.authorizeRequests()
+				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/users/authenticate",
+						"/companies/**", "/activities/**") // TODO Remove the /**
+				.permitAll().anyRequest().authenticated().and().exceptionHandling()
+				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
 		httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
-		//		httpSecurity.csrf().disable()
-		//				// dont authenticate this particular request
-		//				.authorizeRequests().antMatchers("/authenticate").permitAll().
-		//				antMatchers(HttpMethod.OPTIONS, "/**")
-		//				.permitAll().
-		//				// all other requests need to be authenticated
-		//						anyRequest().authenticated().and().
-		//				// make sure we use stateless session; session won't be used to
-		//				// store user's state.
-		//						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-		//				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		// httpSecurity.csrf().disable()
+		// // dont authenticate this particular request
+		// .authorizeRequests().antMatchers("/authenticate").permitAll().
+		// antMatchers(HttpMethod.OPTIONS, "/**")
+		// .permitAll().
+		// // all other requests need to be authenticated
+		// anyRequest().authenticated().and().
+		// // make sure we use stateless session; session won't be used to
+		// // store user's state.
+		// exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+		// .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		// Add a filter to validate the tokens with every request
-		//httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+		// httpSecurity.addFilterBefore(jwtRequestFilter,
+		// UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Bean
@@ -118,7 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		Random random = new SecureRandom();
 		IntStream specialChars = random.ints(count, 33, 45);
 
-		return specialChars.mapToObj(data -> (char) data);	    
+		return specialChars.mapToObj(data -> (char) data);
 	}
 
 	public Stream<Character> getRandomNumbers(int count) {
@@ -126,6 +119,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		return numbers.mapToObj(data -> (char) data);
 	}
+
 	public Stream<Character> getRandomAlphabets(int count, boolean upperCase) {
 		IntStream characters = null;
 		if (upperCase) {
@@ -137,8 +131,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	public String generateSecureRandomPassword() {
-		Stream<Character> pwdStream = Stream.concat(getRandomNumbers(1), 
-				Stream.concat(getRandomSpecialChars(1), 
+		Stream<Character> pwdStream = Stream.concat(getRandomNumbers(1),
+				Stream.concat(getRandomSpecialChars(1),
 						Stream.concat(getRandomAlphabets(2, true), getRandomAlphabets(4, false))));
 		List<Character> charList = pwdStream.collect(Collectors.toList());
 		Collections.shuffle(charList);
@@ -147,11 +141,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.toString();
 
 		System.out.println(password);
-		password = password.replace('"','&');
+		password = password.replace('"', '&');
 		return password;
 	}
 
-	//	public static void main(String[] args) {
-	//		System.err.println(new WebSecurityConfig().passwordEncoder().encode("mypass"));
-	//	}
+	// public static void main(String[] args) {
+	// System.err.println(new
+	// WebSecurityConfig().passwordEncoder().encode("mypass"));
+	// }
 }

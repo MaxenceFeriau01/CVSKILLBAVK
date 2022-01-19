@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.JobOffer;
+import com.ensemble.entreprendre.domain.JobOffer_;
 import com.ensemble.entreprendre.dto.JobOfferDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -33,18 +34,6 @@ public class JobOfferServiceImpl implements IJobOfferService {
 			if (filter.getActive() != null) {
 				specification = addActiveCriteria(filter,specification);
 			}
-			if (filter.getDescription() != null) {
-				specification = addDescriptionCriteria(filter,specification);
-			}
-			if (filter.getTitle() != null) {
-				specification = addTitleCriteria(filter,specification);
-			}
-			if (filter.getId() != null) {
-				specification = addIdCriteria(filter,specification);
-			}
-			if (filter.getStart() != null) {
-				specification = addStartCriteria(filter,specification);
-			}
 		}
 		if(specification == null) {
 			return this.jobOfferConverter.entitiesToDtos(this.jobOfferRepo.findAll(pageable),JobOfferDto.class);
@@ -62,29 +51,9 @@ public class JobOfferServiceImpl implements IJobOfferService {
 		return Specification.where(origin).and(target);
 	}
 
-	private Specification<JobOffer> addStartCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
-		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(jobOffer.get("start"), filter.getStart()); 
-		return ensureSpecification(origin, target);
-	}
-
-	private Specification<JobOffer> addIdCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
-		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(jobOffer.get("id"), filter.getId()); 
-		return ensureSpecification(origin, target);
-	}
-
-	private Specification<JobOffer> addTitleCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
-		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(jobOffer.get("title")), "%" + filter.getTitle().toUpperCase() + "%"); 
-		return ensureSpecification(origin, target);
-	}
-
-	private Specification<JobOffer> addDescriptionCriteria(JobOfferDtoFilter filter,
-			Specification<JobOffer> origin) {
-		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.upper(jobOffer.get("description")), "%" + filter.getTitle().toUpperCase() + "%"); 
-		return ensureSpecification(origin, target);
-	}
 
 	private Specification<JobOffer> addActiveCriteria(JobOfferDtoFilter filter, Specification<JobOffer> origin) {
-		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(jobOffer.get("active"), filter.getActive()); 
+		Specification<JobOffer> target = (jobOffer, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(jobOffer.get(JobOffer_.ACTIVE), filter.getActive()); 
 		return ensureSpecification(origin, target);
 	}
 

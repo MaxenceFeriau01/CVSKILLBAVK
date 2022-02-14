@@ -1,5 +1,6 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -70,6 +71,7 @@ public class CompanyServiceImpl implements ICompanyService {
 		if (businessException.isNotEmpty()) {
 			throw businessException;
 		}
+
 		return this.companyConverter.entityToDto(
 				this.companyRepository.save(this.companyConverter.dtoToEntity(toCreate, Company.class)),
 				CompanyDto.class);
@@ -92,8 +94,14 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	@Override
 	public CompanyDto update(Long id, CompanyDto updatedDto) throws ApiException {
-		this.companyRepository.findById(id)
+		Company oldCompany = this.companyRepository.findById(id)
 				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+		updatedDto.setId(id);
+		if (updatedDto.getLogo() == null) {
+			// Set the old logo if not changed
+			updatedDto.setLogo(oldCompany.getLogo());
+		}
+
 		return this.companyConverter.entityToDto(
 				this.companyRepository.save(this.companyConverter.dtoToEntity(updatedDto, Company.class)),
 				CompanyDto.class);

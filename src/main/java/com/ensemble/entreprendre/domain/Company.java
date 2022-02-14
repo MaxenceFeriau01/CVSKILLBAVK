@@ -45,15 +45,15 @@ public class Company {
 	@Column(name = "COMPANY_CONTACT_NUM", nullable = false)
 	String contactNum;
 
-	@Column(name = "COMPANY_SIRET", unique = true, length = 14)
+	@Column(name = "COMPANY_SIRET", length = 14)
 	@Pattern(regexp = "[0-9]{14}", message = "{company.invalid.siret}")
 	String siret;
 
 	@Column(name = "COMPANY_DESCRIPTION")
 	String description;
 
-	@Lob
-	@Column(name = "COMPANY_LOGO", columnDefinition = "BYTEA")
+	@Type(type="org.hibernate.type.BinaryType")
+	@Column(name = "COMPANY_LOGO")
 	private byte[] logo;
 
 	@ManyToMany

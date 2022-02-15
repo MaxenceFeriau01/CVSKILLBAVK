@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-@RequestMapping(path="/job-offers")
+@RequestMapping(path="/api/job-offers")
 @RestController
 @CrossOrigin("*")
 public class JobOfferController {

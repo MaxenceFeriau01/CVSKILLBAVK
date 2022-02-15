@@ -32,7 +32,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-@RequestMapping(path = "/companies")
+@RequestMapping(path = "api/companies")
 @RestController
 @CrossOrigin("*")
 public class CompanyController {
@@ -45,7 +45,7 @@ public class CompanyController {
 
 	@PostMapping
 	// TODO Remove ROLE_TEST
-	@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
+	//@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
 	public CompanyDto create(@RequestPart("company") String company,
 			@RequestPart(value = "logo", required = false) MultipartFile file) throws ApiException, IOException {
 		CompanyDto toCreate = objectMapper.readValue(company, CompanyDto.class);
@@ -76,7 +76,7 @@ public class CompanyController {
 
 	@PutMapping(path = "/{id}")
 	// TODO Remove ROLE_TEST
-	@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
+	//@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
 	public CompanyDto update(@PathVariable(name = "id") long id, @RequestPart("company") String company,
 			@RequestPart(value = "logo", required = false) MultipartFile file) throws ApiException, IOException {
 

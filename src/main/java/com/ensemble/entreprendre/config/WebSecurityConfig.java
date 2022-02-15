@@ -78,8 +78,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
 				.authorizeRequests()
-				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/users/authenticate",
-						"/companies/**", "/activities/**") // TODO Remove the /**
+				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/api/users/authenticate",
+						"/api/companies/**", "/api/activities/**", "/api/users/register") // TODO Remove the /**
 				.permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

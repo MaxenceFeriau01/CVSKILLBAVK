@@ -34,9 +34,6 @@ public class Role {
 	@Enumerated(EnumType.STRING)
 	private RoleEnum role;
 	
-	@Column(name = "ROL_DESCRIPTION")
-	private String description;
-	
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "roles",cascade = CascadeType.ALL)
 	private Collection<User> users;
 	

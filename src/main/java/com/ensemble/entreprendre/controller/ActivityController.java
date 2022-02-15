@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-@RequestMapping(path = "/activities")
+@RequestMapping(path = "/api/activities")
 @RestController
 @CrossOrigin("*")
 public class ActivityController {

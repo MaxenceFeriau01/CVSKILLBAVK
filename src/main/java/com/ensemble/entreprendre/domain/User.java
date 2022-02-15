@@ -33,6 +33,12 @@ public class User extends FullAuditable<String>{
 	
 	@Column(name = "USR_LOGIN", nullable = false)
 	private String email;
+	
+	/*@Column(name = "USR_FIRSTNAME", nullable = false)
+	private String firstName;
+	
+	@Column(name = "USR_NAME", nullable = false)
+	private String name;*/
 
 	@Column(name = "USR_PASSWORD", nullable = false)
 	private String password;

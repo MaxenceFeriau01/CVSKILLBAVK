@@ -79,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity.csrf().disable()
 				.authorizeRequests()
 				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/api/users/authenticate",
-						"/api/companies/**", "/api/activities/**", "/api/users/register") // TODO Remove the /**
+						"/api/companies/**", "/api/activities/**", "/api/jobs/**", "/api/users/register") // TODO Remove the /**
 				.permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

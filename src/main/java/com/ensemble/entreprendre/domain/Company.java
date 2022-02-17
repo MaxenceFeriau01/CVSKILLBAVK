@@ -22,7 +22,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "COMPANY")
+@Table(name = "COMPANIES")
 public class Company {
 
 	@Id
@@ -59,4 +59,8 @@ public class Company {
 	@ManyToMany
 	@JoinTable(name = "companies_activities", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
 	Set<Activity> activities;
+	
+	@ManyToMany
+	@JoinTable(name = "companies_jobs", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "JOB_ID", referencedColumnName = "JOB_ID"))
+	Set<Job> jobs;
 }

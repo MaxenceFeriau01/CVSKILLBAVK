@@ -1,1 +1,0 @@
-create table activity (activity_id  bigserial not null, activity_name varchar(255) not null, primary key (activity_id));

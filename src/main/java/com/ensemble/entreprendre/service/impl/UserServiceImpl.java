@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
@@ -41,6 +42,10 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	@Autowired
 	GenericConverter<User, UserResponseDto> userResponseConverter;
+
+	@Autowired
+	GenericConverter<User, AuthenticationResponseDto> authenticationResponseConverter;
+
 	@Autowired
 	GenericConverter<User, UserRequestDto> userRequestConverter;
 
@@ -55,14 +60,15 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 				.password(user.getPassword()).authorities(grantedAuthorities).build();
 		return userDetails;
 	}
-	
+
 	@Override
-	public UserResponseDto findByEmail(String email) {
-		return this.userResponseConverter.entityToDto(this.userRepository.findByEmail(email).orElseThrow(()->new AccessDeniedException("Utilisateur inconnu")),UserResponseDto.class);
+	public AuthenticationResponseDto findByEmail(String email) {
+		return this.authenticationResponseConverter.entityToDto(this.userRepository.findByEmail(email)
+				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu")), AuthenticationResponseDto.class);
 	}
-	
-	public UserRequestDto createUser(UserRequestDto newUserDto, Collection<Role> roles) throws EntityNotFoundException, ApiNotFoundException,
-			MessagingException, ParseException, ApiAlreadyExistException {
+
+	public UserRequestDto createUser(UserRequestDto newUserDto, Collection<Role> roles) throws EntityNotFoundException,
+			ApiNotFoundException, MessagingException, ParseException, ApiAlreadyExistException {
 
 		Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
 		if (opOldUser.isPresent()) {

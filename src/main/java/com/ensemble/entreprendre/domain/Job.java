@@ -18,17 +18,19 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "ACTIVITIES")
-public class Activity {
+@Table(name = "JOBS")
+public class Job {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ACTIVITY_ID")
+	@Column(name = "JOB_ID")
 	Long id;
-	@Column(name = "ACTIVITY_NAME", nullable = false)
+	@Column(nullable = false)
 	String name;
-	@ManyToMany(mappedBy = "activities")
-    Set<Company> companies;
+
 	@ManyToMany(mappedBy = "jobs")
-    Set<User> users;
+	Set<Company> companies;
+	
+	@ManyToMany(mappedBy = "jobs")
+	Set<User> users;
 }

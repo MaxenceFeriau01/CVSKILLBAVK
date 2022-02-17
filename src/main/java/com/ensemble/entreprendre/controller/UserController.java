@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
+import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.CredentialsDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
@@ -43,31 +45,30 @@ public class UserController {
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private IUserService userService;
-	
 	@Autowired
 	private IRoleRepository roleRepository;
-	
-	
 
 	@PostMapping(path = "/authenticate")
-	public UserResponseDto createAuthenticationToken(@RequestBody CredentialsDto authenticationRequest)
+	public AuthenticationResponseDto createAuthenticationToken(@RequestBody CredentialsDto authenticationRequest)
 			throws ApiException {
-		
+
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword()));
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
+					authenticationRequest.getPassword()));
+		} catch (BadCredentialsException e) {
+			throw new ApiException("Identifiants incorrectes", HttpStatus.UNAUTHORIZED);
 		}
-		catch (BadCredentialsException e) {
-			throw new ApiException("Identifiants incorrectes",HttpStatus.UNAUTHORIZED);
-		}
-		
-		UserResponseDto user = userService.findByEmail(authenticationRequest.getEmail());
+
+		AuthenticationResponseDto user = userService.findByEmail(authenticationRequest.getEmail());
 		user.setToken(jwtTokenUtilBean.generateToken(userDetails));
 		return user;
 	}
+
 	/**
 	 * 
 	 * Used to create a User with a USER role
+	 * 
 	 * @param useDto
 	 * @return
 	 * @throws ApiNotFoundException
@@ -78,9 +79,9 @@ public class UserController {
 	 */
 
 	@PostMapping(path = "/register")
-	public UserRequestDto registration(@RequestBody UserRequestDto useDto) throws ApiNotFoundException, EntityNotFoundException,
-			MessagingException, ParseException, ApiAlreadyExistException {
-		return this.userService.createUser(useDto, Arrays.asList(roleRepository.findByRole(RoleEnum.USER)));
+	public void registration(@Valid @RequestBody UserRequestDto userDto) throws ApiNotFoundException,
+			EntityNotFoundException, MessagingException, ParseException, ApiAlreadyExistException {
+		this.userService.createUser(userDto, Arrays.asList(roleRepository.findByRole(RoleEnum.USER)));
 
 	}
 }

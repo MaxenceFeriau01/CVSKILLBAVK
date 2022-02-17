@@ -1,1 +1,0 @@
-create table company (company_id  bigserial not null, company_contact varchar(255) not null, company_description varchar(255), company_logo BYTEA, company_name varchar(255) not null, company_siret varchar(14), primary key (company_id));

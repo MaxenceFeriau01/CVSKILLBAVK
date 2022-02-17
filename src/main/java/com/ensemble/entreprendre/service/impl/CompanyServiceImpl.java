@@ -1,19 +1,5 @@
 package com.ensemble.entreprendre.service.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +7,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
-import com.ensemble.entreprendre.domain.Activity;
 import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.domain.Company;
 import com.ensemble.entreprendre.domain.Company_;
-import com.ensemble.entreprendre.domain.JobOffer;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;

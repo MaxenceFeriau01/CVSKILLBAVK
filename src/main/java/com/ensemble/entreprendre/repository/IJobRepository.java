@@ -4,8 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.ensemble.entreprendre.domain.JobOffer;
+import com.ensemble.entreprendre.domain.Job;
 
-public interface IJobOfferRepository extends JpaRepository<JobOffer, Long>, PagingAndSortingRepository<JobOffer, Long>, JpaSpecificationExecutor<JobOffer> {
+public interface IJobRepository extends JpaRepository<Job, Long>, PagingAndSortingRepository<Job, Long>, JpaSpecificationExecutor<Job> {
 
 }

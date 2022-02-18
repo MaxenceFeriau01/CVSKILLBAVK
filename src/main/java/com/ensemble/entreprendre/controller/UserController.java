@@ -14,17 +14,16 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.CredentialsDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
-import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -34,7 +33,6 @@ import com.ensemble.entreprendre.service.IUserService;
 
 @RequestMapping(path = "/api/users")
 @RestController
-@CrossOrigin("*")
 public class UserController {
 
 	@Autowired
@@ -77,11 +75,11 @@ public class UserController {
 	 * @throws ParseException
 	 * @throws ApiAlreadyExistException
 	 */
-
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PostMapping(path = "/register")
 	public void registration(@Valid @RequestBody UserRequestDto userDto) throws ApiNotFoundException,
 			EntityNotFoundException, MessagingException, ParseException, ApiAlreadyExistException {
-		this.userService.createUser(userDto, Arrays.asList(roleRepository.findByRole(RoleEnum.USER)));
+		this.userService.createUser(userDto, Arrays.asList(roleRepository.findByRole(RoleEnum.ROLE_USER)));
 
 	}
 }

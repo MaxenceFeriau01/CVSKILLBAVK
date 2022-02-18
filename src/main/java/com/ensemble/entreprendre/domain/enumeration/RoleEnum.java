@@ -1,5 +1,5 @@
 package com.ensemble.entreprendre.domain.enumeration;
 
 public enum RoleEnum {
-	ADMIN, USER, COMPANY;
+	ROLE_ADMIN, ROLE_USER, ROLE_COMPANY;
 }

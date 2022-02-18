@@ -76,10 +76,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		// We don't need CSRF for this example
-		httpSecurity.csrf().disable()
-				.authorizeRequests()
-				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/api/users/authenticate",
-						"/api/companies/**", "/api/activities/**", "/api/jobs/**", "/api/users/register") // TODO Remove the /**
+		httpSecurity.cors().and().csrf().disable().authorizeRequests()
+				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/api/companies",
+						"/api/activities", "/api/jobs", "/api/users/register", "/api/users/authenticate")
 				.permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -131,13 +130,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	public String generateSecureRandomPassword() {
-		Stream<Character> pwdStream = Stream.concat(getRandomNumbers(1),
-				Stream.concat(getRandomSpecialChars(1),
-						Stream.concat(getRandomAlphabets(2, true), getRandomAlphabets(4, false))));
+		Stream<Character> pwdStream = Stream.concat(getRandomNumbers(1), Stream.concat(getRandomSpecialChars(1),
+				Stream.concat(getRandomAlphabets(2, true), getRandomAlphabets(4, false))));
 		List<Character> charList = pwdStream.collect(Collectors.toList());
 		Collections.shuffle(charList);
-		String password = charList.stream()
-				.collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+		String password = charList.stream().collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
 				.toString();
 
 		System.out.println(password);

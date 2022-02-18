@@ -27,7 +27,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @RequestMapping(path = "/api/activities")
 @RestController
-@CrossOrigin("*")
 public class ActivityController {
 
 	@Autowired

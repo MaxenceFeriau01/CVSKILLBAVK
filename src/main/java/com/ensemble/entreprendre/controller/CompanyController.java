@@ -34,7 +34,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @RequestMapping(path = "api/companies")
 @RestController
-@CrossOrigin("*")
 public class CompanyController {
 
 	@Autowired
@@ -44,8 +43,8 @@ public class CompanyController {
 	ObjectMapper objectMapper;
 
 	@PostMapping
-	// TODO Remove ROLE_TEST
-	//@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
+
+	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
 	public CompanyDto create(@RequestPart("company") String company,
 			@RequestPart(value = "logo", required = false) MultipartFile file) throws ApiException, IOException {
 		CompanyDto toCreate = objectMapper.readValue(company, CompanyDto.class);
@@ -64,9 +63,10 @@ public class CompanyController {
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
 					"id" }, direction = Sort.Direction.ASC) Pageable pageable,
 			CompanyDtoFilter filter) {
-		// pageable.s
+
 		return this.companyService.getAll(pageable, filter);
 	}
+
 
 	@GetMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
@@ -75,8 +75,7 @@ public class CompanyController {
 	}
 
 	@PutMapping(path = "/{id}")
-	// TODO Remove ROLE_TEST
-	//@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
+	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
 	public CompanyDto update(@PathVariable(name = "id") long id, @RequestPart("company") String company,
 			@RequestPart(value = "logo", required = false) MultipartFile file) throws ApiException, IOException {
 
@@ -90,7 +89,7 @@ public class CompanyController {
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	// TODO Remove ROLE_TEST
-	@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
+	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
 	public CompanyDto delete(@PathVariable(name = "id") long id) throws ApiException {
 		return this.companyService.delete(id);
 	}

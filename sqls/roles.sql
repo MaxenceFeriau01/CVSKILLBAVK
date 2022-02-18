@@ -1,9 +1,9 @@
 INSERT INTO public."roles"
 (rol_role)
-VALUES('USER');
+VALUES('ROLE_USER');
 INSERT INTO public."roles"
 (rol_role)
-VALUES('COMPANY');
+VALUES('ROLE_COMPANY');
 INSERT INTO public."roles"
 (rol_role)
-VALUES('ADMIN');
+VALUES('ROLE_ADMIN');

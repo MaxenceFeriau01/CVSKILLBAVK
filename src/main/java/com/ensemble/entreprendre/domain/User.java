@@ -19,6 +19,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
+
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.domain.technical.FullAuditable;
 
@@ -68,6 +70,12 @@ public class User extends FullAuditable<String> {
 
 	@Column(nullable = true)
 	private String internshipPeriod;
+
+	@Type(type = "org.hibernate.type.BinaryType")
+	private byte[] cv;
+
+	@Type(type = "org.hibernate.type.BinaryType")
+	private byte[] coverLetter;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "users_roles", inverseJoinColumns = @JoinColumn(name = "ROL_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_ROLE"), referencedColumnName = "ROL_ID", nullable = false, updatable = false), joinColumns = @JoinColumn(name = "USR_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_USER"), referencedColumnName = "USR_ID", nullable = false, updatable = false))

@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,17 +24,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
-import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.CredentialsDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
-import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
-import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.repository.IRoleRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
 import com.ensemble.entreprendre.service.IUserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RequestMapping(path = "/api/users")
@@ -86,13 +80,15 @@ public class UserController {
 	 * @throws ParseException
 	 * @throws ApiException
 	 * @throws IOException
+	 * @throws org.apache.velocity.runtime.parser.ParseException
 	 */
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PostMapping(path = "/register")
 	public void registration(@RequestPart("user") String user,
 			@RequestPart(value = "cv", required = false) MultipartFile cv,
 			@RequestPart(value = "coverLetter", required = false) MultipartFile coverLetter)
-			throws EntityNotFoundException, MessagingException, ParseException, ApiException, IOException {
+			throws EntityNotFoundException, MessagingException, ParseException, ApiException, IOException,
+			org.apache.velocity.runtime.parser.ParseException {
 
 		UserRequestDto toCreate = objectMapper.readValue(user, UserRequestDto.class);
 		if (cv != null) {

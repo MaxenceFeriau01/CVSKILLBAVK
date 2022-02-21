@@ -1,0 +1,39 @@
+<html>  
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<style>
+        	body {
+           		color:black;               
+            }
+			article {
+				text-align:left;
+                margin-left: 15%;
+			}
+            .password {
+            	margin-left: 30%;
+            }
+            i {
+                color :#2daf8e;
+            }
+		</style>
+	</head>
+    <body>
+          
+        
+        <article>
+            <b>Bonjour $firstName $lastName,</b>
+            </br>
+            </br>
+            Nous vous remercions d&#8217;avoir complété votre inscription auprès de <i>Entreprendre Ensemble</i>.  </br>
+            
+            Cet e-mail confirme que votre compte est activé et que vous pouvez utiliser l'application pour vos recherches de stages.
+            </br>
+            </br>
+            Bien Cordialement, 
+            </br>
+            L&#8217;équipe de <i>Entreprendre Ensemble.</i>
+           
+      	<article>       
+    
+    </body>
+</html>

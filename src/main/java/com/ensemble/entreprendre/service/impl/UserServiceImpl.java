@@ -2,6 +2,7 @@ package com.ensemble.entreprendre.service.impl;
 
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,12 +23,14 @@ import org.springframework.stereotype.Service;
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.repository.IUserRepository;
+import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
 
 @Service
@@ -49,6 +52,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	@Autowired
 	GenericConverter<User, UserRequestDto> userRequestConverter;
 
+	@Autowired
+	IMailService mailService;;
+
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		User user = this.userRepository.findByEmail(email)
@@ -67,8 +73,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu")), AuthenticationResponseDto.class);
 	}
 
-	public UserRequestDto createUser(UserRequestDto newUserDto, Collection<Role> roles) throws EntityNotFoundException,
-			ApiNotFoundException, MessagingException, ParseException, ApiAlreadyExistException {
+	public UserRequestDto createUser(UserRequestDto newUserDto, Collection<Role> roles)
+			throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException,
+			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException {
 
 		Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
 		if (opOldUser.isPresent()) {
@@ -79,26 +86,17 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			String encodedPassword = bCryptPasswordEncoder.encode(newUserDto.getPassword());
 			newUser.setPassword(encodedPassword);
 			newUser.setRoles(roles);
-			// we must save before sending mail
-			// TODO mail
+
 			User user = this.userRepository.save(newUser);
-			/*
-			 * Set<Role> collectedRoles = newUserDto.getRoles().stream().map(role -> {
-			 * UserRole uRole = new UserRole(); uRole.setUser(user); uRole.setRole(role);
-			 * return uRole; }).collect(Collectors.toList());
-			 */
-			/*
-			 * List<UserRole> roles = this.userRoleRepository.saveAll(collectedRoles);
-			 * HashMap<String,String> params = new HashMap<String,String>();
-			 * params.put("password", password); params.put("firstName",
-			 * user.getFirstName()); params.put("lastName", user.getLastName());
-			 * Collection<Resource> attachments = new ArrayList<Resource>();
-			 * Optional<Collection<Resource>> opAttachments = Optional.of(attachments);
-			 * this.mailService.prepareMail(MailSubject.Password,"Bienvenue",
-			 * newUser.getEmail(), params, opAttachments);
-			 * 
-			 * user.setUserRoles(roles);
-			 */
+
+			HashMap<String, String> params = new HashMap<String, String>();
+
+			params.put("firstName", user.getFirstName());
+			params.put("lastName", user.getName());
+
+			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
+					params, null);
+
 			return this.userRequestConverter.entityToDto(user, UserRequestDto.class);
 		}
 

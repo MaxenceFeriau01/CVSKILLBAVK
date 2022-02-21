@@ -1,14 +1,15 @@
 package com.ensemble.entreprendre.exception;
 
-import org.springframework.security.access.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.ensemble.entreprendre.dto.ApiExceptionResponse;
 import com.ensemble.entreprendre.dto.MultipleApiExceptionResponse;
@@ -32,6 +33,11 @@ public class ExceptionManager {
 	@ExceptionHandler(value = AccessDeniedException.class)
 	public ResponseEntity<ApiExceptionResponse> manageAccessRefusedException(final RuntimeException e) {
 		return this.getExceptionResponse(e, HttpStatus.FORBIDDEN, e.getMessage());
+	}
+	
+	@ExceptionHandler(value=MaxUploadSizeExceededException.class)
+	public ResponseEntity<ApiExceptionResponse> manageFileSizeLimitExceededException(final RuntimeException e) {
+		return this.getExceptionResponse(e, HttpStatus.BAD_REQUEST, "Les fichiers ne peuvent pas dépasser 5MB");
 	}
 
 //	@ExceptionHandler(value = InternalAuthenticationServiceException.class)

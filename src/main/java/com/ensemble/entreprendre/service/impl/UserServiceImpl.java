@@ -12,8 +12,11 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,6 +31,7 @@ import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
+import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.service.IMailService;
@@ -71,6 +75,20 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	public AuthenticationResponseDto findByEmail(String email) {
 		return this.authenticationResponseConverter.entityToDto(this.userRepository.findByEmail(email)
 				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu")), AuthenticationResponseDto.class);
+	}
+
+	public UserDetails getConnectedUser() throws ApiException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication == null) {
+			throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
+		}
+		Object principal = authentication.getPrincipal();
+		if (principal != null && principal instanceof UserDetails) {
+			return (UserDetails) principal;
+		}
+		throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
+
 	}
 
 	public UserRequestDto createUser(UserRequestDto newUserDto, Collection<Role> roles)

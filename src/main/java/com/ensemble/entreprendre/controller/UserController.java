@@ -12,8 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,7 @@ import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.CredentialsDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
+import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.repository.IRoleRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
@@ -48,7 +51,6 @@ public class UserController {
 	private IUserService userService;
 	@Autowired
 	private IRoleRepository roleRepository;
-
 	@Autowired
 	ObjectMapper objectMapper;
 
@@ -67,6 +69,30 @@ public class UserController {
 		AuthenticationResponseDto user = userService.findByEmail(authenticationRequest.getEmail());
 		user.setToken(jwtTokenUtilBean.generateToken(userDetails));
 		return user;
+	}
+
+	/**
+	 * Get the roles of the connected user
+	 * 
+	 * @return roles
+	 * @throws ApiException
+	 */
+	@GetMapping(path = "/self/roles")
+	public String[] getConnectedUserRoles() throws ApiException {
+		return userService.getConnectedUser().getAuthorities().stream().map(GrantedAuthority::getAuthority)
+				.toArray(String[]::new);
+	}
+
+	/**
+	 * Get the connected
+	 * 
+	 * @return userResponseDto
+	 * @throws ApiException
+	 */
+	@GetMapping(path = "/self")
+	public UserResponseDto getConnectedUser() throws ApiException {
+		return null;
+
 	}
 
 	/**

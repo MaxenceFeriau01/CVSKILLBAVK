@@ -1,8 +1,8 @@
 package com.ensemble.entreprendre.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,9 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Type;
 
 import com.ensemble.entreprendre.domain.technical.FullAuditable;
 
@@ -67,22 +66,19 @@ public class User extends FullAuditable<String> {
 
 	@Column(nullable = true)
 	private String internshipPeriod;
+	//TODO see to remove eager and avoid the bug with modelMapper
+	@OneToMany(mappedBy = "userFile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	private Collection<FileDb> files;
 
-	@Type(type = "org.hibernate.type.BinaryType")
-	private byte[] cv;
-
-	@Type(type = "org.hibernate.type.BinaryType")
-	private byte[] coverLetter;
-
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "users_roles", inverseJoinColumns = @JoinColumn(name = "ROL_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_ROLE"), referencedColumnName = "ROL_ID", nullable = false, updatable = false), joinColumns = @JoinColumn(name = "USR_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_USER"), referencedColumnName = "USR_ID", nullable = false, updatable = false))
 	private Collection<Role> roles;
 
 	@ManyToMany
 	@JoinTable(name = "users_jobs", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "JOB_ID", referencedColumnName = "JOB_ID"))
-	Set<Job> jobs;
+	private Collection<Job> jobs;
 
 	@ManyToMany
 	@JoinTable(name = "users_activities", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
-	Set<Activity> activities;
+	Collection<Activity> activities;
 }

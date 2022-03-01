@@ -3,6 +3,8 @@ package com.ensemble.entreprendre.dto;
 import java.time.LocalDate;
 import java.util.Set;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,9 +34,9 @@ public class UserRequestDto {
 
 	private String internshipPeriod;
 
-	private byte[] cv;
+	private MultipartFile cv;
 
-	private byte[] coverLetter;
+	private MultipartFile coverLetter;
 
 	private Set<ActivityDto> activities;
 

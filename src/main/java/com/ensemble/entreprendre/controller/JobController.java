@@ -27,7 +27,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @RequestMapping(path = "/api/jobs")
 @RestController
-@CrossOrigin("*")
 public class JobController {
 
 	@Autowired

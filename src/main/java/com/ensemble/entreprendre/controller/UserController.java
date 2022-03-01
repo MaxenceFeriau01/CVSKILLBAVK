@@ -8,7 +8,11 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -66,7 +70,8 @@ public class UserController {
 			throw new ApiException("Identifiants incorrectes", HttpStatus.UNAUTHORIZED);
 		}
 
-		AuthenticationResponseDto user = userService.findByEmail(authenticationRequest.getEmail());
+		AuthenticationResponseDto user = userService
+				.findByEmailToAuthenticationResponseDto(authenticationRequest.getEmail());
 		user.setToken(jwtTokenUtilBean.generateToken(userDetails));
 		return user;
 	}
@@ -91,7 +96,8 @@ public class UserController {
 	 */
 	@GetMapping(path = "/self")
 	public UserResponseDto getConnectedUser() throws ApiException {
-		return null;
+		var userDetails = userService.getConnectedUser();
+		return userService.findByEmailToUserResponseDto(userDetails.getUsername());
 
 	}
 
@@ -121,13 +127,13 @@ public class UserController {
 			if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
 				throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
 			}
-			toCreate.setCv(cv.getBytes());
+			toCreate.setCv(cv);
 		}
 		if (coverLetter != null) {
 			if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
 				throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
 			}
-			toCreate.setCoverLetter(coverLetter.getBytes());
+			toCreate.setCoverLetter(coverLetter);
 
 		}
 		this.userService.createUser(toCreate, Arrays.asList(roleRepository.findByRole(RoleEnum.ROLE_USER)));

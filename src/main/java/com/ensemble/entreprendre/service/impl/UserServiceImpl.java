@@ -1,6 +1,8 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +26,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
+import com.ensemble.entreprendre.domain.FileDb;
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
@@ -72,9 +76,16 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	}
 
 	@Override
-	public AuthenticationResponseDto findByEmail(String email) {
+	public AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email) {
 		return this.authenticationResponseConverter.entityToDto(this.userRepository.findByEmail(email)
 				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu")), AuthenticationResponseDto.class);
+	}
+
+	@Override
+	public UserResponseDto findByEmailToUserResponseDto(String email) {
+		User user = this.userRepository.findByEmail(email)
+				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+		return this.userResponseConverter.entityToDto(user, UserResponseDto.class);
 	}
 
 	public UserDetails getConnectedUser() throws ApiException {
@@ -91,16 +102,31 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	}
 
+	@Override
 	public UserRequestDto createUser(UserRequestDto newUserDto, Collection<Role> roles)
 			throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException,
-			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException {
+			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException, IOException {
 
 		Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
 		if (opOldUser.isPresent()) {
 			throw new ApiAlreadyExistException("Cette email est déjà utilisée");
 		} else {
 			User newUser = this.userRequestConverter.dtoToEntity(newUserDto, User.class);
+			Collection<FileDb> files = new ArrayList<>();
+			if (newUserDto.getCoverLetter() != null) {
+				FileDb fileDb = new FileDb(null, newUserDto.getCoverLetter().getOriginalFilename(),
+						FileTypeEnum.COVER_LETTER, newUserDto.getCoverLetter().getBytes(), newUser);
+				files.add(fileDb);
+			}
 
+			if (newUserDto.getCv() != null) {
+				FileDb fileDb = new FileDb(null, newUserDto.getCv().getOriginalFilename(), FileTypeEnum.CV,
+						newUserDto.getCv().getBytes(), newUser);
+				files.add(fileDb);
+			}
+			if (files.size() > 0) {
+				newUser.setFiles(files);
+			}
 			String encodedPassword = bCryptPasswordEncoder.encode(newUserDto.getPassword());
 			newUser.setPassword(encodedPassword);
 			newUser.setRoles(roles);

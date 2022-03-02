@@ -30,7 +30,7 @@ public class Job {
 
 	@ManyToMany(mappedBy = "jobs")
 	Set<Company> companies;
-	
+
 	@ManyToMany(mappedBy = "jobs")
 	Set<User> users;
 }

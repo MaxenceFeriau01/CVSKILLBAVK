@@ -27,7 +27,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @RequestMapping(path = "/api/jobs")
 @RestController
-@CrossOrigin("*")
 public class JobController {
 
 	@Autowired
@@ -48,15 +47,15 @@ public class JobController {
 					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
 	@GetMapping
 	public Page<JobDto> getAll(
-			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable) throws ApiException {
-		
+			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable)
+			throws ApiException {
+
 		return this.jobService.getAll(pageable);
 	}
 
 	@GetMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public JobDto getById(@PathVariable(name = "id") long id) throws ApiException {
-		
 		return this.jobService.getById(id);
 	}
 

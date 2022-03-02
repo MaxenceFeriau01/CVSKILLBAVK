@@ -1,6 +1,8 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +24,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
+import com.ensemble.entreprendre.domain.FileDb;
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
@@ -40,6 +45,8 @@ import com.ensemble.entreprendre.service.IUserService;
 @Service
 @Transactional
 public class UserServiceImpl implements IUserService, UserDetailsService {
+
+	public static final String ACCEPTED_FILE_FORMAT = "application/pdf";
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -72,9 +79,16 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	}
 
 	@Override
-	public AuthenticationResponseDto findByEmail(String email) {
+	public AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email) {
 		return this.authenticationResponseConverter.entityToDto(this.userRepository.findByEmail(email)
 				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu")), AuthenticationResponseDto.class);
+	}
+
+	@Override
+	public UserResponseDto findByEmailToUserResponseDto(String email) {
+		User user = this.userRepository.findByEmail(email)
+				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+		return this.userResponseConverter.entityToDto(user, UserResponseDto.class);
 	}
 
 	public UserDetails getConnectedUser() throws ApiException {
@@ -91,16 +105,20 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	}
 
-	public UserRequestDto createUser(UserRequestDto newUserDto, Collection<Role> roles)
-			throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException,
-			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException {
+	@Override
+	public void createUser(UserRequestDto newUserDto, Collection<Role> roles, MultipartFile cv,
+			MultipartFile coverLetter) throws EntityNotFoundException, MessagingException,
+			ParseException, org.apache.velocity.runtime.parser.ParseException, IOException, ApiException {
 
 		Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
 		if (opOldUser.isPresent()) {
 			throw new ApiAlreadyExistException("Cette email est déjà utilisée");
 		} else {
 			User newUser = this.userRequestConverter.dtoToEntity(newUserDto, User.class);
-
+			Collection<FileDb> files = getUserFileDbs(newUserDto, newUser,cv,coverLetter);
+			if (files.size() > 0) {
+				newUser.setFiles(files);
+			}
 			String encodedPassword = bCryptPasswordEncoder.encode(newUserDto.getPassword());
 			newUser.setPassword(encodedPassword);
 			newUser.setRoles(roles);
@@ -114,10 +132,53 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
 					params, null);
-
-			return this.userRequestConverter.entityToDto(user, UserRequestDto.class);
 		}
 
+	}
+
+	@Override
+	public UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter)
+			throws IOException, ApiException {
+
+		User currentUser = this.userRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+		userDto.setId(id);
+		User newUser = this.userRequestConverter.dtoToEntity(userDto, User.class);
+		Collection<FileDb> files = getUserFileDbs(userDto, newUser,cv,coverLetter);
+
+		if (files.size() > 0) {
+			newUser.setFiles(files);
+		} else {
+			newUser.setFiles(currentUser.getFiles());
+		}
+		newUser.setPassword(currentUser.getPassword());
+
+		return this.userResponseConverter.entityToDto(this.userRepository.save(newUser), UserResponseDto.class);
+	}
+
+	private Collection<FileDb> getUserFileDbs(UserRequestDto userDto, User user, MultipartFile cv,
+			MultipartFile coverLetter) throws IOException, ApiException {
+		Collection<FileDb> files = new ArrayList<>();
+
+		if (cv != null) {
+			if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
+				throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
+			}
+			FileDb fileDb = new FileDb(null, userDto.getCoverLetter().getOriginalFilename(), FileTypeEnum.COVER_LETTER,
+					userDto.getCoverLetter().getBytes(), user);
+			files.add(fileDb);
+		}
+		if (coverLetter != null) {
+			if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
+				throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
+			}
+			FileDb fileDb = new FileDb(null, userDto.getCv().getOriginalFilename(), FileTypeEnum.CV,
+					userDto.getCv().getBytes(), user);
+			files.add(fileDb);
+
+		}
+
+		return files;
 	}
 
 }

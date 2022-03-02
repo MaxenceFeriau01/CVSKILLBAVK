@@ -1,6 +1,12 @@
 package com.ensemble.entreprendre.dto;
 
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.Collection;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,15 +15,37 @@ import lombok.Setter;
 @Setter
 public class UserResponseDto {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "USR_ID")
+	private Long id;
+
 	private String email;
 
-	private String phone;
-	
-	private String name;
-	
 	private String firstName;
 
-	private Set<RoleDto> roles;
-	
-	private String token;
+	private String name;
+
+	private String phone;
+
+	private int postalCode;
+
+	private LocalDate dateOfBirth;
+
+	private String status;
+
+	private String civility;
+
+	private String diploma;
+
+	private String internshipPeriod;
+
+	Collection<PartialFileDbDto> files;
+
+	Collection<ActivityDto> activities;
+
+	Collection<JobDto> jobs;
+
+	private Collection<RoleDto> roles;
+
 }

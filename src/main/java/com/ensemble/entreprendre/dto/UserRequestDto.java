@@ -1,7 +1,7 @@
 package com.ensemble.entreprendre.dto;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.Collection;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +13,8 @@ import lombok.Setter;
 public class UserRequestDto {
 
 	private String email;
+
+	private Long id;
 
 	private String firstName;
 
@@ -38,7 +40,9 @@ public class UserRequestDto {
 
 	private MultipartFile coverLetter;
 
-	private Set<ActivityDto> activities;
+	private Collection<ActivityDto> activities;
 
-	private Set<JobDto> jobs;
+	private Collection<JobDto> jobs;
+
+	private Collection<RoleDto> roles;
 }

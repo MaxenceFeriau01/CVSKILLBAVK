@@ -8,6 +8,7 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
@@ -19,9 +20,11 @@ import com.ensemble.entreprendre.exception.ApiNotFoundException;
 
 public interface IUserService {
 
-	UserRequestDto createUser(UserRequestDto useDto, Collection<Role> roles)
+	void createUser(UserRequestDto userDto, Collection<Role> roles, MultipartFile cv, MultipartFile coverLetter)
 			throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException,
-			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException, IOException;
+			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException, IOException, ApiException;
+
+	UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter) throws IOException, ApiNotFoundException, ApiException;
 
 	AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email);
 

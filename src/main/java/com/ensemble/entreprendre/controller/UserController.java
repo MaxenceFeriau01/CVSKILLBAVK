@@ -8,11 +8,7 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +16,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -42,8 +40,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping(path = "/api/users")
 @RestController
 public class UserController {
-
-	public static final String ACCEPTED_FILE_FORMAT = "application/pdf";
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -73,6 +69,7 @@ public class UserController {
 		AuthenticationResponseDto user = userService
 				.findByEmailToAuthenticationResponseDto(authenticationRequest.getEmail());
 		user.setToken(jwtTokenUtilBean.generateToken(userDetails));
+
 		return user;
 	}
 
@@ -101,6 +98,17 @@ public class UserController {
 
 	}
 
+	@ResponseStatus(HttpStatus.OK)
+	@PutMapping(path = "/{id}")
+	public UserResponseDto updateUser(@PathVariable(name = "id") long id, @RequestPart("user") String user,
+			@RequestPart(value = "cv", required = false) MultipartFile cv,
+			@RequestPart(value = "coverLetter", required = false) MultipartFile coverLetter)
+			throws IOException, ApiException {
+		UserRequestDto toUpdate = objectMapper.readValue(user, UserRequestDto.class);
+
+		return this.userService.updateUser(id, toUpdate, cv, coverLetter);
+	}
+
 	/**
 	 * 
 	 * Used to create a User with a USER role
@@ -123,20 +131,9 @@ public class UserController {
 			org.apache.velocity.runtime.parser.ParseException {
 
 		UserRequestDto toCreate = objectMapper.readValue(user, UserRequestDto.class);
-		if (cv != null) {
-			if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
-				throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
-			}
-			toCreate.setCv(cv);
-		}
-		if (coverLetter != null) {
-			if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
-				throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
-			}
-			toCreate.setCoverLetter(coverLetter);
 
-		}
-		this.userService.createUser(toCreate, Arrays.asList(roleRepository.findByRole(RoleEnum.ROLE_USER)));
+		this.userService.createUser(toCreate, Arrays.asList(roleRepository.findByRole(RoleEnum.ROLE_USER)), cv,
+				coverLetter);
 
 	}
 }

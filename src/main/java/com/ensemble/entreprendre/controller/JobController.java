@@ -1,5 +1,7 @@
 package com.ensemble.entreprendre.controller;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ensemble.entreprendre.dto.JobDto;
 import com.ensemble.entreprendre.exception.ApiException;
-import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.service.IJobService;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -45,12 +46,18 @@ public class JobController {
 			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"),
 			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
 					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
-	@GetMapping
+	@GetMapping("/search")
 	public Page<JobDto> getAll(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable)
 			throws ApiException {
 
-		return this.jobService.getAll(pageable);
+		return this.jobService.getAllWithFilter(pageable);
+	}
+
+	@GetMapping
+	public Collection<JobDto> getAll() throws ApiException {
+
+		return this.jobService.getAll();
 	}
 
 	@GetMapping(path = "/{id}")
@@ -68,8 +75,8 @@ public class JobController {
 
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	// TODO Remove ROLE_TEST
-	@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
+
+	@Secured({ "ROLE_ADMIN" })
 	public JobDto delete(@PathVariable(name = "id") long id) throws ApiException {
 		return this.jobService.delete(id);
 	}

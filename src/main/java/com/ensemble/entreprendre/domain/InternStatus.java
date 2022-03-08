@@ -1,13 +1,11 @@
 package com.ensemble.entreprendre.domain;
 
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -16,19 +14,19 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "JOBS")
-public class Job {
+@Table(name = "INTERNS_STATUS")
+public class InternStatus {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "JOB_ID")
-	Long id;
-	@Column(nullable = false)
-	String name;
+	@Column(name = "STATUS_ID")
+	private Long id;
+	@Column(name = "STATUS_NAME", nullable = false)
+	private String name;
 
-	@ManyToMany(mappedBy = "searchedJobs")
-	Set<Company> companies;
+	@OneToOne(mappedBy = "status")
+	private User user;
 
-	@ManyToMany(mappedBy = "jobs")
-	Set<User> users;
+	@OneToOne(mappedBy = "status")
+	private InternType internType;
 }

@@ -43,6 +43,6 @@ public class FileDb {
 
 	@ManyToOne
 	@JoinColumn(name = "USR_ID", nullable = false)
-	private User userFile;
+	private User user;
 
 }

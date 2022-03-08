@@ -1,5 +1,7 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +33,13 @@ public class JobServiceImpl implements IJobService {
 	}
 
 	@Override
-	public Page<JobDto> getAll(Pageable pageable) {
+	public Page<JobDto> getAllWithFilter(Pageable pageable) {
 		return this.jobConverter.entitiesToDtos(this.jobRepository.findAll(pageable), JobDto.class);
+	}
+
+	@Override
+	public Collection<JobDto> getAll() {
+		return this.jobConverter.entitiesToDtos(this.jobRepository.findAll(), JobDto.class);
 	}
 
 	@Override
@@ -41,24 +48,21 @@ public class JobServiceImpl implements IJobService {
 			throw new TechnicalException("job.post.not.null");
 		}
 		BusinessException businessException = new BusinessException();
-		if (toCreate.getName()== null || toCreate.getName().isBlank()) {
+		if (toCreate.getName() == null || toCreate.getName().isBlank()) {
 			businessException.addMessage("job.post.name.not.empty");
 		}
 		if (businessException.isNotEmpty()) {
 			throw businessException;
 		}
-		return this.jobConverter.entityToDto(
-				this.jobRepository.save(this.jobConverter.dtoToEntity(toCreate, Job.class)),
-				JobDto.class);
+		return this.jobConverter
+				.entityToDto(this.jobRepository.save(this.jobConverter.dtoToEntity(toCreate, Job.class)), JobDto.class);
 	}
 
 	@Override
 	public JobDto update(Long id, JobDto updatedDto) throws ApiException {
-		this.jobRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
+		this.jobRepository.findById(id).orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
 		return this.jobConverter.entityToDto(
-				this.jobRepository.save(this.jobConverter.dtoToEntity(updatedDto, Job.class)),
-				JobDto.class);
+				this.jobRepository.save(this.jobConverter.dtoToEntity(updatedDto, Job.class)), JobDto.class);
 	}
 
 	@Override

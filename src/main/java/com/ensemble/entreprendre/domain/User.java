@@ -7,7 +7,6 @@ import java.util.Collection;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.ensemble.entreprendre.domain.technical.FullAuditable;
@@ -55,8 +55,9 @@ public class User extends FullAuditable<String> {
 	@Column(nullable = false)
 	private LocalDate dateOfBirth;
 
-	@Column(nullable = false)
-	private String status;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "STATUS_ID", referencedColumnName = "STATUS_ID")
+	private InternStatus status;
 
 	@Column(nullable = false)
 	private String civility;
@@ -66,8 +67,8 @@ public class User extends FullAuditable<String> {
 
 	@Column(nullable = true)
 	private String internshipPeriod;
-	//TODO see to remove eager and avoid the bug with modelMapper
-	@OneToMany(mappedBy = "userFile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<FileDb> files;
 
 	@ManyToMany(cascade = CascadeType.ALL)

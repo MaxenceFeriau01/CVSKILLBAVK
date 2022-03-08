@@ -1,5 +1,7 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +33,13 @@ public class ActivityServiceImpl implements IActivityService {
 	}
 
 	@Override
-	public Page<ActivityDto> getAll(Pageable pageable) {
+	public Page<ActivityDto> getAllWithFilter(Pageable pageable) {
 		return this.activityConverter.entitiesToDtos(this.activityRepository.findAll(pageable), ActivityDto.class);
+	}
+
+	@Override
+	public Collection<ActivityDto> getAll() {
+		return this.activityConverter.entitiesToDtos(this.activityRepository.findAll(), ActivityDto.class);
 	}
 
 	@Override
@@ -41,7 +48,7 @@ public class ActivityServiceImpl implements IActivityService {
 			throw new TechnicalException("activity.post.not.null");
 		}
 		BusinessException businessException = new BusinessException();
-		if (toCreate.getName()== null || toCreate.getName().isBlank()) {
+		if (toCreate.getName() == null || toCreate.getName().isBlank()) {
 			businessException.addMessage("activity.post.name.not.empty");
 		}
 		if (businessException.isNotEmpty()) {

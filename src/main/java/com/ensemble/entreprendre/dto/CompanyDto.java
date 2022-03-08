@@ -1,6 +1,6 @@
 package com.ensemble.entreprendre.dto;
 
-import java.util.Set;
+import java.util.Collection;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,5 +18,14 @@ public class CompanyDto {
 	String siret;
 	String description;
 	byte[] logo;
-	Set<ActivityDto> activities;
+	String town;
+	String address;
+	String postalCode;
+	String type;
+	String desiredInternsNumber;
+	boolean isPaidAndLongTermInternship;
+	Collection<ActivityDto> activities;
+	Collection<ActivityDto> searchedActivities;
+	Collection<JobDto> searchedJobs;
+	Collection<InternTypeDto> searchedInternType;
 }

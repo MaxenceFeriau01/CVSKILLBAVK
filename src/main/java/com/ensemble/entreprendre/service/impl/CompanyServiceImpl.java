@@ -1,19 +1,20 @@
 package com.ensemble.entreprendre.service.impl;
 
-import java.util.Collection;
+import javax.persistence.criteria.CriteriaBuilder.In;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.domain.Company;
 import com.ensemble.entreprendre.domain.Company_;
 import com.ensemble.entreprendre.domain.InternStatus;
+import com.ensemble.entreprendre.domain.InternStatus_;
+import com.ensemble.entreprendre.domain.InternType_;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -22,8 +23,6 @@ import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
 import com.ensemble.entreprendre.service.ICompanyService;
-
-import lombok.experimental.var;
 
 @Service
 public class CompanyServiceImpl implements ICompanyService {
@@ -52,9 +51,6 @@ public class CompanyServiceImpl implements ICompanyService {
 		if (toCreate.getContactLastName() == null || toCreate.getContactLastName().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
-		if (toCreate.getContactMail() == null || toCreate.getContactMail().isBlank()) {
-			businessException.addMessage("company.post.contact.not.empty");
-		}
 		if (toCreate.getContactNum() == null || toCreate.getContactNum().isBlank()) {
 			businessException.addMessage("company.post.contact.not.empty");
 		}
@@ -71,7 +67,7 @@ public class CompanyServiceImpl implements ICompanyService {
 	public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
 		Specification<Company> specification = null;
 		if (filter != null) {
-			if (filter.getActivityId() != null) {
+			if (filter.getActivities() != null) {
 				specification = addActivityCriteria(filter, specification);
 			}
 			if (filter.getStatusId() != null) {
@@ -81,17 +77,11 @@ public class CompanyServiceImpl implements ICompanyService {
 				specification = addBoolCriteria(filter, specification);
 			}
 		}
-		Collection<Company> companies = companyRepository.findAll(pageable).getContent();
-		var test = companies.iterator().next().getSearchedInternsType();
 		if (specification == null) {
 			return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(pageable), CompanyDto.class);
 		}
-		
-		Page<Company> comps = this.companyRepository.findAll(specification, pageable);
-		
-		Page<CompanyDto> companies = this.companyConverter.entitiesToDtos(comps,
+		return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),
 				CompanyDto.class);
-		return companies;
 	}
 
 	@Override
@@ -126,9 +116,17 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
 		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			/*
 			criteriaQuery.distinct(true);
 			return criteriaBuilder.equal(root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID),
-					filter.getActivityId());
+					filter.getStatusId());
+			*/
+			if (filter.getActivities() != null && !filter.getActivities().isEmpty()) {
+				return root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID).in(filter.getActivities());
+			} else {
+				return criteriaBuilder.and();
+			}
+			
 		};
 		return ensureSpecification(origin, target);
 	}
@@ -136,7 +134,7 @@ public class CompanyServiceImpl implements ICompanyService {
 	private Specification<Company> addTypesCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
 		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
 			criteriaQuery.distinct(true);
-			return criteriaBuilder.equal(root.joinSet("searchedInternType").<InternStatus>get("status").<Long>get("id"),
+			return criteriaBuilder.equal(root.join(Company_.SEARCHED_INTERNS_TYPE).<InternStatus>get(InternType_.INTERN_STATUS).<Long>get(InternStatus_.ID),
 					filter.getStatusId());
 		};
 		return ensureSpecification(origin, target);
@@ -145,7 +143,7 @@ public class CompanyServiceImpl implements ICompanyService {
 	private Specification<Company> addBoolCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
 		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
 			criteriaQuery.distinct(true);
-			return criteriaBuilder.equal(root.get("isPaidAndLongTermInternship"),
+			return criteriaBuilder.equal(root.get(Company_.IS_PAID_AND_LONG_TERM_INTERNSHIP),
 					filter.getIsPaidAndLongTermInternship());
 		};
 		return ensureSpecification(origin, target);

@@ -14,7 +14,7 @@ import com.ensemble.entreprendre.dto.InternStatusDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.service.IInternStatusService;
 
-@RequestMapping(path = "/api/internStatus")
+@RequestMapping(path = "/api/intern-status")
 @RestController
 public class InternStatusController {
 	

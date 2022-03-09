@@ -1,10 +1,13 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Activity_;
@@ -18,6 +21,8 @@ import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
 import com.ensemble.entreprendre.service.ICompanyService;
+
+import lombok.experimental.var;
 
 @Service
 public class CompanyServiceImpl implements ICompanyService {
@@ -55,12 +60,12 @@ public class CompanyServiceImpl implements ICompanyService {
 		if (businessException.isNotEmpty()) {
 			throw businessException;
 		}
-
-		return this.companyConverter.entityToDto(
-				this.companyRepository.save(this.companyConverter.dtoToEntity(toCreate, Company.class)),
-				CompanyDto.class);
+		Company newCompany = this.companyConverter.dtoToEntity(toCreate, Company.class);
+		newCompany.getSearchedInternsType().stream().forEach(t -> t.setCompany(newCompany));
+		return this.companyConverter.entityToDto(this.companyRepository.save(newCompany), CompanyDto.class);
 	}
 
+	@javax.transaction.Transactional
 	@Override
 	public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
 		Specification<Company> specification = null;
@@ -69,6 +74,8 @@ public class CompanyServiceImpl implements ICompanyService {
 				specification = addActivityCriteria(filter, specification);
 			}
 		}
+		Collection<Company> companies = companyRepository.findAll(pageable).getContent();
+		var test = companies.iterator().next().getSearchedInternsType();
 		if (specification == null) {
 			return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(pageable), CompanyDto.class);
 		}
@@ -85,10 +92,9 @@ public class CompanyServiceImpl implements ICompanyService {
 			// Set the old logo if not changed
 			updatedDto.setLogo(oldCompany.getLogo());
 		}
-
-		return this.companyConverter.entityToDto(
-				this.companyRepository.save(this.companyConverter.dtoToEntity(updatedDto, Company.class)),
-				CompanyDto.class);
+		Company newCompany = this.companyConverter.dtoToEntity(updatedDto, Company.class);
+		newCompany.getSearchedInternsType().stream().forEach(t -> t.setCompany(newCompany));
+		return this.companyConverter.entityToDto(this.companyRepository.save(newCompany), CompanyDto.class);
 	}
 
 	@Override

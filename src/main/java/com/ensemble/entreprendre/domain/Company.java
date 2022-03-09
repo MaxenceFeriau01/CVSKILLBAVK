@@ -1,10 +1,11 @@
 package com.ensemble.entreprendre.domain;
 
-import java.util.Set;
+import java.util.Collection;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,12 +18,10 @@ import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.Type;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "COMPANIES")
 public class Company {
 
@@ -77,17 +76,17 @@ public class Company {
 
 	@ManyToMany
 	@JoinTable(name = "companies_activities", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
-	private Set<Activity> activities;
+	private Collection<Activity> activities;
 
 	@ManyToMany
 	@JoinTable(name = "companies_searched_jobs", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "JOB_ID", referencedColumnName = "JOB_ID"))
-	private Set<Job> searchedJobs;
+	private Collection<Job> searchedJobs;
 
 	@ManyToMany
 	@JoinTable(name = "companies_searched_activities", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
-	private Set<Activity> searchedActivities;
+	private Collection<Activity> searchedActivities;
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<InternType> searchedInternType;
+	private Collection<InternType> searchedInternsType;
 
 }

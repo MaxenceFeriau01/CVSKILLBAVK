@@ -2,11 +2,9 @@ package com.ensemble.entreprendre.dto;
 
 import java.util.Collection;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class CompanyDto {
 
 	Long id;
@@ -27,5 +25,5 @@ public class CompanyDto {
 	Collection<ActivityDto> activities;
 	Collection<ActivityDto> searchedActivities;
 	Collection<JobDto> searchedJobs;
-	Collection<InternTypeDto> searchedInternType;
+	Collection<InternTypeDto> searchedInternsType;
 }

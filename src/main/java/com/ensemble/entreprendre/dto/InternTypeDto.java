@@ -9,7 +9,7 @@ public class InternTypeDto {
 
 	private Long id;
 	
-	private InternStatusDto status;
+	private InternStatusDto internStatus;
 	
 	private String period;
 

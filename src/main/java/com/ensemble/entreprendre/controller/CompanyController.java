@@ -86,7 +86,6 @@ public class CompanyController {
 
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	// TODO Remove ROLE_TEST
 	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
 	public CompanyDto delete(@PathVariable(name = "id") long id) throws ApiException {
 		return this.companyService.delete(id);

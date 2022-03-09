@@ -13,6 +13,7 @@ import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.domain.Company;
 import com.ensemble.entreprendre.domain.Company_;
+import com.ensemble.entreprendre.domain.InternStatus;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -73,14 +74,24 @@ public class CompanyServiceImpl implements ICompanyService {
 			if (filter.getActivityId() != null) {
 				specification = addActivityCriteria(filter, specification);
 			}
+			if (filter.getStatusId() != null) {
+				specification = addTypesCriteria(filter, specification);
+			}
+			if (filter.getIsPaidAndLongTermInternship() != null) {
+				specification = addBoolCriteria(filter, specification);
+			}
 		}
 		Collection<Company> companies = companyRepository.findAll(pageable).getContent();
 		var test = companies.iterator().next().getSearchedInternsType();
 		if (specification == null) {
 			return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(pageable), CompanyDto.class);
 		}
-		return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),
+		
+		Page<Company> comps = this.companyRepository.findAll(specification, pageable);
+		
+		Page<CompanyDto> companies = this.companyConverter.entitiesToDtos(comps,
 				CompanyDto.class);
+		return companies;
 	}
 
 	@Override
@@ -118,6 +129,24 @@ public class CompanyServiceImpl implements ICompanyService {
 			criteriaQuery.distinct(true);
 			return criteriaBuilder.equal(root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID),
 					filter.getActivityId());
+		};
+		return ensureSpecification(origin, target);
+	}
+	
+	private Specification<Company> addTypesCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			criteriaQuery.distinct(true);
+			return criteriaBuilder.equal(root.joinSet("searchedInternType").<InternStatus>get("status").<Long>get("id"),
+					filter.getStatusId());
+		};
+		return ensureSpecification(origin, target);
+	}
+	
+	private Specification<Company> addBoolCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			criteriaQuery.distinct(true);
+			return criteriaBuilder.equal(root.get("isPaidAndLongTermInternship"),
+					filter.getIsPaidAndLongTermInternship());
 		};
 		return ensureSpecification(origin, target);
 	}

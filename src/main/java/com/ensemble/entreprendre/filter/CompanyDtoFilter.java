@@ -7,4 +7,6 @@ import lombok.Setter;
 @Setter
 public class CompanyDtoFilter {
 	Long activityId;
+	Long statusId;
+	Boolean isPaidAndLongTermInternship;
 }

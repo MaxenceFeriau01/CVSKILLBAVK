@@ -61,7 +61,7 @@ public class Company {
 	@Column(name = "COMPANY_TYPE", nullable = false)
 	private String type;
 
-	@Column(name = "COMPANY_DESCRIPTION")
+	@Column(name = "COMPANY_DESCRIPTION", length = 1024)
 	private String description;
 
 	@Column(name = "COMPANY_DESIRED_INTERNS_NUMBER", nullable = false)

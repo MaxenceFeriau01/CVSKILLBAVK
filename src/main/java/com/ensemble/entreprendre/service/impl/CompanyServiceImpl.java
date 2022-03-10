@@ -1,8 +1,21 @@
 package com.ensemble.entreprendre.service.impl;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Optional;
 
+import javax.mail.MessagingException;
+import javax.persistence.EntityNotFoundException;
+
+import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,6 +28,8 @@ import com.ensemble.entreprendre.domain.Company_;
 import com.ensemble.entreprendre.domain.InternStatus;
 import com.ensemble.entreprendre.domain.InternStatus_;
 import com.ensemble.entreprendre.domain.InternType_;
+import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -23,6 +38,8 @@ import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
 import com.ensemble.entreprendre.service.ICompanyService;
+import com.ensemble.entreprendre.service.IMailService;
+import com.ensemble.entreprendre.service.IUserService;
 
 @Service
 public class CompanyServiceImpl implements ICompanyService {
@@ -32,6 +49,12 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	@Autowired
 	GenericConverter<Company, CompanyDto> companyConverter;
+
+	@Autowired
+	IMailService mailService;
+
+	@Autowired
+	IUserService userService;
 
 	@Override
 	public CompanyDto getById(long id) throws ApiException {
@@ -121,20 +144,20 @@ public class CompanyServiceImpl implements ICompanyService {
 			} else {
 				return criteriaBuilder.and();
 			}
-			
+
 		};
 		return ensureSpecification(origin, target);
 	}
-	
+
 	private Specification<Company> addTypesCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
 		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
 			criteriaQuery.distinct(true);
-			return criteriaBuilder.equal(root.join(Company_.SEARCHED_INTERNS_TYPE).<InternStatus>get(InternType_.INTERN_STATUS).<Long>get(InternStatus_.ID),
-					filter.getStatusId());
+			return criteriaBuilder.equal(root.join(Company_.SEARCHED_INTERNS_TYPE)
+					.<InternStatus>get(InternType_.INTERN_STATUS).<Long>get(InternStatus_.ID), filter.getStatusId());
 		};
 		return ensureSpecification(origin, target);
 	}
-	
+
 	private Specification<Company> addBoolCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
 		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
 			criteriaQuery.distinct(true);
@@ -142,6 +165,56 @@ public class CompanyServiceImpl implements ICompanyService {
 					filter.getIsPaidAndLongTermInternship());
 		};
 		return ensureSpecification(origin, target);
+	}
+
+	@Override
+	public void apply(long id) throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
+		var userDetails = userService.getConnectedUser();
+		User user = userService.findByEmail(userDetails.getUsername());
+		Company company = companyRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+
+		// AMDIN MAIL
+		HashMap<String, String> ApplyCompanyAdminTemplate = new HashMap<String, String>();
+		Collection<Resource> attachments = new ArrayList<Resource>();
+
+		// File file = new File("pathName");
+		// FileUtils.writeByteArrayToFile(file,
+		// user.getFiles().iterator().next().getData());
+
+		Resource resource;
+		try (OutputStream out = new FileOutputStream(user.getFiles().iterator().next().getName())) {
+			   out.write(user.getFiles().iterator().next().getData());
+			 
+			}
+		  resource = new FileSystemResource(user.getFiles().iterator().next().getName());
+		
+	
+		
+		attachments.add(resource);
+		
+		Optional<Collection<Resource>> opAttachments = Optional.of(attachments);
+
+		ApplyCompanyAdminTemplate.put("firstName", user.getFirstName());
+		ApplyCompanyAdminTemplate.put("lastName", user.getName());
+		ApplyCompanyAdminTemplate.put("companyName", company.getName());
+
+		this.mailService.prepareMail(MailSubject.ApplyCompanyAdminTemplate, "Confirmation de demande de stage",
+				user.getEmail(), ApplyCompanyAdminTemplate, opAttachments);
+
+		/*
+		 * // USER MAIL HashMap<String, String> applyConfirmParams = new HashMap<String,
+		 * String>();
+		 * 
+		 * applyConfirmParams.put("firstName", user.getFirstName());
+		 * applyConfirmParams.put("lastName", user.getName());
+		 * applyConfirmParams.put("companyName", company.getName());
+		 * 
+		 * this.mailService.prepareMail(MailSubject.ApplyConfirm,
+		 * "Confirmation de demande de stage", user.getEmail(), applyConfirmParams,
+		 * null);
+		 */
+
 	}
 
 }

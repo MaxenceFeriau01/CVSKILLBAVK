@@ -2,6 +2,10 @@ package com.ensemble.entreprendre.controller;
 
 import java.io.IOException;
 
+import javax.mail.MessagingException;
+import javax.persistence.EntityNotFoundException;
+
+import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,5 +93,14 @@ public class CompanyController {
 	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
 	public CompanyDto delete(@PathVariable(name = "id") long id) throws ApiException {
 		return this.companyService.delete(id);
+	}
+	
+	
+	@Secured({"ROLE_USER"})
+	@PostMapping(path = "apply/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void apply(@PathVariable(name = "id") long id) throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException{
+	
+		this.companyService.apply(id);
 	}
 }

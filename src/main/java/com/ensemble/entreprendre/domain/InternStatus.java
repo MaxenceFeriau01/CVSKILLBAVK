@@ -26,8 +26,8 @@ public class InternStatus {
 	@Column(name = "STATUS_NAME", nullable = false)
 	private String name;
 
-	@OneToOne(mappedBy = "status")
-	private User user;
+	@OneToMany(mappedBy = "internStatus", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Collection<User> user;
 
 	@OneToMany(mappedBy = "internStatus", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<InternType> internType;

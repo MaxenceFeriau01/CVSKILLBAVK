@@ -32,13 +32,13 @@ public class UserResponseDto {
 
 	private LocalDate dateOfBirth;
 
-	private String status;
-
 	private String civility;
 
 	private String diploma;
 
 	private String internshipPeriod;
+	
+	private InternStatusDto status;
 
 	Collection<PartialFileDbDto> files;
 

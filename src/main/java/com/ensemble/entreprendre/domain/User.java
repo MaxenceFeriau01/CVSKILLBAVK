@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -55,9 +56,9 @@ public class User extends FullAuditable<String> {
 	@Column(nullable = false)
 	private LocalDate dateOfBirth;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "STATUS_ID", referencedColumnName = "STATUS_ID")
-	private InternStatus status;
+	private InternStatus internStatus;
 
 	@Column(nullable = false)
 	private String civility;

@@ -116,11 +116,6 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
 		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
-			/*
-			criteriaQuery.distinct(true);
-			return criteriaBuilder.equal(root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID),
-					filter.getStatusId());
-			*/
 			if (filter.getActivities() != null && !filter.getActivities().isEmpty()) {
 				return root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID).in(filter.getActivities());
 			} else {

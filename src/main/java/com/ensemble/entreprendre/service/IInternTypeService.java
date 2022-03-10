@@ -11,10 +11,4 @@ public interface IInternTypeService {
 	
 	InternTypeDto findById(long id) throws ApiException;
 	
-	InternTypeDto create(InternTypeDto toCreate) throws ApiException;
-	
-	InternTypeDto update(long id, InternTypeDto updatedDto) throws ApiException;
-	
-	InternTypeDto delete(long id) throws ApiException;
-	
 }

@@ -10,6 +10,7 @@ import com.ensemble.entreprendre.domain.InternType;
 import com.ensemble.entreprendre.dto.InternStatusDto;
 import com.ensemble.entreprendre.dto.InternTypeDto;
 import com.ensemble.entreprendre.exception.ApiException;
+import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.repository.IInternTypeRepository;
 import com.ensemble.entreprendre.service.IInternTypeService;
 
@@ -31,24 +32,6 @@ public class InternTypeServiceImpl implements IInternTypeService {
 	public InternTypeDto findById(long id) throws ApiException {
 		return this.typeConverter.entityToDto(this.typeRepository.findById(id)
 				.orElseThrow(() -> new ApiException("Ce statut de stagiaire n'existe pas.")), InternTypeDto.class);
-	}
-
-	@Override
-	public InternTypeDto create(InternTypeDto toCreate) throws ApiException {
-		// TODO Auto-generated method stub
-		return toCreate;
-	}
-
-	@Override
-	public InternTypeDto update(long id, InternTypeDto updatedDto) throws ApiException {
-		// TODO Auto-generated method stub
-		return findById(id);
-	}
-
-	@Override
-	public InternTypeDto delete(long id) throws ApiException {
-		// TODO Auto-generated method stub
-		return findById(id);
 	}
 
 }

@@ -64,7 +64,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	GenericConverter<User, UserRequestDto> userRequestConverter;
 
 	@Autowired
-	IMailService mailService;;
+	IMailService mailService;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -107,15 +107,15 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	@Override
 	public void createUser(UserRequestDto newUserDto, Collection<Role> roles, MultipartFile cv,
-			MultipartFile coverLetter) throws EntityNotFoundException, MessagingException,
-			ParseException, org.apache.velocity.runtime.parser.ParseException, IOException, ApiException {
+			MultipartFile coverLetter) throws EntityNotFoundException, MessagingException, ParseException,
+			org.apache.velocity.runtime.parser.ParseException, IOException, ApiException {
 
 		Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
 		if (opOldUser.isPresent()) {
 			throw new ApiAlreadyExistException("Cette email est déjà utilisée");
 		} else {
 			User newUser = this.userRequestConverter.dtoToEntity(newUserDto, User.class);
-			Collection<FileDb> files = getUserFileDbs(newUserDto, newUser,cv,coverLetter);
+			Collection<FileDb> files = getUserFileDbs(newUserDto, newUser, cv, coverLetter);
 			if (files.size() > 0) {
 				newUser.setFiles(files);
 			}
@@ -133,7 +133,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
 					params, null);
 		}
-
 	}
 
 	@Override
@@ -144,16 +143,49 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
 		userDto.setId(id);
 		User newUser = this.userRequestConverter.dtoToEntity(userDto, User.class);
-		Collection<FileDb> files = getUserFileDbs(userDto, newUser,cv,coverLetter);
+		Collection<FileDb> files = getUserFileDbs(userDto, newUser, cv, coverLetter);
+		// KEEP THE ROLES
+		newUser.setRoles(currentUser.getRoles());
 
-		if (files.size() > 0) {
-			newUser.setFiles(files);
-		} else {
-			newUser.setFiles(currentUser.getFiles());
+		// KEEP THE OLD FILES
+		for (FileDb f : currentUser.getFiles()) {
+			if (f.getType() == FileTypeEnum.CV) {
+				boolean containsCV = false;
+				for (FileDb sF : files) {
+					if (sF.getType() == FileTypeEnum.CV) {
+						containsCV = true;
+					}
+				}
+				if (containsCV == false) {
+					files.add(f);
+				}
+			}
+
+			if (f.getType() == FileTypeEnum.COVER_LETTER) {
+				boolean containsLetter = false;
+				for (FileDb sF : files) {
+					if (sF.getType() == FileTypeEnum.COVER_LETTER) {
+						containsLetter = true;
+					}
+				}
+
+				if (containsLetter == false) {
+					files.add(f);
+				}
+			}
 		}
+
+		newUser.setFiles(files);
+
 		newUser.setPassword(currentUser.getPassword());
 
 		return this.userResponseConverter.entityToDto(this.userRepository.save(newUser), UserResponseDto.class);
+	}
+
+	@Override
+	public User findByEmail(String email) throws ApiNotFoundException {
+		return userRepository.findByEmail(email)
+				.orElseThrow(() -> new ApiNotFoundException("L'utilisateur n'existe pas"));
 	}
 
 	private Collection<FileDb> getUserFileDbs(UserRequestDto userDto, User user, MultipartFile cv,
@@ -164,20 +196,18 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
 				throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
 			}
-			FileDb fileDb = new FileDb(null, userDto.getCoverLetter().getOriginalFilename(), FileTypeEnum.COVER_LETTER,
-					userDto.getCoverLetter().getBytes(), user);
+			FileDb fileDb = new FileDb(null, cv.getOriginalFilename(), FileTypeEnum.CV, cv.getBytes(), user);
 			files.add(fileDb);
 		}
 		if (coverLetter != null) {
 			if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
 				throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
 			}
-			FileDb fileDb = new FileDb(null, userDto.getCv().getOriginalFilename(), FileTypeEnum.CV,
-					userDto.getCv().getBytes(), user);
+			FileDb fileDb = new FileDb(null, coverLetter.getOriginalFilename(), FileTypeEnum.COVER_LETTER,
+					coverLetter.getBytes(), user);
 			files.add(fileDb);
 
 		}
-
 		return files;
 	}
 

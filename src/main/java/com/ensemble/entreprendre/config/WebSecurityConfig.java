@@ -78,27 +78,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// We don't need CSRF for this example
 		httpSecurity.cors().and().csrf().disable().authorizeRequests()
 				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/api/companies",
-						"/api/activities", "/api/jobs", "/api/intern-status", "/api/users/register", "/api/users/authenticate")
+						"/api/activities", "/api/jobs", "/api/intern-status", "/api/users/register",
+						"/api/users/authenticate")
 				.permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
-		// httpSecurity.csrf().disable()
-		// // dont authenticate this particular request
-		// .authorizeRequests().antMatchers("/authenticate").permitAll().
-		// antMatchers(HttpMethod.OPTIONS, "/**")
-		// .permitAll().
-		// // all other requests need to be authenticated
-		// anyRequest().authenticated().and().
-		// // make sure we use stateless session; session won't be used to
-		// // store user's state.
-		// exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-		// .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-		// Add a filter to validate the tokens with every request
-		// httpSecurity.addFilterBefore(jwtRequestFilter,
-		// UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Bean
@@ -142,8 +129,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return password;
 	}
 
-	// public static void main(String[] args) {
-	// System.err.println(new
-	// WebSecurityConfig().passwordEncoder().encode("mypass"));
-	// }
 }

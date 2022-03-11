@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.domain.Role;
+import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
@@ -27,6 +28,8 @@ public interface IUserService {
 	UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter) throws IOException, ApiNotFoundException, ApiException;
 
 	AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email);
+	
+	User findByEmail(String email) throws ApiNotFoundException;
 
 	UserDetails getConnectedUser() throws ApiException;
 

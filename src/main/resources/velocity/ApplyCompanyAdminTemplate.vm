@@ -25,18 +25,25 @@
           
         
         <article>
-            Bonjour <b>$lastName $firstName</b>,
+            Bonjour,
             </br>
             </br>
          
-            Cet e-mail confirme que votre demande de stage auprés de <b>$companyName</b> !  </br>
-            Vous allez bientôt être contacté par la cellule ! 
-
+            <b>$lastName $firstName</b> a effectué une demande de stage à l'entreprise <b>$companyName</b> !  </br>
+            Ses informations de contacts sont les suivantes :  </br>
+            <ul>
+                <li>
+                Email : $email
+                </li>
+                <li>
+                Numéro de téléphone : $phoneNumber
+                </li>
+            </ul> 
             </br>
             </br>
             Bien Cordialement, 
             </br>
-            L&#8217;équipe de <i>Dkstages.</i>
+            L&#8217;équipe de <i>Dkstages</i>
            
       	<article>       
     

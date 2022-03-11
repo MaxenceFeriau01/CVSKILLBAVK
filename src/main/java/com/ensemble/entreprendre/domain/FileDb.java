@@ -40,7 +40,7 @@ public class FileDb {
 	@Enumerated(EnumType.STRING)
 	private FileTypeEnum type;
 
-	@Type(type = "org.hibernate.type.PrimitiveByteArrayBlobType")
+	@Type(type = "org.hibernate.type.BinaryType")
 	private byte[] data;
 
 	@ManyToOne

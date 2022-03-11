@@ -1,5 +1,6 @@
 package com.ensemble.entreprendre.service.impl;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,7 +14,7 @@ import javax.persistence.EntityNotFoundException;
 
 import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.domain.Company;
 import com.ensemble.entreprendre.domain.Company_;
+import com.ensemble.entreprendre.domain.FileDb;
 import com.ensemble.entreprendre.domain.InternStatus;
 import com.ensemble.entreprendre.domain.InternStatus_;
 import com.ensemble.entreprendre.domain.InternType_;
@@ -55,6 +57,9 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	@Autowired
 	IUserService userService;
+
+	@Value("${spring.mail.replyto:reply-ee@ee.com}")
+	String adminMail;
 
 	@Override
 	public CompanyDto getById(long id) throws ApiException {
@@ -168,7 +173,8 @@ public class CompanyServiceImpl implements ICompanyService {
 	}
 
 	@Override
-	public void apply(long id) throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
+	public void apply(long id)
+			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
 		var userDetails = userService.getConnectedUser();
 		User user = userService.findByEmail(userDetails.getUsername());
 		Company company = companyRepository.findById(id)
@@ -177,43 +183,46 @@ public class CompanyServiceImpl implements ICompanyService {
 		// AMDIN MAIL
 		HashMap<String, String> ApplyCompanyAdminTemplate = new HashMap<String, String>();
 		Collection<Resource> attachments = new ArrayList<Resource>();
+		Collection<File> localFiles = new ArrayList<File>();
 
-		// File file = new File("pathName");
-		// FileUtils.writeByteArrayToFile(file,
-		// user.getFiles().iterator().next().getData());
+		for (FileDb f : user.getFiles()) {
 
-		Resource resource;
-		try (OutputStream out = new FileOutputStream(user.getFiles().iterator().next().getName())) {
-			   out.write(user.getFiles().iterator().next().getData());
-			 
+			File localFile = File.createTempFile(f.getName(), ".pdf", new File(System.getProperty("java.io.tmpdir")));
+
+			try (OutputStream out = new FileOutputStream(localFile.getAbsolutePath())) {
+				out.write(f.getData());
+
 			}
-		  resource = new FileSystemResource(user.getFiles().iterator().next().getName());
-		
-	
-		
-		attachments.add(resource);
-		
+
+			localFiles.add(localFile);
+			attachments.add(new FileSystemResource(localFile.getAbsolutePath()));
+		}
+
 		Optional<Collection<Resource>> opAttachments = Optional.of(attachments);
 
 		ApplyCompanyAdminTemplate.put("firstName", user.getFirstName());
 		ApplyCompanyAdminTemplate.put("lastName", user.getName());
+		ApplyCompanyAdminTemplate.put("email", user.getEmail());
+		ApplyCompanyAdminTemplate.put("phoneNumber", user.getPhone());
 		ApplyCompanyAdminTemplate.put("companyName", company.getName());
 
-		this.mailService.prepareMail(MailSubject.ApplyCompanyAdminTemplate, "Confirmation de demande de stage",
-				user.getEmail(), ApplyCompanyAdminTemplate, opAttachments);
+		this.mailService.prepareMail(MailSubject.ApplyCompanyAdminTemplate, "Une demande de stage a été effectuée",
+				adminMail, ApplyCompanyAdminTemplate, opAttachments);
 
-		/*
-		 * // USER MAIL HashMap<String, String> applyConfirmParams = new HashMap<String,
-		 * String>();
-		 * 
-		 * applyConfirmParams.put("firstName", user.getFirstName());
-		 * applyConfirmParams.put("lastName", user.getName());
-		 * applyConfirmParams.put("companyName", company.getName());
-		 * 
-		 * this.mailService.prepareMail(MailSubject.ApplyConfirm,
-		 * "Confirmation de demande de stage", user.getEmail(), applyConfirmParams,
-		 * null);
-		 */
+		localFiles.stream().forEach(f -> f.delete());
+		// END ADMIN MAIL
+
+		// USER MAIL
+		HashMap<String, String> applyConfirmParams = new HashMap<String, String>();
+
+		applyConfirmParams.put("firstName", user.getFirstName());
+		applyConfirmParams.put("lastName", user.getName());
+		applyConfirmParams.put("companyName", company.getName());
+
+		this.mailService.prepareMail(MailSubject.ApplyConfirm, "Confirmation de demande de stage", user.getEmail(),
+				applyConfirmParams, null);
+
+		// END USER MAIL
 
 	}
 

@@ -28,7 +28,7 @@ public class UserRequestDto {
 
 	private LocalDate dateOfBirth;
 
-	private InternStatusDto status;
+	private InternStatusDto internStatus;
 
 	private String civility;
 

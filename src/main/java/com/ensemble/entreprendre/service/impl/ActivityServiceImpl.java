@@ -14,6 +14,8 @@ import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.exception.BusinessException;
 import com.ensemble.entreprendre.exception.TechnicalException;
+import com.ensemble.entreprendre.filter.ActivityDtoFilter;
+import com.ensemble.entreprendre.projection.CustomActivity;
 import com.ensemble.entreprendre.repository.IActivityRepository;
 import com.ensemble.entreprendre.service.IActivityService;
 
@@ -33,8 +35,16 @@ public class ActivityServiceImpl implements IActivityService {
 	}
 
 	@Override
-	public Page<ActivityDto> getAllWithFilter(Pageable pageable) {
-		return this.activityConverter.entitiesToDtos(this.activityRepository.findAll(pageable), ActivityDto.class);
+	public Page<CustomActivity> getAllWithFilter(Pageable pageable, ActivityDtoFilter filter) {
+
+		if (filter != null) {
+			if (filter.getName() != null) {
+				return this.activityRepository.findAllWithCountsByName(pageable, filter.getName().toUpperCase());
+			}
+		}
+
+		return this.activityRepository.findAllWithCountsByName(pageable, "");
+
 	}
 
 	@Override
@@ -72,7 +82,9 @@ public class ActivityServiceImpl implements IActivityService {
 	public ActivityDto delete(long id) throws ApiException {
 		Activity toDelete = this.activityRepository.findById(id)
 				.orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
+
 		this.activityRepository.delete(toDelete);
 		return this.activityConverter.entityToDto(toDelete, ActivityDto.class);
 	}
+
 }

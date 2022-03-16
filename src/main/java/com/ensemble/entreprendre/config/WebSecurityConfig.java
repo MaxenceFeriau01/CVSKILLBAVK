@@ -77,9 +77,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		// We don't need CSRF for this example
 		httpSecurity.cors().and().csrf().disable().authorizeRequests()
-				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/api/companies", "/api/companies/search",
-						"/api/activities", "/api/jobs", "/api/intern-status", "/api/users/register",
-						"/api/users/authenticate")
+				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**",
+						"/api/companies/search", "/api/activities", "/api/jobs", "/api/intern-status",
+						"/api/users/register", "/api/users/authenticate")
 				.permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

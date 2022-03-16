@@ -8,10 +8,11 @@ import org.springframework.data.domain.Pageable;
 import com.ensemble.entreprendre.dto.ActivityDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.ActivityDtoFilter;
+import com.ensemble.entreprendre.projection.CustomActivity;
 
 public interface IActivityService {
 
-	Page<ActivityDto> getAllWithFilter(Pageable pageable, ActivityDtoFilter filter);
+	Page<CustomActivity> getAllWithFilter(Pageable pageable, ActivityDtoFilter filter);
 
 	Collection<ActivityDto> getAll();
 

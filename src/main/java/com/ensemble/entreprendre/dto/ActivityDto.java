@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ActivityDto {
 
-	Long id;
-	String name;
+	private Long id;
+	private String name;
 }

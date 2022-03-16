@@ -172,6 +172,7 @@ public class CompanyServiceImpl implements ICompanyService {
 		return ensureSpecification(origin, target);
 	}
 
+	//TODO REGISTER THE APPLICATION LIKE THAT THE USER CAN SEE IT
 	@Override
 	public void apply(long id)
 			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {

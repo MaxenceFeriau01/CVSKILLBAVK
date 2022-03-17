@@ -7,18 +7,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ensemble.entreprendre.dto.JobDto;
 import com.ensemble.entreprendre.exception.ApiException;
+import com.ensemble.entreprendre.filter.JobDtoFilter;
+import com.ensemble.entreprendre.projection.CustomJob;
 import com.ensemble.entreprendre.service.IJobService;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,9 +36,8 @@ public class JobController {
 	private IJobService jobService;
 
 	@PostMapping
-	// TODO Remove ROLE_TEST
-	@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
-	public JobDto create(JobDto toCreate) throws ApiException {
+	@Secured({ "ROLE_ADMIN" })
+	public JobDto create(@RequestBody JobDto toCreate) throws ApiException {
 		return this.jobService.create(toCreate);
 	}
 
@@ -47,11 +48,11 @@ public class JobController {
 			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
 					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
 	@GetMapping("/search")
-	public Page<JobDto> getAll(
-			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable)
-			throws ApiException {
+	public Page<CustomJob> getAll(
+			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable,
+			JobDtoFilter filter) throws ApiException {
 
-		return this.jobService.getAllWithFilter(pageable);
+		return this.jobService.getAllWithFilter(pageable, filter);
 	}
 
 	@GetMapping
@@ -67,9 +68,8 @@ public class JobController {
 	}
 
 	@PutMapping(path = "/{id}")
-	// TODO Remove ROLE_TEST
-	@Secured({ "ROLE_ADMIN", "ROLE_TEST" })
-	public JobDto update(@PathVariable(name = "id") long id, JobDto toUpdate) throws ApiException {
+	@Secured({ "ROLE_ADMIN" })
+	public JobDto update(@PathVariable(name = "id") long id, @RequestBody JobDto toUpdate) throws ApiException {
 		return this.jobService.update(id, toUpdate);
 	}
 

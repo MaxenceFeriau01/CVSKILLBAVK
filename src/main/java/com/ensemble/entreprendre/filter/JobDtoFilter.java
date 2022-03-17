@@ -1,11 +1,10 @@
-package com.ensemble.entreprendre.dto;
+package com.ensemble.entreprendre.filter;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class JobDto {
-	Long id;
+public class JobDtoFilter {
 	String name;
 }

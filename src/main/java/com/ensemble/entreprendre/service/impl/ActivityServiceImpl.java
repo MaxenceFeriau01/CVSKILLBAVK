@@ -36,15 +36,12 @@ public class ActivityServiceImpl implements IActivityService {
 
 	@Override
 	public Page<CustomActivity> getAllWithFilter(Pageable pageable, ActivityDtoFilter filter) {
-
 		if (filter != null) {
 			if (filter.getName() != null) {
 				return this.activityRepository.findAllWithCountsByName(pageable, filter.getName().toUpperCase());
 			}
 		}
-
 		return this.activityRepository.findAllWithCountsByName(pageable, "");
-
 	}
 
 	@Override

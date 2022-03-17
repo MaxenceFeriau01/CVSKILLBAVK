@@ -14,6 +14,8 @@ import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.exception.BusinessException;
 import com.ensemble.entreprendre.exception.TechnicalException;
+import com.ensemble.entreprendre.filter.JobDtoFilter;
+import com.ensemble.entreprendre.projection.CustomJob;
 import com.ensemble.entreprendre.repository.IJobRepository;
 import com.ensemble.entreprendre.service.IJobService;
 
@@ -33,8 +35,13 @@ public class JobServiceImpl implements IJobService {
 	}
 
 	@Override
-	public Page<JobDto> getAllWithFilter(Pageable pageable) {
-		return this.jobConverter.entitiesToDtos(this.jobRepository.findAll(pageable), JobDto.class);
+	public Page<CustomJob> getAllWithFilter(Pageable pageable, JobDtoFilter filter) {
+		if (filter != null) {
+			if (filter.getName() != null) {
+				return this.jobRepository.findAllWithCountsByName(pageable, filter.getName().toUpperCase());
+			}
+		}
+		return this.jobRepository.findAllWithCountsByName(pageable, "");
 	}
 
 	@Override
@@ -60,7 +67,7 @@ public class JobServiceImpl implements IJobService {
 
 	@Override
 	public JobDto update(Long id, JobDto updatedDto) throws ApiException {
-		this.jobRepository.findById(id).orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
+		this.jobRepository.findById(id).orElseThrow(() -> new ApiNotFoundException("Ce job n'existe pas !"));
 		return this.jobConverter.entityToDto(
 				this.jobRepository.save(this.jobConverter.dtoToEntity(updatedDto, Job.class)), JobDto.class);
 	}

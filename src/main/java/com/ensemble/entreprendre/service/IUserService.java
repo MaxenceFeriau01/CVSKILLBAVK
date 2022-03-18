@@ -7,6 +7,8 @@ import java.util.Collection;
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +20,7 @@ import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.UserDtoFilter;
 
 public interface IUserService {
 
@@ -25,13 +28,22 @@ public interface IUserService {
 			throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException,
 			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException, IOException, ApiException;
 
-	UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter) throws IOException, ApiNotFoundException, ApiException;
+	UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter)
+			throws IOException, ApiNotFoundException, ApiException;
 
 	AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email);
-	
+
 	User findByEmail(String email) throws ApiNotFoundException;
 
 	UserDetails getConnectedUser() throws ApiException;
 
 	UserResponseDto findByEmailToUserResponseDto(String email);
+
+	Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter);
+
+	void active(long id, boolean activated) throws ApiException;
+
+	void delete(long id) throws ApiException;
+
+	UserResponseDto getById(long id) throws ApiNotFoundException;
 }

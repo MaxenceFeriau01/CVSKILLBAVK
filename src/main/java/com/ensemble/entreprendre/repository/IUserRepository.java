@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.ensemble.entreprendre.domain.Activity;
 import com.ensemble.entreprendre.domain.User;
 
 public interface IUserRepository
@@ -14,4 +13,5 @@ public interface IUserRepository
 
 	Optional<User> findByEmail(String email);
 
+	
 }

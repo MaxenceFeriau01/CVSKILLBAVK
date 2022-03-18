@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 
 import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import com.ensemble.entreprendre.domain.InternType_;
 import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.CompanyDto;
+import com.ensemble.entreprendre.dto.SimpleCompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.exception.BusinessException;
@@ -51,6 +53,9 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	@Autowired
 	GenericConverter<Company, CompanyDto> companyConverter;
+
+	@Autowired
+	GenericConverter<Company, SimpleCompanyDto> simpleCompanyConverter;
 
 	@Autowired
 	IMailService mailService;
@@ -90,28 +95,34 @@ public class CompanyServiceImpl implements ICompanyService {
 		return this.companyConverter.entityToDto(this.companyRepository.save(newCompany), CompanyDto.class);
 	}
 
-	@javax.transaction.Transactional
 	@Override
 	public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
 		Specification<Company> specification = null;
-		if (filter != null) {
-			if (filter.getActivities() != null) {
-				specification = addActivityCriteria(filter, specification);
-			}
-			if (filter.getStatusId() != null) {
-				specification = addTypesCriteria(filter, specification);
-			}
-			if (filter.getIsPaidAndLongTermInternship() != null) {
-				specification = addBoolCriteria(filter, specification);
-			}
-		}
+		filter.setActivated(true);
+		specification = addCriterias(filter, specification);
+
 		if (specification == null) {
 			return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(pageable), CompanyDto.class);
 		}
+
 		return this.companyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),
 				CompanyDto.class);
 	}
 
+	@Override
+	public Page<SimpleCompanyDto> getAllSimple(Pageable pageable, CompanyDtoFilter filter) {
+		Specification<Company> specification = null;
+		specification = addCriterias(filter, specification);
+
+		if (specification == null) {
+			return this.simpleCompanyConverter.entitiesToDtos(this.companyRepository.findAll(pageable),
+					SimpleCompanyDto.class);
+		}
+		return this.simpleCompanyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),
+				SimpleCompanyDto.class);
+	}
+
+	@Transactional
 	@Override
 	public CompanyDto update(Long id, CompanyDto updatedDto) throws ApiException {
 		Company oldCompany = this.companyRepository.findById(id)
@@ -121,58 +132,32 @@ public class CompanyServiceImpl implements ICompanyService {
 			// Set the old logo if not changed
 			updatedDto.setLogo(oldCompany.getLogo());
 		}
+
+		
 		Company newCompany = this.companyConverter.dtoToEntity(updatedDto, Company.class);
+		newCompany.setActivated(oldCompany.isActivated());
 		newCompany.getSearchedInternsType().stream().forEach(t -> t.setCompany(newCompany));
 		return this.companyConverter.entityToDto(this.companyRepository.save(newCompany), CompanyDto.class);
 	}
 
 	@Override
-	public CompanyDto delete(long id) throws ApiException {
+	public void delete(long id) throws ApiException {
 		Company toDelete = this.companyRepository.findById(id)
 				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
 		this.companyRepository.delete(toDelete);
-		return this.companyConverter.entityToDto(toDelete, CompanyDto.class);
+
 	}
 
-	private Specification<Company> ensureSpecification(Specification<Company> origin, Specification<Company> target) {
-		if (origin == null)
-			return target;
-		if (target == null)
-			return origin;
-		return Specification.where(origin).and(target);
+	@Override
+	public void active(long id, boolean activated) throws ApiException {
+		Company company = this.companyRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+		company.setActivated(activated);
+		this.companyRepository.save(company);
+
 	}
 
-	private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
-			if (filter.getActivities() != null && !filter.getActivities().isEmpty()) {
-				return root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID).in(filter.getActivities());
-			} else {
-				return criteriaBuilder.and();
-			}
-
-		};
-		return ensureSpecification(origin, target);
-	}
-
-	private Specification<Company> addTypesCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
-			criteriaQuery.distinct(true);
-			return criteriaBuilder.equal(root.join(Company_.SEARCHED_INTERNS_TYPE)
-					.<InternStatus>get(InternType_.INTERN_STATUS).<Long>get(InternStatus_.ID), filter.getStatusId());
-		};
-		return ensureSpecification(origin, target);
-	}
-
-	private Specification<Company> addBoolCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
-			criteriaQuery.distinct(true);
-			return criteriaBuilder.equal(root.get(Company_.IS_PAID_AND_LONG_TERM_INTERNSHIP),
-					filter.getIsPaidAndLongTermInternship());
-		};
-		return ensureSpecification(origin, target);
-	}
-
-	//TODO REGISTER THE APPLICATION LIKE THAT THE USER CAN SEE IT
+	// TODO REGISTER THE APPLICATION LIKE THAT THE USER CAN SEE IT
 	@Override
 	public void apply(long id)
 			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
@@ -224,7 +209,85 @@ public class CompanyServiceImpl implements ICompanyService {
 				applyConfirmParams, null);
 
 		// END USER MAIL
-
 	}
 
+	private Specification<Company> addCriterias(CompanyDtoFilter filter, Specification<Company> specification) {
+		if (filter != null) {
+			if (filter.getActivities() != null) {
+				specification = addActivityCriteria(filter, specification);
+			}
+			if (filter.getStatusId() != null) {
+				specification = addTypesCriteria(filter, specification);
+			}
+			if (filter.getIsPaidAndLongTermInternship() != null) {
+				specification = addBoolCriteria(filter, specification);
+			}
+			if (filter.getName() != null) {
+				specification = addNameCriteria(filter, specification);
+			}
+
+			if (filter.getActivated() != null) {
+				specification = addActivatedCriteria(filter, specification);
+			}
+		}
+		return specification;
+	}
+
+	private Specification<Company> ensureSpecification(Specification<Company> origin, Specification<Company> target) {
+		if (origin == null)
+			return target;
+		if (target == null)
+			return origin;
+		return Specification.where(origin).and(target);
+	}
+
+	private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			if (filter.getActivities() != null && !filter.getActivities().isEmpty()) {
+				return root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID).in(filter.getActivities());
+			} else {
+				return criteriaBuilder.and();
+			}
+
+		};
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<Company> addTypesCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			criteriaQuery.distinct(true);
+			return criteriaBuilder.equal(root.join(Company_.SEARCHED_INTERNS_TYPE)
+					.<InternStatus>get(InternType_.INTERN_STATUS).<Long>get(InternStatus_.ID), filter.getStatusId());
+		};
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<Company> addBoolCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			criteriaQuery.distinct(true);
+			return criteriaBuilder.equal(root.get(Company_.IS_PAID_AND_LONG_TERM_INTERNSHIP),
+					filter.getIsPaidAndLongTermInternship());
+		};
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<Company> addActivatedCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			criteriaQuery.distinct(true);
+			return criteriaBuilder.equal(root.get(Company_.ACTIVATED), filter.getActivated());
+		};
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<Company> addNameCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+			if (filter.getName() != null && !filter.getName().isEmpty()) {
+				return criteriaBuilder.like(criteriaBuilder.upper(root.get(Company_.NAME)),
+						"%" + filter.getName().toUpperCase() + "%");
+			} else {
+				return criteriaBuilder.and();
+			}
+		};
+		return ensureSpecification(origin, target);
+	}
 }

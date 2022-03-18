@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.dto.CompanyDto;
+import com.ensemble.entreprendre.dto.SimpleCompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.service.ICompanyService;
@@ -46,7 +48,6 @@ public class CompanyController {
 	ObjectMapper objectMapper;
 
 	@PostMapping
-
 	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
 	public CompanyDto create(@RequestPart("company") String company,
 			@RequestPart(value = "logo", required = false) MultipartFile file) throws ApiException, IOException {
@@ -69,6 +70,17 @@ public class CompanyController {
 		return this.companyService.getAll(pageable, filter);
 	}
 
+	@ApiOperation(value = "Company getAllSimple endpoint", response = CompanyDto.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
+			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"), })
+	@GetMapping("simple/search")
+	public Page<SimpleCompanyDto> getAllSimple(
+			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
+					"id" }, direction = Sort.Direction.ASC) Pageable pageable,
+			CompanyDtoFilter filter) {
+		return this.companyService.getAllSimple(pageable, filter);
+	}
 
 	@GetMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
@@ -89,18 +101,27 @@ public class CompanyController {
 	}
 
 	@DeleteMapping(path = "/{id}")
-	@ResponseStatus(HttpStatus.OK)
-	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
-	public CompanyDto delete(@PathVariable(name = "id") long id) throws ApiException {
-		return this.companyService.delete(id);
-	}
-	
-	
-	@Secured({"ROLE_USER"})
-	@PostMapping(path = "apply/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void apply(@PathVariable(name = "id") long id) throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException{
-	
+	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
+	public void delete(@PathVariable(name = "id") long id) throws ApiException {
+		this.companyService.delete(id);
+	}
+
+	@Secured({ "ROLE_USER" })
+	@PostMapping(path = "{id}/apply")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void apply(@PathVariable(name = "id") long id)
+			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
+
 		this.companyService.apply(id);
+	}
+
+	@Secured({ "ROLE_ADMIN", })
+	@PostMapping(path = "{id}/active")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void active(@PathVariable(name = "id") long id, @RequestBody CompanyDtoFilter companyDtoFilter)
+			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
+
+		this.companyService.active(id, companyDtoFilter.getActivated());
 	}
 }

@@ -46,4 +46,10 @@ public interface IUserService {
 	void delete(long id) throws ApiException;
 
 	UserResponseDto getById(long id) throws ApiNotFoundException;
+
+	void updateResetPasswordToken(String email) throws ApiNotFoundException;
+
+	User getByResetPasswordToken(String token);
+
+	void updatePassword(User user, String newPassword);
 }

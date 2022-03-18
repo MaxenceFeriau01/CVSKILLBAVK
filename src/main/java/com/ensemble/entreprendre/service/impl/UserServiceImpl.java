@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
-import com.ensemble.entreprendre.domain.Company;
 import com.ensemble.entreprendre.domain.FileDb;
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
@@ -38,7 +37,6 @@ import com.ensemble.entreprendre.domain.User_;
 import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
-import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
@@ -48,6 +46,8 @@ import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
+
+import net.bytebuddy.utility.RandomString;
 
 @Service
 @Transactional
@@ -182,6 +182,29 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
 					params, null);
 		}
+	}
+
+	public void updateResetPasswordToken(String email) throws ApiNotFoundException {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+		if (user != null) {
+			String token = RandomString.make(30);
+			user.setResetPasswordToken(token);
+			userRepository.save(user);
+		}
+	}
+
+	public User getByResetPasswordToken(String token) {
+		return userRepository.findByResetPasswordToken(token);
+	}
+
+	public void updatePassword(User user, String newPassword) {
+
+		String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
+		user.setPassword(encodedPassword);
+
+		user.setResetPasswordToken(null);
+		userRepository.save(user);
 	}
 
 	@Override

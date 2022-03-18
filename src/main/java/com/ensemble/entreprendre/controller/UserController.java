@@ -36,10 +36,10 @@ import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.CredentialsDto;
+import com.ensemble.entreprendre.dto.ForgotPasswordDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiException;
-import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IRoleRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
@@ -162,6 +162,27 @@ public class UserController {
 				coverLetter);
 	}
 	
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PostMapping(path = "/forgot-password")
+	public void forgotPassword(@RequestBody ForgotPasswordDto forgotPassword) {
+
+		
+	}
+	
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PostMapping(path = "/reset-password")
+	public void processResetPassword(@RequestBody ForgotPasswordDto forgotPassword) {
+
+		
+	}
+	
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@GetMapping(path = "{token}/reset-password")
+	public void showResetPassword(@PathVariable String token) {
+
+		
+	}
+
 	@GetMapping(path = "/{id}")
 	@Secured({ "ROLE_ADMIN" })
 	@ResponseStatus(HttpStatus.OK)
@@ -176,7 +197,7 @@ public class UserController {
 		this.userService.delete(id);
 	}
 
-	@Secured({ "ROLE_ADMIN"})
+	@Secured({ "ROLE_ADMIN" })
 	@PostMapping(path = "{id}/active")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void active(@PathVariable(name = "id") long id, @RequestBody UserDtoFilter userDtoFilter)

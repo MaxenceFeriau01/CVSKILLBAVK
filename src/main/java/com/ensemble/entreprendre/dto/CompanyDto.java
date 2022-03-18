@@ -22,6 +22,7 @@ public class CompanyDto {
 	String type;
 	String desiredInternsNumber;
 	boolean isPaidAndLongTermInternship;
+	boolean activated;
 	Collection<ActivityDto> activities;
 	Collection<ActivityDto> searchedActivities;
 	Collection<JobDto> searchedJobs;

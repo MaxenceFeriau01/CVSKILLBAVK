@@ -74,6 +74,9 @@ public class Company {
 	@Column(name = "COMPANY_LOGO")
 	private byte[] logo;
 
+	@Column(name = "COMPANY_ACTIVATED", nullable = false, columnDefinition = "boolean default true")
+	private boolean activated = true;
+
 	@ManyToMany
 	@JoinTable(name = "companies_activities", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
 	private Collection<Activity> activities;

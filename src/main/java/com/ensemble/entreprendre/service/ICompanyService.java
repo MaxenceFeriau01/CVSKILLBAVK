@@ -10,13 +10,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.ensemble.entreprendre.dto.CompanyDto;
+import com.ensemble.entreprendre.dto.SimpleCompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
-import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 
 public interface ICompanyService {
 
 	Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter);
+
+	Page<SimpleCompanyDto> getAllSimple(Pageable pageable, CompanyDtoFilter filter);
 
 	CompanyDto getById(long id) throws ApiException;
 
@@ -24,7 +26,9 @@ public interface ICompanyService {
 
 	CompanyDto update(Long id, CompanyDto updatedDto) throws ApiException;
 
-	CompanyDto delete(long id) throws ApiException;
+	void delete(long id) throws ApiException;
+
+	void active(long id, boolean activated) throws ApiException;
 
 	void apply(long id) throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException;
 }

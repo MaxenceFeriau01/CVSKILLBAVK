@@ -122,7 +122,6 @@ public class CompanyServiceImpl implements ICompanyService {
 				SimpleCompanyDto.class);
 	}
 
-	@Transactional
 	@Override
 	public CompanyDto update(Long id, CompanyDto updatedDto) throws ApiException {
 		Company oldCompany = this.companyRepository.findById(id)

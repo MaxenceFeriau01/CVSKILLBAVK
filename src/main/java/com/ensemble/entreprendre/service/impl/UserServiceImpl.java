@@ -14,6 +14,9 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -27,17 +30,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
+import com.ensemble.entreprendre.domain.Company;
 import com.ensemble.entreprendre.domain.FileDb;
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.User_;
 import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
+import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
@@ -67,6 +74,35 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	IMailService mailService;
 
 	@Override
+	public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
+		Specification<User> specification = null;
+
+		specification = addCriterias(filter, specification);
+
+		if (specification == null) {
+			return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(pageable),
+					UserResponseDto.class);
+		}
+
+		return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(specification, pageable),
+				UserResponseDto.class);
+	}
+
+	@Override
+	public void delete(long id) throws ApiException {
+		User toDelete = this.userRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+		this.userRepository.delete(toDelete);
+
+	}
+
+	@Override
+	public UserResponseDto getById(long id) throws ApiNotFoundException {
+		return this.userResponseConverter.entityToDto(this.userRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !")), UserResponseDto.class);
+	}
+
+	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		User user = this.userRepository.findByEmail(email)
 				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
@@ -80,8 +116,12 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	@Override
 	public AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email) {
-		return this.authenticationResponseConverter.entityToDto(this.userRepository.findByEmail(email)
-				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu")), AuthenticationResponseDto.class);
+		User user = this.userRepository.findByEmail(email)
+				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+		if (user.isActivated() == false) {
+			throw new AccessDeniedException("Vous ne pouvez pas vous connecter !");
+		}
+		return this.authenticationResponseConverter.entityToDto(user, AuthenticationResponseDto.class);
 	}
 
 	@Override
@@ -102,6 +142,15 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			return (UserDetails) principal;
 		}
 		throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
+
+	}
+
+	@Override
+	public void active(long id, boolean activated) throws ApiException {
+		User user = this.userRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+		user.setActivated(activated);
+		this.userRepository.save(user);
 
 	}
 
@@ -146,6 +195,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 		Collection<FileDb> files = getUserFileDbs(userDto, newUser, cv, coverLetter);
 		// KEEP THE ROLES
 		newUser.setRoles(currentUser.getRoles());
+		newUser.setActivated(currentUser.isActivated());
 
 		// KEEP THE OLD FILES
 		for (FileDb f : currentUser.getFiles()) {
@@ -186,6 +236,37 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	public User findByEmail(String email) throws ApiNotFoundException {
 		return userRepository.findByEmail(email)
 				.orElseThrow(() -> new ApiNotFoundException("L'utilisateur n'existe pas"));
+	}
+
+	private Specification<User> addCriterias(UserDtoFilter filter, Specification<User> specification) {
+		if (filter != null) {
+
+			if (filter.getName() != null) {
+				specification = addNameCriteria(filter, specification);
+			}
+
+		}
+		return specification;
+	}
+
+	private Specification<User> addNameCriteria(UserDtoFilter filter, Specification<User> origin) {
+		Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+			if (filter.getName() != null && !filter.getName().isEmpty()) {
+				return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.NAME)),
+						"%" + filter.getName().toUpperCase() + "%");
+			} else {
+				return criteriaBuilder.and();
+			}
+		};
+		return ensureSpecification(origin, target);
+	}
+
+	private Specification<User> ensureSpecification(Specification<User> origin, Specification<User> target) {
+		if (origin == null)
+			return target;
+		if (target == null)
+			return origin;
+		return Specification.where(origin).and(target);
 	}
 
 	private Collection<FileDb> getUserFileDbs(UserRequestDto userDto, User user, MultipartFile cv,

@@ -32,14 +32,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.CredentialsDto;
 import com.ensemble.entreprendre.dto.ForgotPasswordDto;
+import com.ensemble.entreprendre.dto.ResetPasswordDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiException;
+import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IRoleRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
@@ -148,7 +151,7 @@ public class UserController {
 	 * @throws IOException
 	 * @throws org.apache.velocity.runtime.parser.ParseException
 	 */
-	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(path = "/register")
 	public void registration(@RequestPart("user") String user,
 			@RequestPart(value = "cv", required = false) MultipartFile cv,
@@ -161,26 +164,25 @@ public class UserController {
 		this.userService.createUser(toCreate, Arrays.asList(roleRepository.findByRole(RoleEnum.ROLE_USER)), cv,
 				coverLetter);
 	}
-	
+
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PostMapping(path = "/forgot-password")
-	public void forgotPassword(@RequestBody ForgotPasswordDto forgotPassword) {
+	public void forgotPassword(@RequestBody ForgotPasswordDto forgotPassword) throws ApiNotFoundException, EntityNotFoundException, MessagingException, org.apache.velocity.runtime.parser.ParseException {
+		this.userService.updateResetPasswordToken(forgotPassword.getEmail());
 
-		
 	}
-	
+
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PostMapping(path = "/reset-password")
-	public void processResetPassword(@RequestBody ForgotPasswordDto forgotPassword) {
-
-		
+	public void processResetPassword(@RequestBody ResetPasswordDto resetPassword) throws ApiNotFoundException {
+		this.userService.updatePassword(resetPassword.getUserId(), resetPassword.getPassword());
 	}
-	
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@GetMapping(path = "{token}/reset-password")
-	public void showResetPassword(@PathVariable String token) {
 
-		
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(path = "{token}/reset-password")
+	public Long showResetPassword(@PathVariable String token) throws ApiNotFoundException {
+		User user = this.userService.getByResetPasswordToken(token);
+		return user.getId();
 	}
 
 	@GetMapping(path = "/{id}")

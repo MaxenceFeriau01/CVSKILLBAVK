@@ -36,6 +36,7 @@ public class JobController {
 	private IJobService jobService;
 
 	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
 	@Secured({ "ROLE_ADMIN" })
 	public JobDto create(@RequestBody JobDto toCreate) throws ApiException {
 		return this.jobService.create(toCreate);
@@ -48,6 +49,7 @@ public class JobController {
 			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
 					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
 	@GetMapping("/search")
+	@ResponseStatus(HttpStatus.OK)
 	public Page<CustomJob> getAll(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable,
 			JobDtoFilter filter) throws ApiException {
@@ -56,8 +58,8 @@ public class JobController {
 	}
 
 	@GetMapping
+	@ResponseStatus(HttpStatus.OK)
 	public Collection<JobDto> getAll() throws ApiException {
-
 		return this.jobService.getAll();
 	}
 
@@ -75,7 +77,6 @@ public class JobController {
 
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
-
 	@Secured({ "ROLE_ADMIN" })
 	public JobDto delete(@PathVariable(name = "id") long id) throws ApiException {
 		return this.jobService.delete(id);

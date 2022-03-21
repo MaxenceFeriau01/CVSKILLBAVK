@@ -47,9 +47,9 @@ public interface IUserService {
 
 	UserResponseDto getById(long id) throws ApiNotFoundException;
 
-	void updateResetPasswordToken(String email) throws ApiNotFoundException;
+	void updateResetPasswordToken(String email) throws ApiNotFoundException, EntityNotFoundException, MessagingException, org.apache.velocity.runtime.parser.ParseException;
 
-	User getByResetPasswordToken(String token);
+	User getByResetPasswordToken(String token) throws ApiNotFoundException;
 
-	void updatePassword(User user, String newPassword);
+	void updatePassword(Long id, String newPassword) throws ApiNotFoundException;
 }

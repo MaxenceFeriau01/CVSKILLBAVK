@@ -14,6 +14,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -54,6 +55,7 @@ import net.bytebuddy.utility.RandomString;
 public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	public static final String ACCEPTED_FILE_FORMAT = "application/pdf";
+	public static final String RESET_PASSWORD_PATH = "/reset-password";
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -72,6 +74,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	@Autowired
 	IMailService mailService;
+
+	@Value("${front.url}")
+	String frontUrl;
 
 	@Override
 	public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
@@ -178,13 +183,15 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 			params.put("firstName", user.getFirstName());
 			params.put("lastName", user.getName());
+			
 
 			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
 					params, null);
 		}
 	}
 
-	public void updateResetPasswordToken(String email) throws ApiNotFoundException {
+	public void updateResetPasswordToken(String email) throws ApiNotFoundException, EntityNotFoundException,
+			MessagingException, org.apache.velocity.runtime.parser.ParseException {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
 		if (user != null) {
@@ -192,17 +199,25 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			user.setResetPasswordToken(token);
 			userRepository.save(user);
 		}
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("firstName", user.getFirstName());
+		params.put("lastName", user.getName());
+		params.put("resetPasswordUrl", frontUrl + user.getResetPasswordToken() + RESET_PASSWORD_PATH);
+
+		this.mailService.prepareMail(MailSubject.ResetPassword, "Réinitialisation du mot de passe", user.getEmail(),
+				params, null);
 	}
 
-	public User getByResetPasswordToken(String token) {
-		return userRepository.findByResetPasswordToken(token);
+	public User getByResetPasswordToken(String token) throws ApiNotFoundException {
+		return userRepository.findByResetPasswordToken(token)
+				.orElseThrow(() -> new ApiNotFoundException("Vous ne pouvez pas réinitialiser votre mot de passe !"));
 	}
 
-	public void updatePassword(User user, String newPassword) {
-
+	public void updatePassword(Long userId, String newPassword) throws ApiNotFoundException {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
 		String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
 		user.setPassword(encodedPassword);
-
 		user.setResetPasswordToken(null);
 		userRepository.save(user);
 	}

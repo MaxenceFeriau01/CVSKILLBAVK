@@ -14,6 +14,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
-import com.ensemble.entreprendre.domain.Company;
 import com.ensemble.entreprendre.domain.FileDb;
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
@@ -38,7 +38,6 @@ import com.ensemble.entreprendre.domain.User_;
 import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
-import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
@@ -49,11 +48,14 @@ import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
 
+import net.bytebuddy.utility.RandomString;
+
 @Service
 @Transactional
 public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	public static final String ACCEPTED_FILE_FORMAT = "application/pdf";
+	public static final String RESET_PASSWORD_PATH = "/reset-password";
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -72,6 +74,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 	@Autowired
 	IMailService mailService;
+
+	@Value("${front.url}")
+	String frontUrl;
 
 	@Override
 	public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
@@ -182,6 +187,36 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
 					params, null);
 		}
+	}
+
+	public void updateResetPasswordToken(String email) throws ApiNotFoundException, EntityNotFoundException,
+			MessagingException, org.apache.velocity.runtime.parser.ParseException {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+		String token = RandomString.make(30);
+		user.setResetPasswordToken(token);
+		userRepository.save(user);
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("firstName", user.getFirstName());
+		params.put("lastName", user.getName());
+		params.put("resetPasswordUrl", this.frontUrl + user.getResetPasswordToken() + RESET_PASSWORD_PATH);
+
+		this.mailService.prepareMail(MailSubject.ResetPassword, "Réinitialisation du mot de passe", user.getEmail(),
+				params, null);
+	}
+
+	public User getByResetPasswordToken(String token) throws ApiNotFoundException {
+		return userRepository.findByResetPasswordToken(token)
+				.orElseThrow(() -> new ApiNotFoundException("Vous ne pouvez pas réinitialiser votre mot de passe !"));
+	}
+
+	public void updatePassword(Long userId, String newPassword) throws ApiNotFoundException {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+		String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
+		user.setPassword(encodedPassword);
+		user.setResetPasswordToken(null);
+		userRepository.save(user);
 	}
 
 	@Override

@@ -13,5 +13,5 @@ public interface IUserRepository
 
 	Optional<User> findByEmail(String email);
 
-	
+	Optional<User> findByResetPasswordToken(String token);
 }

@@ -37,6 +37,7 @@ public class ActivityController {
 
 	@PostMapping
 	@Secured({ "ROLE_ADMIN" })
+	@ResponseStatus(HttpStatus.CREATED)
 	public ActivityDto create(@RequestBody ActivityDto toCreate) throws ApiException {
 		return this.activityService.create(toCreate);
 	}

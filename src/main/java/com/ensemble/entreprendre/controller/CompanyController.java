@@ -48,6 +48,7 @@ public class CompanyController {
 	ObjectMapper objectMapper;
 
 	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
 	@Secured({ "ROLE_ADMIN", "ROLE_COMPANY" })
 	public CompanyDto create(@RequestPart("company") String company,
 			@RequestPart(value = "logo", required = false) MultipartFile file) throws ApiException, IOException {

@@ -17,20 +17,18 @@ import com.ensemble.entreprendre.service.IInternStatusService;
 @RequestMapping(path = "/api/intern-status")
 @RestController
 public class InternStatusController {
-	
+
 	@Autowired
 	private IInternStatusService statusService;
-	
+
 	@GetMapping
 	public Collection<InternStatusDto> getAll() throws ApiException {
-
 		return this.statusService.findAll();
 	}
 
 	@GetMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public InternStatusDto getById(@PathVariable(name = "id") long id) throws ApiException {
-
 		return this.statusService.findById(id);
 	}
 

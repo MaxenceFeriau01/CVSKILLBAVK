@@ -3,30 +3,66 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<style>
         	body {
+                font-family: "Roboto","Helvetica","Arial",sans-serif;
            		color:black;               
             }
 			article {
+                width: 500px;
 				text-align:left;
                 margin-left: 15%;
 			}
             .password {
             	margin-left: 30%;
             }
+            i {
+                color :#2daf8e;
+            }
+
+            a {
+               
+                margin: 15px auto;
+                width: 284px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                box-sizing: border-box;
+                user-select: none;
+                vertical-align: middle;
+                text-decoration: none;
+                border: 1px solid #41ceaa;
+                font-weight: 500;
+                font-size: 0.875rem;
+                line-height: 1.75;
+                letter-spacing: 0.02857em;
+                text-transform: uppercase;
+                min-width: 64px;
+                padding: 6px 8px;
+                border-radius: 4px;
+                color: #2daf8e;
+            }
+
+            a:hover {
+                background-color: rgba(45, 175, 142, 0.04);
+            }
 		</style>
 	</head>
-	
-    <body>             
-        <b>Bonjour $firstName $lastName!</b>     
-       
+    <body>
+          
+        
         <article>
-            <p>Voici votre nouveau mot de passe  :</p>
-             <i class="password">$password</i></br>
-            <p>Je vous remercie de bien vouloir le changer lors de votre prochaine connexion.</p>
+            <b>Bonjour $firstName $lastName,</b>
             </br>
             </br>
+            Une requête a été envoyée pour changer votre de mot de passe.
+           <a href="$resetPasswordUrl">Réinitialiser mon mot de passe</a>
+            Si vous n'avez pas initié cette requête, vous pouvez ignorer ce mail.
+            </br>
+            </br>
+            Bien Cordialement, 
+            </br>
+            L&#8217;équipe de <i>Dkstages</i>
            
-            Bien Cordialement,</br></br>
-            L'administrateur de l'application Aduges
       	<article>       
     
     </body>

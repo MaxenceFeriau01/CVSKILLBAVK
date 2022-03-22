@@ -60,6 +60,15 @@ public class Company {
 
 	@Column(name = "COMPANY_TYPE", nullable = false)
 	private String type;
+	
+	@Column(name = "COMPANY_REGION", nullable = true)
+	private String region;
+	
+	@Column(name = "COMPANY_DEPARTMENT", nullable = true)
+	private String department;
+	
+	@Column(name = "COMPANY_EPCI", nullable = true)
+	private String epci;
 
 	@Column(name = "COMPANY_DESCRIPTION", length = 1024)
 	private String description;

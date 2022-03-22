@@ -7,24 +7,27 @@ import lombok.Data;
 @Data
 public class CompanyDto {
 
-	Long id;
-	String name;
-	String contactFirstName;
-	String contactLastName;
-	String contactMail;
-	String contactNum;
-	String siret;
-	String description;
-	byte[] logo;
-	String town;
-	String address;
-	String postalCode;
-	String type;
-	String desiredInternsNumber;
-	boolean isPaidAndLongTermInternship;
-	boolean activated;
-	Collection<ActivityDto> activities;
-	Collection<ActivityDto> searchedActivities;
-	Collection<JobDto> searchedJobs;
-	Collection<InternTypeDto> searchedInternsType;
+	private Long id;
+	private String name;
+	private String contactFirstName;
+	private String contactLastName;
+	private String contactMail;
+	private String contactNum;
+	private String siret;
+	private String description;
+	private byte[] logo;
+	private String town;
+	private String address;
+	private String postalCode;
+	private String type;
+	private String region;
+	private String department;
+	private String epci;
+	private String desiredInternsNumber;
+	private boolean isPaidAndLongTermInternship;
+	private boolean activated;
+	private Collection<ActivityDto> activities;
+	private Collection<ActivityDto> searchedActivities;
+	private Collection<JobDto> searchedJobs;
+	private Collection<InternTypeDto> searchedInternsType;
 }

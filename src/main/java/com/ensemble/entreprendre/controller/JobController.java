@@ -76,9 +76,9 @@ public class JobController {
 	}
 
 	@DeleteMapping(path = "/{id}")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Secured({ "ROLE_ADMIN" })
-	public JobDto delete(@PathVariable(name = "id") long id) throws ApiException {
-		return this.jobService.delete(id);
+	public void delete(@PathVariable(name = "id") long id) throws ApiException {
+		this.jobService.delete(id);
 	}
 }

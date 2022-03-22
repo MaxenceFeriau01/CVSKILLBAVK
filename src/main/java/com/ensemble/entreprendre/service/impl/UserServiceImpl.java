@@ -183,7 +183,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 			params.put("firstName", user.getFirstName());
 			params.put("lastName", user.getName());
-			
 
 			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
 					params, null);
@@ -194,15 +193,13 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			MessagingException, org.apache.velocity.runtime.parser.ParseException {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
-		if (user != null) {
-			String token = RandomString.make(30);
-			user.setResetPasswordToken(token);
-			userRepository.save(user);
-		}
+		String token = RandomString.make(30);
+		user.setResetPasswordToken(token);
+		userRepository.save(user);
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("firstName", user.getFirstName());
 		params.put("lastName", user.getName());
-		params.put("resetPasswordUrl", frontUrl + user.getResetPasswordToken() + RESET_PASSWORD_PATH);
+		params.put("resetPasswordUrl", this.frontUrl + user.getResetPasswordToken() + RESET_PASSWORD_PATH);
 
 		this.mailService.prepareMail(MailSubject.ResetPassword, "Réinitialisation du mot de passe", user.getEmail(),
 				params, null);

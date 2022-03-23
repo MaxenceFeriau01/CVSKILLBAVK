@@ -136,6 +136,14 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 		return this.userResponseConverter.entityToDto(user, UserResponseDto.class);
 	}
 
+	@Override
+	public List<Long> getAppliedCompanies(String email) {
+		User user = this.userRepository.findByEmail(email)
+				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+		return user.getAppliedCompanies().stream().map(n -> n.getId()).collect(Collectors.toCollection(ArrayList::new));
+
+	}
+
 	public UserDetails getConnectedUser() throws ApiException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -322,7 +330,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			FileDb fileDb = new FileDb(null, coverLetter.getOriginalFilename(), FileTypeEnum.COVER_LETTER,
 					coverLetter.getBytes(), user);
 			files.add(fileDb);
-
 		}
 		return files;
 	}

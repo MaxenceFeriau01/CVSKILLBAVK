@@ -3,6 +3,7 @@ package com.ensemble.entreprendre.controller;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
@@ -115,7 +116,7 @@ public class UserController {
 	}
 
 	/**
-	 * Get the connected
+	 * Get the connected user
 	 * 
 	 * @return userResponseDto
 	 * @throws ApiException
@@ -125,6 +126,18 @@ public class UserController {
 		var userDetails = userService.getConnectedUser();
 		return userService.findByEmailToUserResponseDto(userDetails.getUsername());
 
+	}
+
+	/**
+	 * Get applied companies of the connected user
+	 * 
+	 * @return id of applied companies
+	 * @throws ApiException
+	 */
+	@GetMapping(path = "/self/applied-companies")
+	public List<Long> appliedCompanies() throws ApiException {
+		var userDetails = userService.getConnectedUser();
+		return userService.getAppliedCompanies(userDetails.getUsername());
 	}
 
 	@ResponseStatus(HttpStatus.OK)
@@ -167,7 +180,8 @@ public class UserController {
 
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PostMapping(path = "/forgot-password")
-	public void forgotPassword(@RequestBody ForgotPasswordDto forgotPassword) throws ApiNotFoundException, EntityNotFoundException, MessagingException, org.apache.velocity.runtime.parser.ParseException {
+	public void forgotPassword(@RequestBody ForgotPasswordDto forgotPassword) throws ApiNotFoundException,
+			EntityNotFoundException, MessagingException, org.apache.velocity.runtime.parser.ParseException {
 		this.userService.updateResetPasswordToken(forgotPassword.getEmail());
 
 	}

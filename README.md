@@ -45,3 +45,10 @@ CUSTOM_MAIL_USER=mail_user
 FLYWAY_LOGGING_LEVEL=DEBUG
 GLOBAL_LOGGING_LEVEL=WARN
 ```
+
+## Docker 
+
+# DockeFile 
+
+- Create image : ```docker build -t entreprendre-ensemble-back .```
+- Run image : ```docker run --rm -it -p 80:80 entreprendre-ensemble-back```

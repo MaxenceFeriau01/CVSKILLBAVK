@@ -10,13 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "ACTIVITY")
+@Data
+@Table(name = "ACTIVITIES")
 public class Activity {
 
 	@Id
@@ -26,5 +24,11 @@ public class Activity {
 	@Column(name = "ACTIVITY_NAME", nullable = false)
 	String name;
 	@ManyToMany(mappedBy = "activities")
-    Set<Company> companies;
+	Set<Company> companies;
+
+	@ManyToMany(mappedBy = "searchedActivities")
+	Set<Company> companiesSearch;
+
+	@ManyToMany(mappedBy = "jobs")
+	Set<User> users;
 }

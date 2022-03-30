@@ -22,7 +22,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "ROLE")
+@Table(name = "ROLES")
 public class Role {
 
 	@Id
@@ -33,9 +33,6 @@ public class Role {
 	@Column(name = "ROL_ROLE")
 	@Enumerated(EnumType.STRING)
 	private RoleEnum role;
-	
-	@Column(name = "ROL_DESCRIPTION")
-	private String description;
 	
 	@ManyToMany(fetch = FetchType.EAGER, mappedBy = "roles",cascade = CascadeType.ALL)
 	private Collection<User> users;

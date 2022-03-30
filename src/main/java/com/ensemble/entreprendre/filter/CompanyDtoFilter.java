@@ -1,13 +1,16 @@
 package com.ensemble.entreprendre.filter;
 
+import java.util.Collection;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CompanyDtoFilter {
-
-	Long id;
+	Collection<Long> activities;
+	Long statusId;
+	Boolean isPaidAndLongTermInternship;
 	String name;
-	String contact;
-	String siret;
+	Boolean activated;
 }

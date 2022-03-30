@@ -1,10 +1,12 @@
 package com.ensemble.entreprendre.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ActivityDto {
 
-	long id;
-	String name;
+	private Long id;
+	private String name;
 }

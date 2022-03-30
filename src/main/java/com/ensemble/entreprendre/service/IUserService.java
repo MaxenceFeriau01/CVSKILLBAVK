@@ -3,6 +3,7 @@ package com.ensemble.entreprendre.service;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
@@ -52,4 +53,6 @@ public interface IUserService {
 	User getByResetPasswordToken(String token) throws ApiNotFoundException;
 
 	void updatePassword(Long id, String newPassword) throws ApiNotFoundException;
+
+	List<Long> getAppliedCompanies(String email);
 }

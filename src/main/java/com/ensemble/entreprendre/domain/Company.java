@@ -5,13 +5,13 @@ import java.util.Collection;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
@@ -60,13 +60,13 @@ public class Company {
 
 	@Column(name = "COMPANY_TYPE", nullable = false)
 	private String type;
-	
+
 	@Column(name = "COMPANY_REGION", nullable = true)
 	private String region;
-	
+
 	@Column(name = "COMPANY_DEPARTMENT", nullable = true)
 	private String department;
-	
+
 	@Column(name = "COMPANY_EPCI", nullable = true)
 	private String epci;
 
@@ -78,6 +78,10 @@ public class Company {
 
 	@Column(name = "COMPANY_ACCEPTS_LONG_PAID_INTERNSHIP", nullable = false)
 	boolean isPaidAndLongTermInternship;
+
+	@ManyToOne
+	@JoinColumn(name = "USR_ID", nullable = true)
+	private User user;
 
 	@Type(type = "org.hibernate.type.BinaryType")
 	@Column(name = "COMPANY_LOGO")

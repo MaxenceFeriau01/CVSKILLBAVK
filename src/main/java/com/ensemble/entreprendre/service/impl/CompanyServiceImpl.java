@@ -41,6 +41,7 @@ import com.ensemble.entreprendre.exception.BusinessException;
 import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
+import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.service.ICompanyService;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
@@ -50,6 +51,9 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	@Autowired
 	ICompanyRepository companyRepository;
+
+	@Autowired
+	IUserRepository userRepository;
 
 	@Autowired
 	GenericConverter<Company, CompanyDto> companyConverter;
@@ -132,7 +136,6 @@ public class CompanyServiceImpl implements ICompanyService {
 			updatedDto.setLogo(oldCompany.getLogo());
 		}
 
-		
 		Company newCompany = this.companyConverter.dtoToEntity(updatedDto, Company.class);
 		newCompany.setActivated(oldCompany.isActivated());
 		newCompany.getSearchedInternsType().stream().forEach(t -> t.setCompany(newCompany));
@@ -156,7 +159,6 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	}
 
-	// TODO REGISTER THE APPLICATION LIKE THAT THE USER CAN SEE IT
 	@Override
 	public void apply(long id)
 			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
@@ -164,6 +166,10 @@ public class CompanyServiceImpl implements ICompanyService {
 		User user = userService.findByEmail(userDetails.getUsername());
 		Company company = companyRepository.findById(id)
 				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+	
+		//Save the apply
+		user.addAppliedCompany(company);
+		userRepository.save(user);
 
 		// AMDIN MAIL
 		HashMap<String, String> ApplyCompanyAdminTemplate = new HashMap<String, String>();
@@ -171,26 +177,21 @@ public class CompanyServiceImpl implements ICompanyService {
 		Collection<File> localFiles = new ArrayList<File>();
 
 		for (FileDb f : user.getFiles()) {
-
 			File localFile = File.createTempFile(f.getName(), ".pdf", new File(System.getProperty("java.io.tmpdir")));
-
 			try (OutputStream out = new FileOutputStream(localFile.getAbsolutePath())) {
 				out.write(f.getData());
 
 			}
-
 			localFiles.add(localFile);
 			attachments.add(new FileSystemResource(localFile.getAbsolutePath()));
 		}
 
 		Optional<Collection<Resource>> opAttachments = Optional.of(attachments);
-
 		ApplyCompanyAdminTemplate.put("firstName", user.getFirstName());
 		ApplyCompanyAdminTemplate.put("lastName", user.getName());
 		ApplyCompanyAdminTemplate.put("email", user.getEmail());
 		ApplyCompanyAdminTemplate.put("phoneNumber", user.getPhone());
 		ApplyCompanyAdminTemplate.put("companyName", company.getName());
-
 		this.mailService.prepareMail(MailSubject.ApplyCompanyAdminTemplate, "Une demande de stage a été effectuée",
 				adminMail, ApplyCompanyAdminTemplate, opAttachments);
 

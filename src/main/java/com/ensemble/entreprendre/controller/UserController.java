@@ -93,7 +93,7 @@ public class UserController {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
 					authenticationRequest.getPassword()));
 		} catch (BadCredentialsException e) {
-			throw new ApiException("Identifiants incorrectes", HttpStatus.UNAUTHORIZED);
+			throw new ApiException("Identifiants incorrects", HttpStatus.NOT_FOUND);
 		}
 
 		AuthenticationResponseDto user = userService

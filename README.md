@@ -33,17 +33,19 @@ CUSTOM_DB_SHOW=true
 CUSTOM_DB_USER=postgres
 CUSTOM_MAIL_AUTH=true
 CUSTOM_MAIL_DEBUG=true
-CUSTOM_MAIL_ENABLE=false
-CUSTOM_MAIL_FROM=entreprendre.ensemble@eedk.fr
+CUSTOM_MAIL_ENABLE=true
+CUSTOM_MAIL_FROM=noreply-easylog@test.decathlon.com
 CUSTOM_MAIL_HOST=localhost
-CUSTOM_MAIL_PORT=25
+CUSTOM_MAIL_PORT=1025
 CUSTOM_MAIL_PROTOCOL=smtp
-CUSTOM_MAIL_PWD=mail_pwd
-CUSTOM_MAIL_REPLYTO=entreprendre.ensemble@eedk.fr
+CUSTOM_MAIL_PWD=AsPC+JH5+z22Ee5xTzu1BEfY/EBUq4QarNB7IdxWCzMq
+CUSTOM_MAIL_REPLYTO=noreply-easylog@test.decathlon.com
 CUSTOM_MAIL_TLS=true
-CUSTOM_MAIL_USER=mail_user
-FLYWAY_LOGGING_LEVEL=DEBUG
+CUSTOM_MAIL_USER=AKIA4SAWCTS5S3O4ULNM
+FRONT_URL=http://localhost:3000
 GLOBAL_LOGGING_LEVEL=WARN
+PERMIT_ALL=/v2/api-docs, /configuration/ui, /swagger-resources/**, /configuration/security, /swagger-ui.html, /webjars/**, /files/*,/ping/
+SWAGGER_CONTEXT_PATH=/
 ```
 
 ## Docker 

@@ -1,0 +1,69 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'EntreprendreEnsemble-Mecena-acr'
+  imageRepository: 'entreprendre-ensemble-back'
+  containerRegistry: 'EntreprendreEnsembleMecenatasr.azurecr.io'
+  dockerfilePath: '*./Dockerfile'
+  tag: '$(Build.BuildId)'
+  azureContainerRegistry: EntreprendreEnsembleMecenatasr.azurecr.io
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Packaging
+  displayName: Maven packaging
+  jobs:  
+  - job: Packaging
+    displayName: Maven packaging
+    pool:
+      vmImage: $(vmImageName)
+      
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m -Dmaven.test.skip=true'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: 'default'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        goals: 'package'
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/target/
+        artifact: target
+
+- stage: Build
+  displayName: Docker image build
+  jobs:  
+  - job: Docker
+    displayName: Docker image build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: target
+        path: $(Build.SourcesDirectory)/target/
+
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest

@@ -22,7 +22,6 @@ CUSTOM_MAIL_TLS=true
 CUSTOM_MAIL_USER=AKIA4SAWCTS5S3O4ULNM
 FRONT_URL=http://localhost:3000
 GLOBAL_LOGGING_LEVEL=WARN
-PERMIT_ALL=/v2/api-docs, /configuration/ui, /swagger-resources/**, /configuration/security, /swagger-ui.html, /webjars/**, /files/*,/ping/
 SWAGGER_CONTEXT_PATH=/
 ```
 

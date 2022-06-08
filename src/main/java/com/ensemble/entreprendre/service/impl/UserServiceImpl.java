@@ -174,7 +174,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
 		Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
 		if (opOldUser.isPresent()) {
-			throw new ApiAlreadyExistException("Cette email est déjà utilisée");
+			throw new ApiAlreadyExistException("Cet email est déjà utilisé");
 		} else {
 			User newUser = this.userRequestConverter.dtoToEntity(newUserDto, User.class);
 			Collection<FileDb> files = getUserFileDbs(newUserDto, newUser, cv, coverLetter);

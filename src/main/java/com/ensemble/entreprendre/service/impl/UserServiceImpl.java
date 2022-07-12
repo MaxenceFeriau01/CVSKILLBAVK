@@ -151,10 +151,8 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 			throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
 		}
 		Object principal = authentication.getPrincipal();
-		if (principal != null && principal instanceof UserDetails) {
-			return (UserDetails) principal;
-		}
-		throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
+
+		return (UserDetails) principal;
 
 	}
 

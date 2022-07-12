@@ -10,7 +10,6 @@ import lombok.Setter;
 public class CompanyDtoFilter {
 	Collection<Long> activities;
 	Long statusId;
-	Boolean isPaidAndLongTermInternship;
 	String name;
 	Boolean activated;
 }

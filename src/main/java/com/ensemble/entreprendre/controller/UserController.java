@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.User_;
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.CompanyDto;
@@ -79,7 +80,7 @@ public class UserController {
 	@GetMapping("/search")
 	public Page<UserResponseDto> getAll(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
-					"id" }, direction = Sort.Direction.ASC) Pageable pageable,
+					User_.NAME }, direction = Sort.Direction.ASC) Pageable pageable,
 			UserDtoFilter filter) {
 		return this.userService.getAll(pageable, filter);
 	}

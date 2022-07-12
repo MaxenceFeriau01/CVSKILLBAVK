@@ -5,10 +5,12 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Activity;
+import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.dto.ActivityDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -46,7 +48,9 @@ public class ActivityServiceImpl implements IActivityService {
 
 	@Override
 	public Collection<ActivityDto> getAll() {
-		return this.activityConverter.entitiesToDtos(this.activityRepository.findAll(), ActivityDto.class);
+		return this.activityConverter.entitiesToDtos(this.activityRepository.findAll(Sort.by(Sort.Direction.ASC,
+				Activity_.NAME)),
+				ActivityDto.class);
 	}
 
 	@Override

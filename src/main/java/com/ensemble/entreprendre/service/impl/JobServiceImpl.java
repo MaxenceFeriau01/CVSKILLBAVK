@@ -5,10 +5,12 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Job;
+import com.ensemble.entreprendre.domain.Job_;
 import com.ensemble.entreprendre.dto.JobDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -46,7 +48,8 @@ public class JobServiceImpl implements IJobService {
 
 	@Override
 	public Collection<JobDto> getAll() {
-		return this.jobConverter.entitiesToDtos(this.jobRepository.findAll(), JobDto.class);
+		return this.jobConverter.entitiesToDtos(this.jobRepository.findAll(Sort.by(Sort.Direction.ASC,
+				Job_.NAME)), JobDto.class);
 	}
 
 	@Override

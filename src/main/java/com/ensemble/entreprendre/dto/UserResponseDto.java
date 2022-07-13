@@ -15,9 +15,6 @@ import lombok.Setter;
 @Setter
 public class UserResponseDto {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "USR_ID")
 	private Long id;
 
 	private String email;

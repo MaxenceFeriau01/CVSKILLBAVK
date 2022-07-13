@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ensemble.entreprendre.domain.Company_;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.SimpleCompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
@@ -66,7 +67,7 @@ public class CompanyController {
 	@GetMapping("/search")
 	public Page<CompanyDto> getAll(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
-					"id" }, direction = Sort.Direction.ASC) Pageable pageable,
+					Company_.NAME }, direction = Sort.Direction.ASC) Pageable pageable,
 			CompanyDtoFilter filter) {
 		return this.companyService.getAll(pageable, filter);
 	}
@@ -78,7 +79,7 @@ public class CompanyController {
 	@GetMapping("simple/search")
 	public Page<SimpleCompanyDto> getAllSimple(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
-					"id" }, direction = Sort.Direction.ASC) Pageable pageable,
+					Company_.NAME }, direction = Sort.Direction.ASC) Pageable pageable,
 			CompanyDtoFilter filter) {
 		return this.companyService.getAllSimple(pageable, filter);
 	}

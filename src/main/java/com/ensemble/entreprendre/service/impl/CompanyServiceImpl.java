@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
+import javax.persistence.criteria.Order;
 
 import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,8 +166,8 @@ public class CompanyServiceImpl implements ICompanyService {
 		User user = userService.findByEmail(userDetails.getUsername());
 		Company company = companyRepository.findById(id)
 				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
-	
-		//Save the apply
+
+		// Save the apply
 		user.addAppliedCompany(company);
 		userRepository.save(user);
 
@@ -219,9 +219,7 @@ public class CompanyServiceImpl implements ICompanyService {
 			if (filter.getStatusId() != null) {
 				specification = addTypesCriteria(filter, specification);
 			}
-			if (filter.getIsPaidAndLongTermInternship() != null) {
-				specification = addBoolCriteria(filter, specification);
-			}
+
 			if (filter.getName() != null) {
 				specification = addNameCriteria(filter, specification);
 			}
@@ -258,15 +256,6 @@ public class CompanyServiceImpl implements ICompanyService {
 			criteriaQuery.distinct(true);
 			return criteriaBuilder.equal(root.join(Company_.SEARCHED_INTERNS_TYPE)
 					.<InternStatus>get(InternType_.INTERN_STATUS).<Long>get(InternStatus_.ID), filter.getStatusId());
-		};
-		return ensureSpecification(origin, target);
-	}
-
-	private Specification<Company> addBoolCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
-		Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
-			criteriaQuery.distinct(true);
-			return criteriaBuilder.equal(root.get(Company_.IS_PAID_AND_LONG_TERM_INTERNSHIP),
-					filter.getIsPaidAndLongTermInternship());
 		};
 		return ensureSpecification(origin, target);
 	}

@@ -9,26 +9,37 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
+
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
+
 import lombok.Getter;
 import lombok.Setter;
 
+@TypeDefs({
+		@TypeDef(name = "string-array", typeClass = StringArrayType.class)
+})
 @Entity
 @Getter
 @Setter
 @Table(name = "INTERNS_TYPE")
+
 public class InternType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "INTERN_STATUS_ID")
+	@Column(name = "INTERN_TYPE_ID")
 	private Long id;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "STATUS_ID", referencedColumnName = "STATUS_ID")
 	private InternStatus internStatus;
-	
-	@Column(name = "INTERN_PERIOD", nullable = false)
-	private String period;
+
+	@Type(type = "string-array")
+	@Column(name = "periods", columnDefinition = "text[]")
+	private String[] periods;
 
 	@ManyToOne
 	@JoinColumn(name = "COMPANY_ID", nullable = false)

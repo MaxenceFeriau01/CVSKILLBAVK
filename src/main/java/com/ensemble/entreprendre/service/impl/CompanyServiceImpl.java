@@ -166,8 +166,8 @@ public class CompanyServiceImpl implements ICompanyService {
 		User user = userService.findByEmail(userDetails.getUsername());
 		Company company = companyRepository.findById(id)
 				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
-	
-		//Save the apply
+
+		// Save the apply
 		user.addAppliedCompany(company);
 		userRepository.save(user);
 

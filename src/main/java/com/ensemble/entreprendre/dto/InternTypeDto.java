@@ -8,9 +8,9 @@ import lombok.Setter;
 public class InternTypeDto {
 
 	private Long id;
-	
+
 	private InternStatusDto internStatus;
-	
-	private String period;
+
+	private String[] periods;
 
 }

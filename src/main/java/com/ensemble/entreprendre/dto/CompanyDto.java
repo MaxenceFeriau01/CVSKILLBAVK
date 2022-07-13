@@ -13,6 +13,8 @@ public class CompanyDto {
 	private String contactLastName;
 	private String contactMail;
 	private String contactNum;
+	private String fixContactNum;
+	private String websiteUrl;
 	private String siret;
 	private String description;
 	private byte[] logo;

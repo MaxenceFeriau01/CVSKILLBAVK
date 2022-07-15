@@ -42,8 +42,16 @@ public class Company {
 	@Column(name = "COMPANY_CONTACT_MAIL", nullable = true)
 	private String contactMail;
 
+	// mobile
 	@Column(name = "COMPANY_CONTACT_NUM", nullable = false)
 	private String contactNum;
+
+	@Column(name = "COMPANY_FIX_CONTACT_NUM", nullable = true)
+	private String fixContactNum;
+
+	@Column(name = "COMPANY_WEBSITE", nullable = true)
+	@Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")
+	private String websiteUrl;
 
 	@Column(name = "COMPANY_SIRET", length = 14, nullable = false)
 	@Pattern(regexp = "[0-9]{14}", message = "{company.invalid.siret}")
@@ -76,7 +84,7 @@ public class Company {
 	@Column(name = "COMPANY_DESIRED_INTERNS_NUMBER", nullable = false)
 	private String desiredInternsNumber;
 
-	@Column(name = "COMPANY_ACCEPTS_LONG_PAID_INTERNSHIP", nullable = false)
+	@Column(name = "COMPANY_ACCEPTS_LONG_PAID_INTERNSHIP", nullable = false, columnDefinition = "boolean default false")
 	boolean isPaidAndLongTermInternship;
 
 	@ManyToOne

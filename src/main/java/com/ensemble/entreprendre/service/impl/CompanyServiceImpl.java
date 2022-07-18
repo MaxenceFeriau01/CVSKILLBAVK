@@ -168,7 +168,7 @@ public class CompanyServiceImpl implements ICompanyService {
 				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
 
 		// Save the apply
-		user.addAppliedCompany(company);
+		user.getAppliedCompanies().add(company);
 		userRepository.save(user);
 
 		// AMDIN MAIL
@@ -199,14 +199,17 @@ public class CompanyServiceImpl implements ICompanyService {
 		// END ADMIN MAIL
 
 		// USER MAIL
-		HashMap<String, String> applyConfirmParams = new HashMap<String, String>();
+		HashMap<String, String> applyCompanyParams = new HashMap<String, String>();
 
-		applyConfirmParams.put("firstName", user.getFirstName());
-		applyConfirmParams.put("lastName", user.getName());
-		applyConfirmParams.put("companyName", company.getName());
+		applyCompanyParams.put("firstName", user.getFirstName());
+		applyCompanyParams.put("lastName", user.getName());
+		applyCompanyParams.put("companyName", company.getName());
+		applyCompanyParams.put("companyContactMail", company.getContactMail());
+		applyCompanyParams.put("companyFullAddress", company.getAddress() + ", " + company.getPostalCode() + " "
+				+ company.getTown());
 
-		this.mailService.prepareMail(MailSubject.ApplyConfirm, "Confirmation de demande de stage", user.getEmail(),
-				applyConfirmParams, null);
+		this.mailService.prepareMail(MailSubject.ApplyCompany, "Comment faire ma demande de stage", user.getEmail(),
+				applyCompanyParams, null);
 
 		// END USER MAIL
 	}

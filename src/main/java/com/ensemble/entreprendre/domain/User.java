@@ -3,7 +3,6 @@ package com.ensemble.entreprendre.domain;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -78,8 +77,9 @@ public class User extends FullAuditable<String> {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<FileDb> files;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Company> appliedCompanies = new ArrayList<Company>();
+	@ManyToMany
+	@JoinTable(name = "users_applied_companies", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"))
+	private Collection<Company> appliedCompanies = new ArrayList<Company>();
 
 	@ManyToMany
 	@JoinTable(name = "users_roles", inverseJoinColumns = @JoinColumn(name = "ROL_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_ROLE"), referencedColumnName = "ROL_ID", nullable = false, updatable = false), joinColumns = @JoinColumn(name = "USR_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_USER"), referencedColumnName = "USR_ID", nullable = false, updatable = false))
@@ -92,13 +92,4 @@ public class User extends FullAuditable<String> {
 	@ManyToMany
 	@JoinTable(name = "users_activities", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
 	Collection<Activity> activities;
-
-	public void addAppliedCompany(Company company) {
-		company.setUser(this);
-		this.appliedCompanies.add(company);
-	}
-
-	public void removeAppliedCompany(Company company) {
-		this.appliedCompanies.remove(company);
-	}
 }

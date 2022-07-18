@@ -29,6 +29,10 @@ public class UserResponseDto {
 
 	private LocalDate dateOfBirth;
 
+	private LocalDate internshipStartDate;
+
+	private LocalDate internshipEndDate;
+
 	private boolean activated;
 
 	private String civility;

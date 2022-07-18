@@ -87,6 +87,9 @@ public class Company {
 	@Column(name = "COMPANY_ACCEPTS_LONG_PAID_INTERNSHIP", nullable = false, columnDefinition = "boolean default false")
 	boolean isPaidAndLongTermInternship;
 
+	@Column(name = "COMPANY_MINOR_ACCEPTED", nullable = false, columnDefinition = "boolean default false")
+	boolean minorAccepted;
+
 	@ManyToMany(mappedBy = "appliedCompanies")
 	private Collection<User> users;
 

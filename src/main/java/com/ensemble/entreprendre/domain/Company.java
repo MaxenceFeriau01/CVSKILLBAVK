@@ -87,9 +87,8 @@ public class Company {
 	@Column(name = "COMPANY_ACCEPTS_LONG_PAID_INTERNSHIP", nullable = false, columnDefinition = "boolean default false")
 	boolean isPaidAndLongTermInternship;
 
-	@ManyToOne
-	@JoinColumn(name = "USR_ID", nullable = true)
-	private User user;
+	@ManyToMany(mappedBy = "appliedCompanies")
+	private Collection<User> users;
 
 	@Type(type = "org.hibernate.type.BinaryType")
 	@Column(name = "COMPANY_LOGO")

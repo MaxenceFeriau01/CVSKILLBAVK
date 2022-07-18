@@ -56,6 +56,12 @@ public class User extends FullAuditable<String> {
 	private LocalDate dateOfBirth;
 
 	@Column(nullable = true)
+	private LocalDate internshipStartDate;
+
+	@Column(nullable = true)
+	private LocalDate internshipEndDate;
+
+	@Column(nullable = true)
 	private String resetPasswordToken;
 
 	@ManyToOne

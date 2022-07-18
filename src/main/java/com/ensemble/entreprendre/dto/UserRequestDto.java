@@ -28,6 +28,10 @@ public class UserRequestDto {
 
 	private LocalDate dateOfBirth;
 
+	private LocalDate internshipStartDate;
+
+	private LocalDate internshipEndDate;
+
 	private InternStatusDto internStatus;
 
 	private String civility;

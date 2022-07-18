@@ -6,9 +6,11 @@ import com.ensemble.entreprendre.dto.InternStatusDto;
 import com.ensemble.entreprendre.exception.ApiException;
 
 public interface IInternStatusService {
-	
+
 	Collection<InternStatusDto> findAll() throws ApiException;
-	
+
 	InternStatusDto findById(long id) throws ApiException;
+
+	public Collection<InternStatusDto> findAllForApplicant() throws ApiException;
 
 }

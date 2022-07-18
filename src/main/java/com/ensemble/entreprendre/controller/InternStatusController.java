@@ -26,6 +26,11 @@ public class InternStatusController {
 		return this.statusService.findAll();
 	}
 
+	@GetMapping(path = "/for-applicant")
+	public Collection<InternStatusDto> getAllForApplicant() throws ApiException {
+		return this.statusService.findAllForApplicant();
+	}
+
 	@GetMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public InternStatusDto getById(@PathVariable(name = "id") long id) throws ApiException {

@@ -11,6 +11,4 @@ public interface IInternStatusService {
 
 	InternStatusDto findById(long id) throws ApiException;
 
-	public Collection<InternStatusDto> findAllForApplicant() throws ApiException;
-
 }

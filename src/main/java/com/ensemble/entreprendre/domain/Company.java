@@ -33,17 +33,17 @@ public class Company {
 	@Column(name = "COMPANY_NAME", nullable = false)
 	private String name;
 
-	@Column(name = "COMPANY_CONTACT_FIRSTNAME", nullable = false)
+	@Column(name = "COMPANY_CONTACT_FIRSTNAME", nullable = true)
 	private String contactFirstName;
 
-	@Column(name = "COMPANY_CONTACT_LASTNAME", nullable = false)
+	@Column(name = "COMPANY_CONTACT_LASTNAME", nullable = true)
 	private String contactLastName;
 
 	@Column(name = "COMPANY_CONTACT_MAIL", nullable = true)
 	private String contactMail;
 
 	// mobile
-	@Column(name = "COMPANY_CONTACT_NUM", nullable = false)
+	@Column(name = "COMPANY_CONTACT_NUM", nullable = true)
 	private String contactNum;
 
 	@Column(name = "COMPANY_FIX_CONTACT_NUM", nullable = true)
@@ -53,7 +53,7 @@ public class Company {
 	@Pattern(regexp = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")
 	private String websiteUrl;
 
-	@Column(name = "COMPANY_SIRET", length = 14, nullable = false)
+	@Column(name = "COMPANY_SIRET", length = 14, nullable = true)
 	@Pattern(regexp = "[0-9]{14}", message = "{company.invalid.siret}")
 	private String siret;
 

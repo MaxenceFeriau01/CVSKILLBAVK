@@ -14,7 +14,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.ensemble.entreprendre.dto.ApiExceptionResponse;
-import com.ensemble.entreprendre.dto.MultipleApiExceptionResponse;
 
 @ControllerAdvice
 public class ValidationHandler extends ResponseEntityExceptionHandler {
@@ -30,11 +29,11 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
 			String message = error.getDefaultMessage();
 			errors.put(fieldName, message);
 		});
-		
+
 		ApiExceptionResponse error = new ApiExceptionResponse();
 		error.setMessage(errors.toString());
 		error.setStatus(HttpStatus.BAD_REQUEST.value());
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-		
+
 	}
 }

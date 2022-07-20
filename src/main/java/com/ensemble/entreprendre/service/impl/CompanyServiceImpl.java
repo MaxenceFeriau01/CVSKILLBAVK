@@ -78,22 +78,6 @@ public class CompanyServiceImpl implements ICompanyService {
 
 	@Override
 	public CompanyDto create(CompanyDto toCreate) throws ApiException {
-		if (toCreate == null) {
-			throw new TechnicalException("company.post.not.null");
-		}
-		BusinessException businessException = new BusinessException();
-		if (toCreate.getContactFirstName() == null || toCreate.getContactFirstName().isBlank()) {
-			businessException.addMessage("company.post.contact.not.empty");
-		}
-		if (toCreate.getContactLastName() == null || toCreate.getContactLastName().isBlank()) {
-			businessException.addMessage("company.post.contact.not.empty");
-		}
-		if (toCreate.getContactNum() == null || toCreate.getContactNum().isBlank()) {
-			businessException.addMessage("company.post.contact.not.empty");
-		}
-		if (businessException.isNotEmpty()) {
-			throw businessException;
-		}
 		Company newCompany = this.companyConverter.dtoToEntity(toCreate, Company.class);
 		newCompany.getSearchedInternsType().stream().forEach(t -> t.setCompany(newCompany));
 		return this.companyConverter.entityToDto(this.companyRepository.save(newCompany), CompanyDto.class);

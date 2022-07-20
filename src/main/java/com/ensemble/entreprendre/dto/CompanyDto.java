@@ -27,7 +27,8 @@ public class CompanyDto {
 	private String epci;
 	private String desiredInternsNumber;
 	private boolean isPaidAndLongTermInternship;
-	private boolean activated;
+	private boolean activated = true;
+	private boolean minorAccepted;
 	private Collection<ActivityDto> activities;
 	private Collection<ActivityDto> searchedActivities;
 	private Collection<JobDto> searchedJobs;

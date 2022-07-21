@@ -9,6 +9,4 @@ public interface IInternStatusService {
 
 	Collection<InternStatusDto> findAll() throws ApiException;
 
-	InternStatusDto findById(long id) throws ApiException;
-
 }

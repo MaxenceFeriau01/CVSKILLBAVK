@@ -9,7 +9,7 @@ public class SimpleCompanyDto {
 	Long id;
 	String name;
 	String siret;
-	String town;
+	CityDto city;
 	String postalCode;
 	Collection<ActivityDto> searchedActivities;
 	Boolean activated;

@@ -104,7 +104,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 	@Override
 	public UserResponseDto getById(long id) throws ApiNotFoundException {
 		return this.userResponseConverter.entityToDto(this.userRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !")), UserResponseDto.class);
+				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !")), UserResponseDto.class);
 	}
 
 	@Override

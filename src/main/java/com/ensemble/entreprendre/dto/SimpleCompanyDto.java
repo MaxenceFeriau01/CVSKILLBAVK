@@ -8,9 +8,8 @@ import lombok.Data;
 public class SimpleCompanyDto {
 	Long id;
 	String name;
-	String siret;
-	String town;
-	String postalCode;
+	String type;
+	CityDto city;
 	Collection<ActivityDto> searchedActivities;
 	Boolean activated;
 }

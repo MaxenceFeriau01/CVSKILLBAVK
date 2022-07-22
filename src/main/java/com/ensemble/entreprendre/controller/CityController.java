@@ -7,20 +7,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ensemble.entreprendre.dto.InternStatusDto;
+import com.ensemble.entreprendre.dto.CityDto;
 import com.ensemble.entreprendre.exception.ApiException;
-import com.ensemble.entreprendre.service.IInternStatusService;
+import com.ensemble.entreprendre.service.ICityService;
 
-@RequestMapping(path = "/api/intern-status")
+@RequestMapping(path = "/api/cities")
 @RestController
-public class InternStatusController {
+public class CityController {
 
 	@Autowired
-	private IInternStatusService statusService;
+	private ICityService cityService;
 
 	@GetMapping
-	public Collection<InternStatusDto> getAll() throws ApiException {
-		return this.statusService.findAll();
+	public Collection<CityDto> getAll() throws ApiException {
+		return this.cityService.findAll();
 	}
 
 }

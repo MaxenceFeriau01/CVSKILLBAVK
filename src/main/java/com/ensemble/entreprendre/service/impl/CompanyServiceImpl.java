@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.Order;
 
 import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,6 @@ import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.SimpleCompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
-import com.ensemble.entreprendre.exception.BusinessException;
-import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
 import com.ensemble.entreprendre.repository.IUserRepository;
@@ -189,8 +186,9 @@ public class CompanyServiceImpl implements ICompanyService {
 		applyCompanyParams.put("lastName", user.getName());
 		applyCompanyParams.put("companyName", company.getName());
 		applyCompanyParams.put("companyContactMail", company.getContactMail());
-		applyCompanyParams.put("companyFullAddress", company.getAddress() + ", " + company.getPostalCode() + " "
-				+ company.getTown());
+		applyCompanyParams.put("companyFullAddress",
+				company.getAddress() + ", " + company.getCity().getPostalCode() + " "
+						+ company.getCity().getName());
 
 		this.mailService.prepareMail(MailSubject.ApplyCompany, "Comment faire ma demande de stage", user.getEmail(),
 				applyCompanyParams, null);

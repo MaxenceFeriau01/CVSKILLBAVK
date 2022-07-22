@@ -18,10 +18,9 @@ public class CompanyDto {
 	private String siret;
 	private String description;
 	private byte[] logo;
-	private String town;
 	private String address;
-	private String postalCode;
 	private String type;
+	private CityDto city;
 	private String region;
 	private String department;
 	private String epci;

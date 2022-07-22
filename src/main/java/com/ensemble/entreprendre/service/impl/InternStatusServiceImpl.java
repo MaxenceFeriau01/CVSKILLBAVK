@@ -1,8 +1,6 @@
 package com.ensemble.entreprendre.service.impl;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -29,12 +27,6 @@ public class InternStatusServiceImpl implements IInternStatusService {
 	public Collection<InternStatusDto> findAll() throws ApiException {
 		return this.statusConverter.entitiesToDtos(this.statusRepository.findAll(
 				Sort.by(Sort.Direction.ASC, InternStatus_.NAME)), InternStatusDto.class);
-	}
-
-	@Override
-	public InternStatusDto findById(long id) throws ApiException {
-		return this.statusConverter.entityToDto(this.statusRepository.findById(id)
-				.orElseThrow(() -> new ApiException("Ce statut de stagiaire n'existe pas.")), InternStatusDto.class);
 	}
 
 }

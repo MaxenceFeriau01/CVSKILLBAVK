@@ -57,14 +57,8 @@ public class Company {
 	@Pattern(regexp = "[0-9]{14}", message = "{company.invalid.siret}")
 	private String siret;
 
-	@Column(name = "COMPANY_TOWN", nullable = false)
-	private String town;
-
 	@Column(name = "COMPANY_address", nullable = true)
 	private String address;
-
-	@Column(name = "COMPANY_POSTAL_CODE", nullable = false)
-	private String postalCode;
 
 	@Column(name = "COMPANY_TYPE", nullable = false)
 	private String type;
@@ -114,5 +108,9 @@ public class Company {
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<InternType> searchedInternsType;
+
+	@ManyToOne
+	@JoinColumn(name = "CITY_ID")
+	private City city;
 
 }

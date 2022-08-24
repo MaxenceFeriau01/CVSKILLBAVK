@@ -185,7 +185,14 @@ public class CompanyServiceImpl implements ICompanyService {
         applyCompanyParams.put("firstName", user.getFirstName());
         applyCompanyParams.put("lastName", user.getName());
         applyCompanyParams.put("companyName", company.getName());
-        applyCompanyParams.put("companyContactMail", company.getContactMail());
+        applyCompanyParams.put("companyContactMail",
+                company.getContactMail() != null ? company.getContactMail() : "");
+        applyCompanyParams.put("companyContactName",
+                company.getContactFirstName() + " " + company.getContactLastName());
+        applyCompanyParams.put("companyContactPhone",
+                company.getFixContactNum() != null ? company.getFixContactNum() : "");
+        applyCompanyParams.put("companyContactMobile",
+                company.getContactNum() != null ? company.getContactNum() : "");
         applyCompanyParams.put("companyFullAddress",
                 company.getAddress() + ", " + company.getCity().getPostalCode() + " "
                         + company.getCity().getName());

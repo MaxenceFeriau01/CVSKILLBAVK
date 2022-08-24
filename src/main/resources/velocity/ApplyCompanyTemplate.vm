@@ -38,7 +38,18 @@
             Pour présenter votre demande de stage à <b class="color-primary">$companyName</b>, envoyez votre CV et lettre de motivation :
 					</br>
 						<ul class="text-left ml-8 pt-1 pb-1"> 
-							<li> <i>➔ Par mail</i> : $companyContactMail</li> 
+							<li>
+								<i>➔ Référent stage</i> :  $companyContactName
+							</li> 
+                            <li>
+                                <i>➔ Par Téléphone fixe</i> : $companyContactPhone
+                            </li>
+                            <li>
+                                <i>➔ Par Téléphone mobile</i> : $companyContactMobile
+                            </li>
+							<li>
+                                <i>➔ Par mail</i> : $companyContactMail
+                            </li> 
 							<li>
 								<i>➔ Par courrier</i> : $companyFullAddress
 							</li>

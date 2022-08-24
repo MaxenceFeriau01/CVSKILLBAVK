@@ -37,6 +37,7 @@ import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.domain.User_;
 import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
+import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
@@ -54,282 +55,290 @@ import net.bytebuddy.utility.RandomString;
 @Transactional
 public class UserServiceImpl implements IUserService, UserDetailsService {
 
-	public static final String ACCEPTED_FILE_FORMAT = "application/pdf";
-	public static final String RESET_PASSWORD_PATH = "/reset-password";
+    public static final String ACCEPTED_FILE_FORMAT = "application/pdf";
+    public static final String RESET_PASSWORD_PATH = "/reset-password";
 
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	@Autowired
-	IUserRepository userRepository;
+    @Autowired
+    IUserRepository userRepository;
 
-	@Autowired
-	GenericConverter<User, UserResponseDto> userResponseConverter;
+    @Autowired
+    GenericConverter<User, UserResponseDto> userResponseConverter;
 
-	@Autowired
-	GenericConverter<User, AuthenticationResponseDto> authenticationResponseConverter;
+    @Autowired
+    GenericConverter<User, AuthenticationResponseDto> authenticationResponseConverter;
 
-	@Autowired
-	GenericConverter<User, UserRequestDto> userRequestConverter;
+    @Autowired
+    GenericConverter<User, UserRequestDto> userRequestConverter;
 
-	@Autowired
-	IMailService mailService;
+    @Autowired
+    IMailService mailService;
 
-	@Value("${front.url}")
-	String frontUrl;
+    @Value("${front.url}")
+    String frontUrl;
 
-	@Override
-	public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
-		Specification<User> specification = null;
+    @Override
+    public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
+        Specification<User> specification = null;
 
-		specification = addCriterias(filter, specification);
+        specification = addCriterias(filter, specification);
 
-		if (specification == null) {
-			return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(pageable),
-					UserResponseDto.class);
-		}
+        if (specification == null) {
+            return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(pageable),
+                    UserResponseDto.class);
+        }
 
-		return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(specification, pageable),
-				UserResponseDto.class);
-	}
+        return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(specification, pageable),
+                UserResponseDto.class);
+    }
 
-	@Override
-	public void delete(long id) throws ApiException {
-		User toDelete = this.userRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
-		this.userRepository.delete(toDelete);
+    @Override
+    public void delete(long id) throws ApiException {
+        User toDelete = this.userRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+        this.userRepository.delete(toDelete);
 
-	}
+    }
 
-	@Override
-	public UserResponseDto getById(long id) throws ApiNotFoundException {
-		return this.userResponseConverter.entityToDto(this.userRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !")), UserResponseDto.class);
-	}
+    @Override
+    public UserResponseDto getById(long id) throws ApiNotFoundException {
+        return this.userResponseConverter.entityToDto(this.userRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !")), UserResponseDto.class);
+    }
 
-	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		User user = this.userRepository.findByEmail(email)
-				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
-		List<SimpleGrantedAuthority> grantedAuthorities = user.getRoles().stream()
-				.map(authority -> new SimpleGrantedAuthority(authority.getRole().toString()))
-				.collect(Collectors.toList());
-		UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
-				.password(user.getPassword()).authorities(grantedAuthorities).build();
-		return userDetails;
-	}
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+        List<SimpleGrantedAuthority> grantedAuthorities = user.getRoles().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.getRole().toString()))
+                .collect(Collectors.toList());
+        UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
+                .password(user.getPassword()).authorities(grantedAuthorities).build();
+        return userDetails;
+    }
 
-	@Override
-	public AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email) {
-		User user = this.userRepository.findByEmail(email)
-				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
-		if (user.isActivated() == false) {
-			throw new AccessDeniedException("Vous ne pouvez pas vous connecter !");
-		}
-		return this.authenticationResponseConverter.entityToDto(user, AuthenticationResponseDto.class);
-	}
+    @Override
+    public AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email) {
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+        if (user.isActivated() == false) {
+            throw new AccessDeniedException("Vous ne pouvez pas vous connecter !");
+        }
+        return this.authenticationResponseConverter.entityToDto(user, AuthenticationResponseDto.class);
+    }
 
-	@Override
-	public UserResponseDto findByEmailToUserResponseDto(String email) {
-		User user = this.userRepository.findByEmail(email)
-				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
-		return this.userResponseConverter.entityToDto(user, UserResponseDto.class);
-	}
+    @Override
+    public UserResponseDto findByEmailToUserResponseDto(String email) {
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+        return this.userResponseConverter.entityToDto(user, UserResponseDto.class);
+    }
 
-	@Override
-	public List<Long> getAppliedCompanies(String email) {
-		User user = this.userRepository.findByEmail(email)
-				.orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
-		return user.getAppliedCompanies().stream().map(n -> n.getId()).collect(Collectors.toCollection(ArrayList::new));
+    @Override
+    public List<Long> getAppliedCompanies(String email) {
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
+        return user.getAppliedCompanies().stream().map(n -> n.getId()).collect(Collectors.toCollection(ArrayList::new));
 
-	}
+    }
 
-	public UserDetails getConnectedUser() throws ApiException {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public UserDetails getConnectedUser() throws ApiException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null) {
-			throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
-		}
-		Object principal = authentication.getPrincipal();
+        if (authentication == null) {
+            throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
+        }
+        Object principal = authentication.getPrincipal();
 
-		return (UserDetails) principal;
+        return (UserDetails) principal;
 
-	}
+    }
 
-	@Override
-	public void active(long id, boolean activated) throws ApiException {
-		User user = this.userRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
-		user.setActivated(activated);
-		this.userRepository.save(user);
+    @Override
+    public void active(long id, boolean activated) throws ApiException {
+        User user = this.userRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+        user.setActivated(activated);
+        this.userRepository.save(user);
 
-	}
+    }
 
-	@Override
-	public void createUser(UserRequestDto newUserDto, Collection<Role> roles, MultipartFile cv,
-			MultipartFile coverLetter) throws EntityNotFoundException, MessagingException, ParseException,
-			org.apache.velocity.runtime.parser.ParseException, IOException, ApiException {
+    @Override
+    public void createUser(UserRequestDto newUserDto, Collection<Role> roles, MultipartFile cv,
+            MultipartFile coverLetter) throws EntityNotFoundException, MessagingException, ParseException,
+            org.apache.velocity.runtime.parser.ParseException, IOException, ApiException {
 
-		Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
-		if (opOldUser.isPresent()) {
-			throw new ApiAlreadyExistException("Cet email est déjà utilisé");
-		} else {
-			User newUser = this.userRequestConverter.dtoToEntity(newUserDto, User.class);
-			Collection<FileDb> files = getUserFileDbs(newUserDto, newUser, cv, coverLetter);
-			if (files.size() > 0) {
-				newUser.setFiles(files);
-			}
-			String encodedPassword = bCryptPasswordEncoder.encode(newUserDto.getPassword());
-			newUser.setPassword(encodedPassword);
-			newUser.setRoles(roles);
+        Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
+        if (opOldUser.isPresent()) {
+            throw new ApiAlreadyExistException("Cet email est déjà utilisé");
+        } else {
+            User newUser = this.userRequestConverter.dtoToEntity(newUserDto, User.class);
+            Collection<FileDb> files = getUserFileDbs(newUserDto, newUser, cv, coverLetter);
+            if (files.size() > 0) {
+                newUser.setFiles(files);
+            }
+            String encodedPassword = bCryptPasswordEncoder.encode(newUserDto.getPassword());
+            newUser.setPassword(encodedPassword);
+            newUser.setRoles(roles);
 
-			User user = this.userRepository.save(newUser);
+            User user = this.userRepository.save(newUser);
 
-			HashMap<String, String> params = new HashMap<String, String>();
+            HashMap<String, Object> params = new HashMap<String, Object>();
 
-			params.put("firstName", user.getFirstName());
-			params.put("lastName", user.getName());
+            params.put("firstName", user.getFirstName());
+            params.put("lastName", user.getName());
 
-			this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
-					params, null);
-		}
-	}
+            this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
+                    params, null);
 
-	public void updateResetPasswordToken(String email) throws ApiNotFoundException, EntityNotFoundException,
-			MessagingException, org.apache.velocity.runtime.parser.ParseException {
-		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
-		String token = RandomString.make(30);
-		user.setResetPasswordToken(token);
-		userRepository.save(user);
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("firstName", user.getFirstName());
-		params.put("lastName", user.getName());
-		params.put("resetPasswordUrl", this.frontUrl + user.getResetPasswordToken() + RESET_PASSWORD_PATH);
+            Collection<User> admins = userRepository.findByRoles_Role(RoleEnum.ROLE_ADMIN);
+            params.put("user", user);
+            for (User admin : admins) {
+                params.put("admin", admin);
+                mailService.prepareMail(MailSubject.AdminRegistrationConfirm, "Notification d'inscription",
+                        admin.getEmail(), params, null);
+            }
+        }
+    }
 
-		this.mailService.prepareMail(MailSubject.ResetPassword, "Réinitialisation du mot de passe", user.getEmail(),
-				params, null);
-	}
+    public void updateResetPasswordToken(String email) throws ApiNotFoundException, EntityNotFoundException,
+            MessagingException, org.apache.velocity.runtime.parser.ParseException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+        String token = RandomString.make(30);
+        user.setResetPasswordToken(token);
+        userRepository.save(user);
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("firstName", user.getFirstName());
+        params.put("lastName", user.getName());
+        params.put("resetPasswordUrl", this.frontUrl + user.getResetPasswordToken() + RESET_PASSWORD_PATH);
 
-	public User getByResetPasswordToken(String token) throws ApiNotFoundException {
-		return userRepository.findByResetPasswordToken(token)
-				.orElseThrow(() -> new ApiNotFoundException("Vous ne pouvez pas réinitialiser votre mot de passe !"));
-	}
+        this.mailService.prepareMail(MailSubject.ResetPassword, "Réinitialisation du mot de passe", user.getEmail(),
+                params, null);
+    }
 
-	public void updatePassword(Long userId, String newPassword) throws ApiNotFoundException {
-		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
-		String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
-		user.setPassword(encodedPassword);
-		user.setResetPasswordToken(null);
-		userRepository.save(user);
-	}
+    public User getByResetPasswordToken(String token) throws ApiNotFoundException {
+        return userRepository.findByResetPasswordToken(token)
+                .orElseThrow(() -> new ApiNotFoundException("Vous ne pouvez pas réinitialiser votre mot de passe !"));
+    }
 
-	@Override
-	public UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter)
-			throws IOException, ApiException {
+    public void updatePassword(Long userId, String newPassword) throws ApiNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+        String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        user.setResetPasswordToken(null);
+        userRepository.save(user);
+    }
 
-		User currentUser = this.userRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
-		userDto.setId(id);
-		User newUser = this.userRequestConverter.dtoToEntity(userDto, User.class);
-		Collection<FileDb> files = getUserFileDbs(userDto, newUser, cv, coverLetter);
-		// KEEP THE ROLES
-		newUser.setRoles(currentUser.getRoles());
-		newUser.setActivated(currentUser.isActivated());
+    @Override
+    public UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter)
+            throws IOException, ApiException {
 
-		// KEEP THE OLD FILES
-		for (FileDb f : currentUser.getFiles()) {
-			if (f.getType() == FileTypeEnum.CV) {
-				boolean containsCV = false;
-				for (FileDb sF : files) {
-					if (sF.getType() == FileTypeEnum.CV) {
-						containsCV = true;
-					}
-				}
-				if (containsCV == false) {
-					files.add(f);
-				}
-			}
+        User currentUser = this.userRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("Cet utilisateur n'existe pas !"));
+        userDto.setId(id);
+        User newUser = this.userRequestConverter.dtoToEntity(userDto, User.class);
+        Collection<FileDb> files = getUserFileDbs(userDto, newUser, cv, coverLetter);
+        // KEEP THE ROLES
+        newUser.setRoles(currentUser.getRoles());
+        newUser.setActivated(currentUser.isActivated());
 
-			if (f.getType() == FileTypeEnum.COVER_LETTER) {
-				boolean containsLetter = false;
-				for (FileDb sF : files) {
-					if (sF.getType() == FileTypeEnum.COVER_LETTER) {
-						containsLetter = true;
-					}
-				}
+        // KEEP THE OLD FILES
+        for (FileDb f : currentUser.getFiles()) {
+            if (f.getType() == FileTypeEnum.CV) {
+                boolean containsCV = false;
+                for (FileDb sF : files) {
+                    if (sF.getType() == FileTypeEnum.CV) {
+                        containsCV = true;
+                    }
+                }
+                if (containsCV == false) {
+                    files.add(f);
+                }
+            }
 
-				if (containsLetter == false) {
-					files.add(f);
-				}
-			}
-		}
+            if (f.getType() == FileTypeEnum.COVER_LETTER) {
+                boolean containsLetter = false;
+                for (FileDb sF : files) {
+                    if (sF.getType() == FileTypeEnum.COVER_LETTER) {
+                        containsLetter = true;
+                    }
+                }
 
-		newUser.setFiles(files);
+                if (containsLetter == false) {
+                    files.add(f);
+                }
+            }
+        }
 
-		newUser.setPassword(currentUser.getPassword());
+        newUser.setFiles(files);
 
-		return this.userResponseConverter.entityToDto(this.userRepository.save(newUser), UserResponseDto.class);
-	}
+        newUser.setPassword(currentUser.getPassword());
 
-	@Override
-	public User findByEmail(String email) throws ApiNotFoundException {
-		return userRepository.findByEmail(email)
-				.orElseThrow(() -> new ApiNotFoundException("L'utilisateur n'existe pas"));
-	}
+        return this.userResponseConverter.entityToDto(this.userRepository.save(newUser), UserResponseDto.class);
+    }
 
-	private Specification<User> addCriterias(UserDtoFilter filter, Specification<User> specification) {
-		if (filter != null) {
+    @Override
+    public User findByEmail(String email) throws ApiNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiNotFoundException("L'utilisateur n'existe pas"));
+    }
 
-			if (filter.getName() != null) {
-				specification = addNameCriteria(filter, specification);
-			}
+    private Specification<User> addCriterias(UserDtoFilter filter, Specification<User> specification) {
+        if (filter != null) {
 
-		}
-		return specification;
-	}
+            if (filter.getName() != null) {
+                specification = addNameCriteria(filter, specification);
+            }
 
-	private Specification<User> addNameCriteria(UserDtoFilter filter, Specification<User> origin) {
-		Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
-			if (filter.getName() != null && !filter.getName().isEmpty()) {
-				return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.NAME)),
-						"%" + filter.getName().toUpperCase() + "%");
-			} else {
-				return criteriaBuilder.and();
-			}
-		};
-		return ensureSpecification(origin, target);
-	}
+        }
+        return specification;
+    }
 
-	private Specification<User> ensureSpecification(Specification<User> origin, Specification<User> target) {
-		if (origin == null)
-			return target;
-		if (target == null)
-			return origin;
-		return Specification.where(origin).and(target);
-	}
+    private Specification<User> addNameCriteria(UserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            if (filter.getName() != null && !filter.getName().isEmpty()) {
+                return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.NAME)),
+                        "%" + filter.getName().toUpperCase() + "%");
+            } else {
+                return criteriaBuilder.and();
+            }
+        };
+        return ensureSpecification(origin, target);
+    }
 
-	private Collection<FileDb> getUserFileDbs(UserRequestDto userDto, User user, MultipartFile cv,
-			MultipartFile coverLetter) throws IOException, ApiException {
-		Collection<FileDb> files = new ArrayList<>();
+    private Specification<User> ensureSpecification(Specification<User> origin, Specification<User> target) {
+        if (origin == null)
+            return target;
+        if (target == null)
+            return origin;
+        return Specification.where(origin).and(target);
+    }
 
-		if (cv != null) {
-			if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
-				throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
-			}
-			FileDb fileDb = new FileDb(null, cv.getOriginalFilename(), FileTypeEnum.CV, cv.getBytes(), user);
-			files.add(fileDb);
-		}
-		if (coverLetter != null) {
-			if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
-				throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
-			}
-			FileDb fileDb = new FileDb(null, coverLetter.getOriginalFilename(), FileTypeEnum.COVER_LETTER,
-					coverLetter.getBytes(), user);
-			files.add(fileDb);
-		}
-		return files;
-	}
+    private Collection<FileDb> getUserFileDbs(UserRequestDto userDto, User user, MultipartFile cv,
+            MultipartFile coverLetter) throws IOException, ApiException {
+        Collection<FileDb> files = new ArrayList<>();
+
+        if (cv != null) {
+            if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
+                throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
+            }
+            FileDb fileDb = new FileDb(null, cv.getOriginalFilename(), FileTypeEnum.CV, cv.getBytes(), user);
+            files.add(fileDb);
+        }
+        if (coverLetter != null) {
+            if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
+                throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
+            }
+            FileDb fileDb = new FileDb(null, coverLetter.getOriginalFilename(), FileTypeEnum.COVER_LETTER,
+                    coverLetter.getBytes(), user);
+            files.add(fileDb);
+        }
+        return files;
+    }
 
 }

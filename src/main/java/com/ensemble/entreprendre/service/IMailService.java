@@ -14,5 +14,7 @@ import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 
 public interface IMailService {
-	void prepareMail(MailSubject invoice, String title, String recipient, HashMap<String, String> params, Optional <Collection<Resource>> attachments) throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException;	
+    void prepareMail(MailSubject invoice, String title, String recipient, HashMap<String, Object> params,
+            Optional<Collection<Resource>> attachments)
+            throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException;
 }

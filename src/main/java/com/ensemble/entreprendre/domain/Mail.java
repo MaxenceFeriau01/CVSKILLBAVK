@@ -12,14 +12,14 @@ import lombok.Data;
 @Data
 public class Mail {
 
-	private String title;
+    private String title;
 
-	private MailSubject subject;
+    private MailSubject subject;
 
-	private String recipient;
+    private String recipient;
 
-	private HashMap<String, String> params;
+    private HashMap<String, Object> params;
 
-	private Collection<Resource> attachments;
+    private Collection<Resource> attachments;
 
 }

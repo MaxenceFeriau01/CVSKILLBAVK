@@ -35,6 +35,9 @@ public class EntreprendreEnsembleBackApplication {
 	@Bean
 	public ModelMapper modelMapper() {
 		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setCollectionsMergeEnabled(true);
+		modelMapper.getConfiguration().setSkipNullEnabled(true);
+		modelMapper.getConfiguration().setPreferNestedProperties(false);
 
 		/* insert here all conversions specifics adaptations */
 

@@ -30,6 +30,7 @@ import com.ensemble.entreprendre.domain.FileDb;
 import com.ensemble.entreprendre.domain.InternStatus;
 import com.ensemble.entreprendre.domain.InternStatus_;
 import com.ensemble.entreprendre.domain.InternType_;
+import com.ensemble.entreprendre.domain.Job_;
 import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.CompanyDto;
@@ -208,6 +209,11 @@ public class CompanyServiceImpl implements ICompanyService {
             if (filter.getActivities() != null) {
                 specification = addActivityCriteria(filter, specification);
             }
+
+            if (filter.getJobs() != null) {
+                specification = addJobsCriteria(filter, specification);
+            }
+
             if (filter.getStatusId() != null) {
                 specification = addTypesCriteria(filter, specification);
             }
@@ -234,7 +240,19 @@ public class CompanyServiceImpl implements ICompanyService {
     private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
         Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
             if (filter.getActivities() != null && !filter.getActivities().isEmpty()) {
-                return root.join(Company_.ACTIVITIES).<Long>get(Activity_.ID).in(filter.getActivities());
+                return root.join(Company_.SEARCHED_ACTIVITIES).<Long>get(Activity_.ID).in(filter.getActivities());
+            } else {
+                return criteriaBuilder.and();
+            }
+
+        };
+        return ensureSpecification(origin, target);
+    }
+
+    private Specification<Company> addJobsCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+        Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+            if (filter.getJobs() != null && !filter.getJobs().isEmpty()) {
+                return root.join(Company_.SEARCHED_JOBS).<Long>get(Job_.ID).in(filter.getJobs());
             } else {
                 return criteriaBuilder.and();
             }

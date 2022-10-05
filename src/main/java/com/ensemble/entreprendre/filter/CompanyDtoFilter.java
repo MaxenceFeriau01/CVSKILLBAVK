@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class CompanyDtoFilter {
 	Collection<Long> activities;
+	Collection<Long> jobs;
 	Long statusId;
 	String name;
 	Boolean activated;

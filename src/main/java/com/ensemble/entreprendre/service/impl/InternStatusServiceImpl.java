@@ -26,7 +26,7 @@ public class InternStatusServiceImpl implements IInternStatusService {
 	@Override
 	public Collection<InternStatusDto> findAll() throws ApiException {
 		return this.statusConverter.entitiesToDtos(this.statusRepository.findAll(
-				Sort.by(Sort.Direction.ASC, InternStatus_.NAME)), InternStatusDto.class);
+				Sort.by(Sort.Direction.ASC, InternStatus_.ID)), InternStatusDto.class);
 	}
 
 }

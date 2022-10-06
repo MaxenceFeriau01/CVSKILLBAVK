@@ -7,10 +7,11 @@ import lombok.Setter;
 @Setter
 public class AuthenticationResponseDto {
 
-
 	private String name;
 
 	private String firstName;
 
 	private String token;
+
+	private InternStatusDto internStatus;
 }

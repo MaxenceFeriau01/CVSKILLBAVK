@@ -1,5 +1,7 @@
 package com.ensemble.entreprendre.dto;
 
+import java.util.Collection;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +16,8 @@ public class AuthenticationResponseDto {
 	private String token;
 
 	private InternStatusDto internStatus;
+
+	private Collection<ActivityDto> activities;
+
+	private Collection<JobDto> jobs;
 }

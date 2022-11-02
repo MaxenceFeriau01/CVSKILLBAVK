@@ -36,8 +36,6 @@ public interface IUserService {
 
 	User findByEmail(String email) throws ApiNotFoundException;
 
-	UserDetails getConnectedUser() throws ApiException;
-
 	UserResponseDto findByEmailToUserResponseDto(String email);
 
 	Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter);

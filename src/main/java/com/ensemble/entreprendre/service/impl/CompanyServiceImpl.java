@@ -40,6 +40,7 @@ import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
 import com.ensemble.entreprendre.repository.IUserRepository;
+import com.ensemble.entreprendre.service.IAuthenticationService;
 import com.ensemble.entreprendre.service.ICompanyService;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
@@ -64,6 +65,10 @@ public class CompanyServiceImpl implements ICompanyService {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IAuthenticationService authenticationService;
+
 
     @Value("${spring.mail.replyto:reply-ee@ee.com}")
     String adminMail;
@@ -144,7 +149,7 @@ public class CompanyServiceImpl implements ICompanyService {
     @Override
     public void apply(long id)
             throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
-        var userDetails = userService.getConnectedUser();
+        var userDetails = authenticationService.getConnectedUser();
         User user = userService.findByEmail(userDetails.getUsername());
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
@@ -153,7 +158,7 @@ public class CompanyServiceImpl implements ICompanyService {
         user.getAppliedCompanies().add(company);
         userRepository.save(user);
 
-        // AMDIN MAIL
+        // ADMIN MAIL
         HashMap<String, Object> ApplyCompanyAdminTemplate = new HashMap<String, Object>();
         Collection<Resource> attachments = new ArrayList<Resource>();
         Collection<File> localFiles = new ArrayList<File>();

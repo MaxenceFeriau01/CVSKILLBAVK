@@ -145,18 +145,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     }
 
-    public UserDetails getConnectedUser() throws ApiException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null) {
-            throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
-        }
-        Object principal = authentication.getPrincipal();
-
-        return (UserDetails) principal;
-
-    }
-
     @Override
     public void active(long id, boolean activated) throws ApiException {
         User user = this.userRepository.findById(id)

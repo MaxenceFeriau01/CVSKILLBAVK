@@ -48,6 +48,7 @@ import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IRoleRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
+import com.ensemble.entreprendre.service.IAuthenticationService;
 import com.ensemble.entreprendre.service.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -68,6 +69,8 @@ public class UserController {
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private IUserService userService;
+	@Autowired
+	private IAuthenticationService authenticationService;
 	@Autowired
 	private IRoleRepository roleRepository;
 	@Autowired
@@ -112,7 +115,7 @@ public class UserController {
 	 */
 	@GetMapping(path = "/self/roles")
 	public String[] getConnectedUserRoles() throws ApiException {
-		return userService.getConnectedUser().getAuthorities().stream().map(GrantedAuthority::getAuthority)
+		return authenticationService.getConnectedUser().getAuthorities().stream().map(GrantedAuthority::getAuthority)
 				.toArray(String[]::new);
 	}
 
@@ -124,7 +127,7 @@ public class UserController {
 	 */
 	@GetMapping(path = "/self")
 	public UserResponseDto getConnectedUser() throws ApiException {
-		var userDetails = userService.getConnectedUser();
+		var userDetails = authenticationService.getConnectedUser();
 		return userService.findByEmailToUserResponseDto(userDetails.getUsername());
 
 	}
@@ -137,7 +140,7 @@ public class UserController {
 	 */
 	@GetMapping(path = "/self/applied-companies")
 	public List<Long> appliedCompanies() throws ApiException {
-		var userDetails = userService.getConnectedUser();
+		var userDetails = authenticationService.getConnectedUser();
 		return userService.getAppliedCompanies(userDetails.getUsername());
 	}
 

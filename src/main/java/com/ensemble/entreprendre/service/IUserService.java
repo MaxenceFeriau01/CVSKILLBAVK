@@ -10,7 +10,6 @@ import javax.persistence.EntityNotFoundException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.domain.Role;
@@ -46,7 +45,8 @@ public interface IUserService {
 
 	UserResponseDto getById(long id) throws ApiNotFoundException;
 
-	void updateResetPasswordToken(String email) throws ApiNotFoundException, EntityNotFoundException, MessagingException, org.apache.velocity.runtime.parser.ParseException;
+	void updateResetPasswordToken(String email) throws ApiNotFoundException, EntityNotFoundException,
+			MessagingException, org.apache.velocity.runtime.parser.ParseException;
 
 	User getByResetPasswordToken(String token) throws ApiNotFoundException;
 

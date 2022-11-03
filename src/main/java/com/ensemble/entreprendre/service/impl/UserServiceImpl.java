@@ -20,9 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -142,18 +140,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
         return user.getAppliedCompanies().stream().map(n -> n.getId()).collect(Collectors.toCollection(ArrayList::new));
-
-    }
-
-    public UserDetails getConnectedUser() throws ApiException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null) {
-            throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
-        }
-        Object principal = authentication.getPrincipal();
-
-        return (UserDetails) principal;
 
     }
 

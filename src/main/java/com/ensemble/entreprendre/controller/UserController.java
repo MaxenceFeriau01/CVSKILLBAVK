@@ -18,7 +18,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,6 +47,7 @@ import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IRoleRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
+import com.ensemble.entreprendre.service.IConnectedUserService;
 import com.ensemble.entreprendre.service.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -68,6 +68,8 @@ public class UserController {
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private IUserService userService;
+	@Autowired
+	private IConnectedUserService connectedUserService;
 	@Autowired
 	private IRoleRepository roleRepository;
 	@Autowired
@@ -112,8 +114,7 @@ public class UserController {
 	 */
 	@GetMapping(path = "/self/roles")
 	public String[] getConnectedUserRoles() throws ApiException {
-		return userService.getConnectedUser().getAuthorities().stream().map(GrantedAuthority::getAuthority)
-				.toArray(String[]::new);
+		return connectedUserService.getConnectedUserRoles();
 	}
 
 	/**
@@ -124,7 +125,7 @@ public class UserController {
 	 */
 	@GetMapping(path = "/self")
 	public UserResponseDto getConnectedUser() throws ApiException {
-		var userDetails = userService.getConnectedUser();
+		var userDetails = connectedUserService.getConnectedUser();
 		return userService.findByEmailToUserResponseDto(userDetails.getUsername());
 
 	}
@@ -137,7 +138,7 @@ public class UserController {
 	 */
 	@GetMapping(path = "/self/applied-companies")
 	public List<Long> appliedCompanies() throws ApiException {
-		var userDetails = userService.getConnectedUser();
+		var userDetails = connectedUserService.getConnectedUser();
 		return userService.getAppliedCompanies(userDetails.getUsername());
 	}
 

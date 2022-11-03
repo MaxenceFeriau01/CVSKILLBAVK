@@ -1,6 +1,7 @@
 package com.ensemble.entreprendre.domain;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -98,4 +99,9 @@ public class User extends FullAuditable<String> {
 	@ManyToMany
 	@JoinTable(name = "users_activities", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
 	Collection<Activity> activities;
+
+	public Long getDesiredInternshipPeriodDays() {
+		return ChronoUnit.DAYS.between(internshipStartDate, internshipEndDate);
+	}
+
 }

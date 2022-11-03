@@ -16,7 +16,7 @@ import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 
 public interface ICompanyService {
 
-	Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter);
+	Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) throws ApiException;
 
 	Page<SimpleCompanyDto> getAllSimple(Pageable pageable, CompanyDtoFilter filter);
 

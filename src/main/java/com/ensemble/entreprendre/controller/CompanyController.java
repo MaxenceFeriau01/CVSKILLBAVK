@@ -68,7 +68,7 @@ public class CompanyController {
 	public Page<CompanyDto> getAll(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
 					Company_.NAME }, direction = Sort.Direction.ASC) Pageable pageable,
-			CompanyDtoFilter filter) {
+			CompanyDtoFilter filter) throws ApiException {
 		return this.companyService.getAll(pageable, filter);
 	}
 

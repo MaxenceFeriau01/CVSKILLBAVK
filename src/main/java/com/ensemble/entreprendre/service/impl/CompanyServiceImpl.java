@@ -40,6 +40,7 @@ import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
 import com.ensemble.entreprendre.repository.IUserRepository;
+import com.ensemble.entreprendre.service.IConnectedUserService;
 import com.ensemble.entreprendre.service.ICompanyService;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
@@ -65,8 +66,14 @@ public class CompanyServiceImpl implements ICompanyService {
     @Autowired
     IUserService userService;
 
+    @Autowired
+    IConnectedUserService connectedUserService;
+
     @Value("${spring.mail.replyto:reply-ee@ee.com}")
     String adminMail;
+
+    @Value("${period.internship.paid}")
+    Long periodWhenInternshipIsPaid;
 
     @Override
     public CompanyDto getById(long id) throws ApiException {
@@ -82,9 +89,12 @@ public class CompanyServiceImpl implements ICompanyService {
     }
 
     @Override
-    public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) {
+    public Page<CompanyDto> getAll(Pageable pageable, CompanyDtoFilter filter) throws ApiException {
         Specification<Company> specification = null;
         filter.setActivated(true);
+
+        specification = checkIfUserWantPaidInternship(specification);
+
         specification = addCriterias(filter, specification);
 
         if (specification == null) {
@@ -144,7 +154,7 @@ public class CompanyServiceImpl implements ICompanyService {
     @Override
     public void apply(long id)
             throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
-        var userDetails = userService.getConnectedUser();
+        var userDetails = connectedUserService.getConnectedUser();
         User user = userService.findByEmail(userDetails.getUsername());
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
@@ -153,7 +163,7 @@ public class CompanyServiceImpl implements ICompanyService {
         user.getAppliedCompanies().add(company);
         userRepository.save(user);
 
-        // AMDIN MAIL
+        // ADMIN MAIL
         HashMap<String, Object> ApplyCompanyAdminTemplate = new HashMap<String, Object>();
         Collection<Resource> attachments = new ArrayList<Resource>();
         Collection<File> localFiles = new ArrayList<File>();
@@ -288,5 +298,25 @@ public class CompanyServiceImpl implements ICompanyService {
             }
         };
         return ensureSpecification(origin, target);
+    }
+
+    private Specification<Company> addIsPaidInternshipCriteria(Specification<Company> origin) {
+        Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+            criteriaQuery.distinct(true);
+            return criteriaBuilder.equal(root.get(Company_.IS_PAID_AND_LONG_TERM_INTERNSHIP),
+                    true);
+        };
+        return ensureSpecification(origin, target);
+    }
+
+    private Specification<Company> checkIfUserWantPaidInternship(Specification<Company> specification)
+            throws ApiException, ApiNotFoundException {
+        if (connectedUserService.isUserConnected() && !connectedUserService.isAdmin()) {
+            User user = userService.findByEmail(connectedUserService.getConnectedUser().getUsername());
+            if (user.getDesiredInternshipPeriodDays() > periodWhenInternshipIsPaid) {
+                specification = this.addIsPaidInternshipCriteria(specification);
+            }
+        }
+        return specification;
     }
 }

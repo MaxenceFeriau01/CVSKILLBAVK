@@ -13,10 +13,8 @@ variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'EntreprendreEnsemble-Mecena-acr'
   imageRepository: 'entreprendre-ensemble-back'
-  containerRegistry: 'EntreprendreEnsembleMecenatasr.azurecr.io'
   dockerfilePath: './Dockerfile'
   tag: '$(Build.BuildId)'
-  azureContainerRegistry: EntreprendreEnsembleMecenatasr.azurecr.io
   vmImageName: 'ubuntu-latest'
 
 stages:

@@ -40,8 +40,6 @@ public class UserResponseDto {
 
 	Collection<PartialFileDbDto> files;
 
-	Collection<ActivityDto> activities;
-
 	Collection<JobDto> jobs;
 
 	private Collection<RoleDto> roles;

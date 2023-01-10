@@ -96,10 +96,6 @@ public class User extends FullAuditable<String> {
 	@JoinTable(name = "users_jobs", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "JOB_ID", referencedColumnName = "JOB_ID"))
 	private Collection<Job> jobs;
 
-	@ManyToMany
-	@JoinTable(name = "users_activities", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))
-	Collection<Activity> activities;
-
 	public Long getDesiredInternshipPeriodDays() {
 		return ChronoUnit.DAYS.between(internshipStartDate, internshipEndDate);
 	}

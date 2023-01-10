@@ -44,8 +44,6 @@ public class UserRequestDto {
 
 	private MultipartFile coverLetter;
 
-	private Collection<ActivityDto> activities;
-
 	private Collection<JobDto> jobs;
 
 	private Collection<RoleDto> roles;

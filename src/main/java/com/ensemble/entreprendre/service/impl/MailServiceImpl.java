@@ -75,7 +75,6 @@ public class MailServiceImpl implements IMailService {
             VelocityContext context = new VelocityContext();
             MailType type = mail.getSubject().getTemplate();
             Template template = Velocity.getTemplate(type.getPath());
-            System.out.println(mail.getRecipient());
 
             HashMap<String, Object> params = mail.getParams();
             params.forEach((k, v) -> {

@@ -20,6 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,6 +47,7 @@ import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IUserRepository;
+import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
 
@@ -73,6 +77,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Autowired
     IMailService mailService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtTokenUtilBean jwtTokenUtilBean;
 
     @Value("${front.url}")
     String frontUrl;
@@ -325,6 +334,21 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             files.add(fileDb);
         }
         return files;
+    }
+
+    public AuthenticationResponseDto authenticate(String email, String password) throws ApiException {
+        final UserDetails userDetails = this.loadUserByUsername(email);
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,
+                    password));
+        } catch (BadCredentialsException e) {
+            throw new ApiException("Identifiants incorrects", HttpStatus.NOT_FOUND);
+        }
+
+        AuthenticationResponseDto user = this.findByEmailToAuthenticationResponseDto(email);
+        user.setToken(jwtTokenUtilBean.generateToken(userDetails));
+
+        return user;
     }
 
 }

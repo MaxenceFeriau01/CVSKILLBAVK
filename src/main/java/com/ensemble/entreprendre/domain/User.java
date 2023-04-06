@@ -21,12 +21,16 @@ import javax.persistence.Table;
 
 import com.ensemble.entreprendre.domain.technical.FullAuditable;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "USERS")
 public class User extends FullAuditable<String> {
 

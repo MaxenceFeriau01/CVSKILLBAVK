@@ -53,4 +53,6 @@ public interface IUserService {
 	void updatePassword(Long id, String newPassword) throws ApiNotFoundException;
 
 	List<Long> getAppliedCompanies(String email);
+
+    AuthenticationResponseDto authenticate(String email, String password) throws ApiException;
 }

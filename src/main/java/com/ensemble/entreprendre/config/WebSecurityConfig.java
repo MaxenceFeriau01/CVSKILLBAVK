@@ -129,7 +129,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		String password = charList.stream().collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
 				.toString();
 
-		System.out.println(password);
 		password = password.replace('"', '&');
 		return password;
 	}

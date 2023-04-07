@@ -1,4 +1,4 @@
-# ENVIRONNEMENTS
+## ENVIRONNEMENTS
 
 ```
     "ALLOWED_METHODS": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
@@ -29,7 +29,7 @@
 
 ## Docker 
 
-# DockeFile 
+## DockeFile 
 
 - Create image : ```docker build -t entreprendre-ensemble-back .```
 - Run image : ```docker run --rm -it -p 80:80 entreprendre-ensemble-back```
@@ -51,3 +51,8 @@ Where:
 <Description> – Textual description of the migration. A double underscore separates the description from the version numbers.
 ```
 Example: V1_1_0__my_first_migration.sql
+
+## Cucumber
+
+On utilise un base de données docker pour y implanter des données de tests. Sur le schéma **public**
+On peut retrouver les infos dans le fichier **src\test\resources\application.properties**

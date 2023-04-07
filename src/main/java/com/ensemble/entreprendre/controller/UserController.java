@@ -15,11 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +41,6 @@ import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IRoleRepository;
-import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
 import com.ensemble.entreprendre.service.IConnectedUserService;
 import com.ensemble.entreprendre.service.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,12 +54,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 public class UserController {
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	@Autowired
-	private JwtTokenUtilBean jwtTokenUtilBean;
-	@Autowired
-	private UserDetailsService userDetailsService;
 	@Autowired
 	private IUserService userService;
 	@Autowired
@@ -90,20 +78,7 @@ public class UserController {
 	@PostMapping(path = "/authenticate")
 	public AuthenticationResponseDto createAuthenticationToken(@RequestBody CredentialsDto authenticationRequest)
 			throws ApiException {
-
-		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
-		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
-					authenticationRequest.getPassword()));
-		} catch (BadCredentialsException e) {
-			throw new ApiException("Identifiants incorrects", HttpStatus.NOT_FOUND);
-		}
-
-		AuthenticationResponseDto user = userService
-				.findByEmailToAuthenticationResponseDto(authenticationRequest.getEmail());
-		user.setToken(jwtTokenUtilBean.generateToken(userDetails));
-
-		return user;
+		return this.userService.authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 	}
 
 	/**

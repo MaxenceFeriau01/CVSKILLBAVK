@@ -16,12 +16,16 @@ import javax.persistence.Table;
 
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "ROLES")
 public class Role {
 

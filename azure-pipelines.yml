@@ -1,0 +1,15 @@
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    docker run --name postgres-db -e POSTGRES_DB=entreprendre_ensemble -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:15.2
+  displayName: 'postgres install'
+  
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'package'    

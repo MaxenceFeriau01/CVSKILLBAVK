@@ -1,0 +1,99 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- develop
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  # Container registry service connection established during pipeline creation
+  - group: continuous-deployment-CD
+  - name: dockerRegistryServiceConnection
+    value: "EntreprendreEnsemble-Mecena-acr"
+  - name: imageRepository
+    value: "entreprendre-ensemble-pprod-back"
+  - name: dockerfilePath
+    value: "./Dockerfile"
+  - name: tag
+    value: "$(Build.BuildId)"
+  - name: vmImageName
+    value: "ubuntu-latest"
+
+stages:
+- stage: Packaging
+  displayName: Maven packaging
+  jobs:  
+  - job: Packaging
+    displayName: Maven packaging
+    pool:
+      vmImage: $(vmImageName)
+      
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m -Dmaven.test.skip=true'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: 'default'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        goals: 'package'
+    
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/target/
+        artifact: target
+
+- stage: Build
+  displayName: Docker image build
+  jobs:  
+  - job: Docker
+    displayName: Docker image build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: target
+        path: $(Build.SourcesDirectory)/target/
+
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+
+- stage: Deploy
+  jobs:
+    - job: Deploy
+      displayName: "Deploy new image on preprod server"
+      pool:
+        name: ModisAgentV3
+      steps:
+        - task: CmdLine@2
+          inputs:
+            script: |
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+              az login -u $(az-username) -p $(az-password)
+              mkdir -p ~/.ssh
+              touch ~/.ssh/known_hosts
+              ssh-keyscan -H $(ip-server) >> ~/.ssh/known_hosts
+              az config set extension.use_dynamic_install=yes_without_prompt
+              az ssh vm --ip $(ip-server) << EOF
+              sudo su
+              az login -u $(az-username) -p $(az-password)
+              az acr login --name $(az-container-registry)
+              docker pull $(docker-image-back-preprod)
+              docker-compose -f $(docker-compose-file-path-preprod) stop
+              docker-compose --log-level ERROR -f $(docker-compose-file-path-preprod) -p $(docker-project-name) up -d
+              EOF
+            failOnStderr: false

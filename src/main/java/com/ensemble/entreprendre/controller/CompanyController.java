@@ -32,7 +32,7 @@ import com.ensemble.entreprendre.dto.SimpleCompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.service.ICompanyService;
-import com.ensemble.entreprendre.util.IImageFileService;
+import com.ensemble.entreprendre.util.IImageFileUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -51,7 +51,7 @@ public class CompanyController {
 	ObjectMapper objectMapper;
 
 	@Autowired
-	IImageFileService imageFileService;
+	IImageFileUtil imageFileUtil;
 
 	@Value("${max.size.before.compression}")
 	Double maxSizeBeforeCompression;
@@ -110,15 +110,15 @@ public class CompanyController {
 
 		if (file != null) {
 			String[] acceptedExtensions = { "png", "jpg" };
-			if (this.imageFileService.checkAcceptedExtensions(file.getOriginalFilename(),
+			if (this.imageFileUtil.checkAcceptedExtensions(file.getOriginalFilename(),
 					acceptedExtensions) == false) {
 				throw new ApiException("Format d'image non accepté", HttpStatus.BAD_REQUEST);
 			}
 			byte[] fileInByte;
-			if (this.imageFileService.checkAcceptedFileSize(Double.valueOf(file.getSize()), maxSizeBeforeCompression) == false) {
-				fileInByte = this.imageFileService.compressImage(file);
+			if (this.imageFileUtil.checkAcceptedFileSize(Double.valueOf(file.getSize()), maxSizeBeforeCompression) == false) {
+				fileInByte = this.imageFileUtil.compressImage(file);
 				System.out.println(Double.valueOf(fileInByte.length) / 1024 / 1024);
-				if (this.imageFileService.checkAcceptedFileSize(Double.valueOf(fileInByte.length),
+				if (this.imageFileUtil.checkAcceptedFileSize(Double.valueOf(fileInByte.length),
 						maxSizeAfterCompression) == false) {
 
 					throw new ApiException("La taille du logo est trop grande", HttpStatus.BAD_REQUEST);

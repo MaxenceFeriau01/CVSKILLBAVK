@@ -15,13 +15,13 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ensemble.entreprendre.util.IImageFileService;
+import com.ensemble.entreprendre.util.IImageFileUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ImageFileService implements IImageFileService {
+public class ImageFileUtil implements IImageFileUtil {
 
     private static final String EXTENSION_INCOMPRESSIBLE_PNG = "png";
 

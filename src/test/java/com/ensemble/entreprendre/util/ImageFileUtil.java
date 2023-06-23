@@ -43,7 +43,6 @@ public class ImageFileUtil {
             byte[] data = new byte[size];
             fos.write(data);
 
-          
             fos.close();
 
             return file.getAbsolutePath();

@@ -34,7 +34,7 @@ public class ImageFileUtilTest {
         ImageIO.write(image, "jpg", outputStream);
         byte[] imageData = outputStream.toByteArray();
 
-        // Création d'un MockMultipartFile avec les données de l'image
+        // Create a MockMultipartFile with image data
         MockMultipartFile file = new MockMultipartFile("testFile.jpg", "testFile.jpg", "image/jpeg", imageData);
 
         byte[] compressedImage = imageFileUtil.compressImage(file);
@@ -46,7 +46,6 @@ public class ImageFileUtilTest {
 
     @Test
     public void testCheckAcceptedExtensions() {
-        // Appel de la méthode à tester avec différentes extensions
 
         String[] acceptedExtensions = { "jpg", "png", "gif" };
 
@@ -57,7 +56,6 @@ public class ImageFileUtilTest {
 
     @Test
     public void testCheckAcceptedFileSize() {
-        // Appel de la méthode à tester avec différentes tailles de fichiers
 
         Double acceptedSize = 10.0;
         assertTrue(imageFileUtil.checkAcceptedFileSize(5.0 * 1024 * 1024, acceptedSize));
@@ -72,12 +70,12 @@ public class ImageFileUtilTest {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
 
-        // Dessinez un dégradé de couleur
+        // Draw a color gradient
         GradientPaint gradient = new GradientPaint(0, 0, Color.RED, width, height, Color.BLUE);
         graphics.setPaint(gradient);
         graphics.fillRect(0, 0, width, height);
 
-        // Dessinez des motifs
+        // Draw patterns
         graphics.setColor(Color.WHITE);
         graphics.setStroke(new BasicStroke(2.0f));
 

@@ -7,6 +7,7 @@ import javax.persistence.EntityNotFoundException;
 
 import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +32,7 @@ import com.ensemble.entreprendre.dto.SimpleCompanyDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.service.ICompanyService;
+import com.ensemble.entreprendre.util.IImageFileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -47,6 +49,15 @@ public class CompanyController {
 
 	@Autowired
 	ObjectMapper objectMapper;
+
+	@Autowired
+	IImageFileService imageFileService;
+
+	@Value("${max.size.before.compression}")
+	Double maxSizeBeforeCompression;
+
+	@Value("${max.size.after.compression}")
+	Double maxSizeAfterCompression;
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
@@ -96,8 +107,27 @@ public class CompanyController {
 			@RequestPart(value = "logo", required = false) MultipartFile file) throws ApiException, IOException {
 
 		CompanyDto toUpdate = objectMapper.readValue(company, CompanyDto.class);
+
 		if (file != null) {
-			toUpdate.setLogo(file.getBytes());
+			String[] acceptedExtensions = { "png", "jpg" };
+			if (this.imageFileService.checkAcceptedExtensions(file.getOriginalFilename(),
+					acceptedExtensions) == false) {
+				throw new ApiException("Format d'image non accepté", HttpStatus.BAD_REQUEST);
+			}
+			byte[] fileInByte;
+			if (this.imageFileService.checkAcceptedFileSize(Double.valueOf(file.getSize()), maxSizeBeforeCompression) == false) {
+				fileInByte = this.imageFileService.compressImage(file);
+				System.out.println(Double.valueOf(fileInByte.length) / 1024 / 1024);
+				if (this.imageFileService.checkAcceptedFileSize(Double.valueOf(fileInByte.length),
+						maxSizeAfterCompression) == false) {
+
+					throw new ApiException("La taille du logo est trop grande", HttpStatus.BAD_REQUEST);
+				}
+			} else {
+				fileInByte = file.getBytes();
+			}
+
+			toUpdate.setLogo(fileInByte);
 		}
 		return this.companyService.update(id, toUpdate);
 	}

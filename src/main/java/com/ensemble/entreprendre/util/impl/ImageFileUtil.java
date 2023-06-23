@@ -12,7 +12,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.util.IImageFileUtil;
@@ -20,7 +20,7 @@ import com.ensemble.entreprendre.util.IImageFileUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
+@Component
 public class ImageFileUtil implements IImageFileUtil {
 
     private static final String EXTENSION_INCOMPRESSIBLE_PNG = "png";
@@ -78,7 +78,6 @@ public class ImageFileUtil implements IImageFileUtil {
         return baos.toByteArray();
     }
 
-   
     public boolean checkAcceptedExtensions(String fileName, String[] acceptedExtensions) {
         String imageExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
         for (String extension : acceptedExtensions) {
@@ -89,7 +88,6 @@ public class ImageFileUtil implements IImageFileUtil {
         return false;
     }
 
-  
     public boolean checkAcceptedFileSize(Double fileSize, Double acceptedSize) {
         return fileSize / 1024 / 1024 <= acceptedSize;
     }

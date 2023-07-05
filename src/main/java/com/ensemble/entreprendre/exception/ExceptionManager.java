@@ -37,13 +37,8 @@ public class ExceptionManager {
 	
 	@ExceptionHandler(value=MaxUploadSizeExceededException.class)
 	public ResponseEntity<ApiExceptionResponse> manageFileSizeLimitExceededException(final RuntimeException e) {
-		return this.getExceptionResponse(e, HttpStatus.BAD_REQUEST, "Les fichiers ne peuvent pas dépasser 5MB");
+		return this.getExceptionResponse(e, HttpStatus.BAD_REQUEST, "Les fichiers ne peuvent pas dépasser 15MB");
 	}
-
-//	@ExceptionHandler(value = InternalAuthenticationServiceException.class)
-//	public ResponseEntity<ApiExceptionResponse> manageAccessDeniedException(final RuntimeException e) {
-//		return this.getExceptionResponse(e, HttpStatus.UNAUTHORIZED, e.getMessage());
-//	}
 
 
 	@ExceptionHandler(value = ApiException.class)

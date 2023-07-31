@@ -1,0 +1,41 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- develop
+- main
+
+pool:
+  name: ModisAgentV2
+
+steps:
+     
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'Sonar - EEDK'
+    scannerMode: 'Other'
+    extraProperties: |
+      # Additional properties that will be passed to the scanner, 
+      # Put one key=value per line, example:
+      # sonar.exclusions=**/*.bin
+      sonar.projectKey=EntreprendreEnsemble-backend
+      sonar.projectName=EntreprendreEnsemble-backend
+      sonar.sources=src/main
+      sonar.sourceEncoding=UTF-8
+      sonar.language=java
+      sonar.binaries=target/classes
+    cliProjectName: 'EEDK-backend'
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m -Dmaven.test.skip=true'
+    publishJUnitResults: false
+    goals: 'package'    
+    sonarQubeRunAnalysis: true
+    
+
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'

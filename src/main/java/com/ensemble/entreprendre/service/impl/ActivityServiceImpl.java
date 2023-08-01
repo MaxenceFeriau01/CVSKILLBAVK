@@ -1,13 +1,18 @@
 package com.ensemble.entreprendre.service.impl;
 
 import java.util.Collection;
+import java.util.List;
+
+import javax.persistence.Tuple;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
+import com.ensemble.entreprendre.converter.CustomActivityConverter;
 import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.Activity;
 import com.ensemble.entreprendre.domain.Activity_;
@@ -30,6 +35,9 @@ public class ActivityServiceImpl implements IActivityService {
 	@Autowired
 	GenericConverter<Activity, ActivityDto> activityConverter;
 
+	@Autowired
+	CustomActivityConverter customActivityConverter;
+
 	@Override
 	public ActivityDto getById(long id) throws ApiException {
 		return this.activityConverter.entityToDto(this.activityRepository.findById(id)
@@ -40,10 +48,16 @@ public class ActivityServiceImpl implements IActivityService {
 	public Page<CustomActivity> getAllWithFilter(Pageable pageable, ActivityDtoFilter filter) {
 		if (filter != null) {
 			if (filter.getName() != null) {
-				return this.activityRepository.findAllWithCountsByName(pageable, filter.getName().toUpperCase());
+				Page<Tuple> tuplePage = this.activityRepository.findAllWithCountsByName(pageable,
+						filter.getName().toUpperCase());
+				List<CustomActivity> customActivities = customActivityConverter.mapTupleToCustomActivity(tuplePage);
+				return PageableExecutionUtils.getPage(customActivities, pageable, tuplePage::getTotalElements);
 			}
 		}
-		return this.activityRepository.findAllWithCountsByName(pageable, "");
+
+		Page<Tuple> tuplePage = this.activityRepository.findAllWithCountsByName(pageable, "");
+		List<CustomActivity> customActivities = customActivityConverter.mapTupleToCustomActivity(tuplePage);
+		return PageableExecutionUtils.getPage(customActivities, pageable, tuplePage::getTotalElements);
 	}
 
 	@Override

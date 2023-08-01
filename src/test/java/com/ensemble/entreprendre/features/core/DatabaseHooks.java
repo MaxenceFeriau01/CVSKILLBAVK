@@ -93,8 +93,8 @@ public class DatabaseHooks {
         this.roleRepository.save(new Role(null, RoleEnum.ROLE_COMPANY, null));
         this.roleRepository.save(new Role(null, RoleEnum.ROLE_ADMIN, null));
 
-        this.activityRepository.save(new Activity(null, "Droit", null, null, null));
-        this.activityRepository.save(new Activity(null, "Mécanique", null, null, null));
+        this.activityRepository.save(new Activity(null, "Droit", null, null));
+        this.activityRepository.save(new Activity(null, "Mécanique", null, null));
 
         this.jobRepository.save(new Job(null, "Technicien", null, null));
         this.jobRepository.save(new Job(null, "Juriste", null, null));

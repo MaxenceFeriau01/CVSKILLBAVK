@@ -35,6 +35,4 @@ public class Activity {
 	@ManyToMany(mappedBy = "searchedActivities")
 	Set<Company> companiesSearch;
 
-	@ManyToMany(mappedBy = "jobs")
-	Set<User> users;
 }

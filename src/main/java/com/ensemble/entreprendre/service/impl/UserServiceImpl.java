@@ -50,6 +50,7 @@ import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
 import com.ensemble.entreprendre.service.IMailService;
 import com.ensemble.entreprendre.service.IUserService;
+import com.ensemble.entreprendre.util.IPdfFileUtil;
 
 import net.bytebuddy.utility.RandomString;
 
@@ -79,12 +80,21 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     IMailService mailService;
 
     @Autowired
+    IPdfFileUtil pdfFileUtil;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtTokenUtilBean jwtTokenUtilBean;
 
     @Value("${front.url}")
     String frontUrl;
+
+    @Value("${max.bytes.size.before.compression}")
+    Double maxBytesSizeBeforeCompression;
+
+    @Value("${max.bytes.size.after.compression}")
+    Double maxBytesSizeAfterCompression;
 
     @Override
     public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
@@ -322,15 +332,38 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
                 throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
             }
-            FileDb fileDb = new FileDb(null, cv.getOriginalFilename(), FileTypeEnum.CV, cv.getBytes(), user);
+
+            byte[] cvBytes = cv.getBytes();
+            if (cv.getSize() > maxBytesSizeBeforeCompression) {
+                System.out.println("File size before compression : " + cv.getSize() + " bytes");
+                cvBytes = this.pdfFileUtil.compressPdf(cv);
+                System.out.println("File size after compression : " + cvBytes.length + " bytes");
+                if (cvBytes.length > maxBytesSizeAfterCompression) {
+                    throw new ApiException("Le CV est trop volumineux", HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            FileDb fileDb = new FileDb(null, cv.getOriginalFilename(), FileTypeEnum.CV, cvBytes, user);
             files.add(fileDb);
         }
+
         if (coverLetter != null) {
             if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
                 throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
             }
+
+            byte[] coverLetterBytes = coverLetter.getBytes();
+            if (coverLetter.getSize() > maxBytesSizeBeforeCompression) {
+                System.out.println("File size before compression : " + coverLetter.getSize() + " bytes");
+                coverLetterBytes = this.pdfFileUtil.compressPdf(coverLetter);
+                System.out.println("File size after compression : " + coverLetterBytes.length + " bytes");
+                if (coverLetterBytes.length > maxBytesSizeAfterCompression) {
+                    throw new ApiException("La lettre de motivation est trop volumineuse", HttpStatus.BAD_REQUEST);
+                }
+            }
+
             FileDb fileDb = new FileDb(null, coverLetter.getOriginalFilename(), FileTypeEnum.COVER_LETTER,
-                    coverLetter.getBytes(), user);
+                    coverLetterBytes, user);
             files.add(fileDb);
         }
         return files;

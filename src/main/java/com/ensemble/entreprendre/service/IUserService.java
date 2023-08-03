@@ -55,4 +55,6 @@ public interface IUserService {
 	List<Long> getAppliedCompanies(String email);
 
     AuthenticationResponseDto authenticate(String email, String password) throws ApiException;
+
+	void updateProfil(Integer updateProfil, UserResponseDto UserResponseDto);
 }

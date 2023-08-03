@@ -351,4 +351,10 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         return user;
     }
 
+    public updateProfil (Integer updateProfil, UserResponseDto){
+       Integer updateProfil = this.UserResponseDto.updateProfil + 1;
+
+        return Integer updateProfil;
+    }
+
 }

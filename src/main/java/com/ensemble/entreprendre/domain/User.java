@@ -69,6 +69,9 @@ public class User extends FullAuditable<String> {
 	@Column(nullable = true)
 	private String resetPasswordToken;
 
+	@Column(nullable = true)
+	private int updateProfil;
+
 	@ManyToOne
 	@JoinColumn(name = "STATUS_ID", referencedColumnName = "STATUS_ID")
 	private InternStatus internStatus;

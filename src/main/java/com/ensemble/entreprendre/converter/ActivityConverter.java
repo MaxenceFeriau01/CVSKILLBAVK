@@ -8,10 +8,12 @@ import javax.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import com.ensemble.entreprendre.domain.Activity;
+import com.ensemble.entreprendre.dto.ActivityDto;
 import com.ensemble.entreprendre.projection.CustomActivity;
 
 @Component
-public class CustomActivityConverter {
+public class ActivityConverter extends GenericConverter<Activity, ActivityDto> {
 
 	public List<CustomActivity> mapTupleToCustomActivity(Page<Tuple> tuplePage) {
 		return tuplePage.stream().map(tuple -> new CustomActivity(

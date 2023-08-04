@@ -17,6 +17,7 @@ import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
+import com.ensemble.entreprendre.dto.UserStatDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -55,5 +56,7 @@ public interface IUserService {
 	List<Long> getAppliedCompanies(String email);
 
     AuthenticationResponseDto authenticate(String email, String password) throws ApiException;
+
+    Page<UserStatDto> getUserStats(Pageable pageable);
 
 }

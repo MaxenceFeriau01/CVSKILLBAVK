@@ -37,6 +37,7 @@ import com.ensemble.entreprendre.dto.ForgotPasswordDto;
 import com.ensemble.entreprendre.dto.ResetPasswordDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
+import com.ensemble.entreprendre.dto.UserStatDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
@@ -197,5 +198,17 @@ public class UserController {
 			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
 
 		this.userService.active(id, userDtoFilter.isActivated());
+	}
+
+	@Secured({ "ROLE_ADMIN" })
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
+			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"), })
+	@GetMapping("/stats")
+	public Page<UserStatDto> getUserStats(
+			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
+					User_.NAME }, direction = Sort.Direction.ASC) Pageable pageable
+			) {
+		return this.userService.getUserStats(pageable);
 	}
 }

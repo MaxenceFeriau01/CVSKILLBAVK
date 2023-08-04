@@ -42,6 +42,7 @@ import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
+import com.ensemble.entreprendre.dto.UserStatDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
@@ -68,6 +69,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Autowired
     GenericConverter<User, UserResponseDto> userResponseConverter;
+
+    @Autowired
+    GenericConverter<User, UserStatDto> userStatConverter;
 
     @Autowired
     GenericConverter<User, AuthenticationResponseDto> authenticationResponseConverter;
@@ -271,7 +275,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         }
 
         Integer saveVisit = currentUser.getUpdateProfil();
-        saveVisit ++;
+        saveVisit++;
 
         newUser.setUpdateProfil(saveVisit);
 
@@ -355,5 +359,10 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
         return user;
     }
+
+    public Page<UserStatDto> getUserStats(Pageable pageable) {
+        return this.userStatConverter.entitiesToDtos(this.userRepository.findAll(pageable),
+                UserStatDto.class);
+    };
 
 }

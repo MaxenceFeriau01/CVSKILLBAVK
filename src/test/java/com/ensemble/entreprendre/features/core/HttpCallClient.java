@@ -43,14 +43,10 @@ public class HttpCallClient {
         }
 
         public void requestPost(final String url, final JsonNode body) {
-                MultipartBodyBuilder builder = new MultipartBodyBuilder();
-                builder.part("company", body);
                 ResponseSpec responseSpec = this.webClient.post()
                                 .uri(url)
                                 .headers(h -> h.setBearerAuth(this.jwtToken))
-                                .headers(h-> h.setContentType(MediaType.MULTIPART_FORM_DATA))
-                                .headers(h-> h.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
-                                .body(BodyInserters.fromMultipartData(builder.build()))
+                                .bodyValue(body)
                                 .retrieve()
                                 .onStatus(HttpStatus::isError, clientResponse -> Mono.empty());
                 this.response = responseSpec.toEntity(JsonNode.class).block();

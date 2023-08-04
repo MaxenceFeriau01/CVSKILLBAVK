@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomActivity  {
+public class CustomActivity {
 
 	private Long id;
 	private String name;
 	private Long companyCount;
 	private Long companySearchCount;
-	private Long userCount;
 }

@@ -56,5 +56,4 @@ public interface IUserService {
 
     AuthenticationResponseDto authenticate(String email, String password) throws ApiException;
 
-	void updateProfil(Integer updateProfil, UserResponseDto UserResponseDto);
 }

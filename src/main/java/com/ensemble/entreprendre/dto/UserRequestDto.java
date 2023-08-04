@@ -47,4 +47,7 @@ public class UserRequestDto {
 	private Collection<JobDto> jobs;
 
 	private Collection<RoleDto> roles;
+
+	private Integer updateProfil;
+
 }

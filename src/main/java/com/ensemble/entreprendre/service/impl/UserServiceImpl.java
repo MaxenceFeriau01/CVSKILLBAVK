@@ -270,6 +270,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             }
         }
 
+        Integer saveVisit = currentUser.getUpdateProfil();
+        saveVisit ++;
+
+        newUser.setUpdateProfil(saveVisit);
+
         newUser.setFiles(files);
 
         newUser.setPassword(currentUser.getPassword());
@@ -349,12 +354,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         user.setToken(jwtTokenUtilBean.generateToken(userDetails));
 
         return user;
-    }
-
-    public updateProfil (Integer updateProfil, UserResponseDto){
-       Integer updateProfil = this.UserResponseDto.updateProfil + 1;
-
-        return Integer updateProfil;
     }
 
 }

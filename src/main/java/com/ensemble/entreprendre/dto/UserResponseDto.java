@@ -44,6 +44,6 @@ public class UserResponseDto {
 
 	private Collection<RoleDto> roles;
 
-	public Integer updateProfil;
+	private Integer updateProfil;
 
 }

@@ -69,9 +69,6 @@ public class User extends FullAuditable<String> {
 	@Column(nullable = true)
 	private String resetPasswordToken;
 
-	@Column(nullable = true)
-	private int updateProfil;
-
 	@ManyToOne
 	@JoinColumn(name = "STATUS_ID", referencedColumnName = "STATUS_ID")
 	private InternStatus internStatus;
@@ -102,6 +99,9 @@ public class User extends FullAuditable<String> {
 	@ManyToMany
 	@JoinTable(name = "users_jobs", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "JOB_ID", referencedColumnName = "JOB_ID"))
 	private Collection<Job> jobs;
+
+	@Column(nullable = false)
+	private Integer updateProfil;
 
 	public Long getDesiredInternshipPeriodDays() {
 		return ChronoUnit.DAYS.between(internshipStartDate, internshipEndDate);

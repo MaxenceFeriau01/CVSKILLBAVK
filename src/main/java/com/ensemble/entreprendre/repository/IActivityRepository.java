@@ -19,7 +19,8 @@ public interface IActivityRepository extends JpaRepository<Activity, Long>,
 			"LEFT JOIN a.companies c " +
 			"LEFT JOIN a.companiesSearch cs " +
 			"WHERE (:name IS NULL OR UPPER(a.name) LIKE %:name%) " +
-			"GROUP BY a.id, a.name")
+			"GROUP BY a.id " +
+			"ORDER BY name ASC")
 	public Page<Tuple> findAllWithCountsByName(Pageable pageable, @Param("name") String name);
 
 }

@@ -335,9 +335,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             byte[] cvBytes = cv.getBytes();
             if (!this.pdfFileUtil.checkFileSize(Double.valueOf(cv.getSize()),
                     Double.valueOf(maxSizeBeforeCompression * 1024 * 1024))) {
-                System.out.println("CV size before compression : " + cv.getSize() + " bytes");
                 cvBytes = this.pdfFileUtil.compressPdf(cv);
-                System.out.println("CV size after compression : " + cvBytes.length + " bytes");
                 if (!this.pdfFileUtil.checkFileSize(Double.valueOf(cvBytes.length),
                         Double.valueOf(maxSizeAfterCompression * 1024 * 1024))) {
                     throw new ApiException("Le CV dépasse la taille maximale", HttpStatus.BAD_REQUEST);
@@ -354,9 +352,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             byte[] coverLetterBytes = coverLetter.getBytes();
             if (!this.pdfFileUtil.checkFileSize(Double.valueOf(coverLetter.getSize()),
                     Double.valueOf(maxSizeBeforeCompression * 1024 * 1024))) {
-                System.out.println("Cover letter size before compression : " + coverLetter.getSize() + " bytes");
                 coverLetterBytes = this.pdfFileUtil.compressPdf(coverLetter);
-                System.out.println("Cover letter size after compression : " + coverLetterBytes.length + " bytes");
                 if (!this.pdfFileUtil.checkFileSize(Double.valueOf(coverLetterBytes.length),
                         Double.valueOf(maxSizeAfterCompression * 1024 * 1024))) {
                     throw new ApiException("La lettre de motivation dépasse la taille maximale",

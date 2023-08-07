@@ -90,11 +90,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     @Value("${front.url}")
     String frontUrl;
 
-    @Value("${max.bytes.size.before.compression}")
-    Double maxBytesSizeBeforeCompression;
+    @Value("${max.size.before.compression}")
+    Double maxSizeBeforeCompression;
 
-    @Value("${max.bytes.size.after.compression}")
-    Double maxBytesSizeAfterCompression;
+    @Value("${max.size.after.compression}")
+    Double maxSizeAfterCompression;
 
     @Override
     public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
@@ -332,17 +332,17 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             if (!cv.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
                 throw new ApiException("Le CV doit respecter le format pdf", HttpStatus.BAD_REQUEST);
             }
-
             byte[] cvBytes = cv.getBytes();
-            if (cv.getSize() > maxBytesSizeBeforeCompression) {
-                System.out.println("File size before compression : " + cv.getSize() + " bytes");
+            if (!this.pdfFileUtil.checkFileSize(Double.valueOf(cv.getSize()),
+                    Double.valueOf(maxSizeBeforeCompression * 1024 * 1024))) {
+                System.out.println("CV size before compression : " + cv.getSize() + " bytes");
                 cvBytes = this.pdfFileUtil.compressPdf(cv);
-                System.out.println("File size after compression : " + cvBytes.length + " bytes");
-                if (cvBytes.length > maxBytesSizeAfterCompression) {
-                    throw new ApiException("Le CV est trop volumineux", HttpStatus.BAD_REQUEST);
+                System.out.println("CV size after compression : " + cvBytes.length + " bytes");
+                if (!this.pdfFileUtil.checkFileSize(Double.valueOf(cvBytes.length),
+                        Double.valueOf(maxSizeAfterCompression * 1024 * 1024))) {
+                    throw new ApiException("Le CV dépasse la taille maximale", HttpStatus.BAD_REQUEST);
                 }
             }
-
             FileDb fileDb = new FileDb(null, cv.getOriginalFilename(), FileTypeEnum.CV, cvBytes, user);
             files.add(fileDb);
         }
@@ -351,17 +351,18 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             if (!coverLetter.getContentType().equals(ACCEPTED_FILE_FORMAT)) {
                 throw new ApiException("La lettre de motivation doit respecter le format pdf", HttpStatus.BAD_REQUEST);
             }
-
             byte[] coverLetterBytes = coverLetter.getBytes();
-            if (coverLetter.getSize() > maxBytesSizeBeforeCompression) {
-                System.out.println("File size before compression : " + coverLetter.getSize() + " bytes");
+            if (!this.pdfFileUtil.checkFileSize(Double.valueOf(coverLetter.getSize()),
+                    Double.valueOf(maxSizeBeforeCompression * 1024 * 1024))) {
+                System.out.println("Cover letter size before compression : " + coverLetter.getSize() + " bytes");
                 coverLetterBytes = this.pdfFileUtil.compressPdf(coverLetter);
-                System.out.println("File size after compression : " + coverLetterBytes.length + " bytes");
-                if (coverLetterBytes.length > maxBytesSizeAfterCompression) {
-                    throw new ApiException("La lettre de motivation est trop volumineuse", HttpStatus.BAD_REQUEST);
+                System.out.println("Cover letter size after compression : " + coverLetterBytes.length + " bytes");
+                if (!this.pdfFileUtil.checkFileSize(Double.valueOf(coverLetterBytes.length),
+                        Double.valueOf(maxSizeAfterCompression * 1024 * 1024))) {
+                    throw new ApiException("La lettre de motivation dépasse la taille maximale",
+                            HttpStatus.BAD_REQUEST);
                 }
             }
-
             FileDb fileDb = new FileDb(null, coverLetter.getOriginalFilename(), FileTypeEnum.COVER_LETTER,
                     coverLetterBytes, user);
             files.add(fileDb);

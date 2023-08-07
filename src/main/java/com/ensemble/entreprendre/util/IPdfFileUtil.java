@@ -13,4 +13,11 @@ public interface IPdfFileUtil {
      * @throws ApiException
      */
     public byte[] compressPdf(MultipartFile mpFile) throws ApiException;
+    
+    /**
+     * @param fileSize the size of the file in long
+     * @return false if bigger than the max size provided, true otherwise
+     */
+    public boolean checkFileSize(Double fileSize, Double maxSize);
+
 }

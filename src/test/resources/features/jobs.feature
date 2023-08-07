@@ -51,6 +51,22 @@
     }
     """
 
+    When the client calls "/jobs/stats" with GET
+    Then the response should have a status code of 200
+    And the response body should be
+    """
+    [
+        {
+            "name": "Technicien",
+            "userCount": 0
+        },
+        {
+            "name": "Juriste",
+            "userCount": 0
+        }
+    ]
+    """
+
     @admin
     Scenario: Register a user and check the jobs statistics, create a company and check the jobs statistics again
 
@@ -136,6 +152,22 @@
         "numberOfElements": 2,
         "empty": false
     }
+    """
+
+    When the client calls "/jobs/stats" with GET
+    Then the response should have a status code of 200
+    And the response body should be
+    """
+    [
+        {
+            "name": "Technicien",
+            "userCount": 1
+        },
+        {
+            "name": "Juriste",
+            "userCount": 1
+        }
+    ]
     """
 
     Given the client request body as multipart-form-data contains
@@ -316,4 +348,20 @@
         "numberOfElements": 2,
         "empty": false
     }
+    """
+
+    When the client calls "/jobs/stats" with GET
+    Then the response should have a status code of 200
+    And the response body should be
+    """
+    [
+        {
+            "name": "Technicien",
+            "userCount": 1
+        },
+        {
+            "name": "Juriste",
+            "userCount": 1
+        }
+    ]
     """

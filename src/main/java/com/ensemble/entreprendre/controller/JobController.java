@@ -1,6 +1,7 @@
 package com.ensemble.entreprendre.controller;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,10 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ensemble.entreprendre.dto.JobAdministrationDto;
 import com.ensemble.entreprendre.dto.JobDto;
+import com.ensemble.entreprendre.dto.JobStatDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.JobDtoFilter;
-import com.ensemble.entreprendre.projection.CustomJob;
 import com.ensemble.entreprendre.service.IJobService;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -49,8 +51,9 @@ public class JobController {
 			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
 					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
 	@GetMapping("/search")
+	@Secured({ "ROLE_ADMIN" })
 	@ResponseStatus(HttpStatus.OK)
-	public Page<CustomJob> getAll(
+	public Page<JobAdministrationDto> getAll(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable,
 			JobDtoFilter filter) throws ApiException {
 
@@ -61,6 +64,13 @@ public class JobController {
 	@ResponseStatus(HttpStatus.OK)
 	public Collection<JobDto> getAll() throws ApiException {
 		return this.jobService.getAll();
+	}
+
+	@Secured({ "ROLE_ADMIN" })
+	@GetMapping("/stats")
+	@ResponseStatus(HttpStatus.OK)
+	public List<JobStatDto> getJobStats() throws ApiException {
+		return this.jobService.getJobStats();
 	}
 
 	@GetMapping(path = "/{id}")

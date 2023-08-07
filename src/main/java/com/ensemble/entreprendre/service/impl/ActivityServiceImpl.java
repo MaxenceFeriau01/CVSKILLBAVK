@@ -16,12 +16,12 @@ import com.ensemble.entreprendre.converter.ActivityConverter;
 import com.ensemble.entreprendre.domain.Activity;
 import com.ensemble.entreprendre.domain.Activity_;
 import com.ensemble.entreprendre.dto.ActivityDto;
+import com.ensemble.entreprendre.dto.ActivityAdministrationDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.exception.BusinessException;
 import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.filter.ActivityDtoFilter;
-import com.ensemble.entreprendre.projection.CustomActivity;
 import com.ensemble.entreprendre.repository.IActivityRepository;
 import com.ensemble.entreprendre.service.IActivityService;
 
@@ -41,18 +41,20 @@ public class ActivityServiceImpl implements IActivityService {
 	}
 
 	@Override
-	public Page<CustomActivity> getAllWithFilter(Pageable pageable, ActivityDtoFilter filter) {
+	public Page<ActivityAdministrationDto> getAllWithFilter(Pageable pageable, ActivityDtoFilter filter) {
 		if (filter != null) {
 			if (filter.getName() != null) {
 				Page<Tuple> tuplePage = this.activityRepository.findAllWithCountsByName(pageable,
 						filter.getName().toUpperCase());
-				List<CustomActivity> customActivities = activityConverter.mapTupleToCustomActivity(tuplePage);
+				List<ActivityAdministrationDto> customActivities = activityConverter
+						.mapTupleToActivityAdministrationDto(tuplePage);
 				return PageableExecutionUtils.getPage(customActivities, pageable, tuplePage::getTotalElements);
 			}
 		}
 
 		Page<Tuple> tuplePage = this.activityRepository.findAllWithCountsByName(pageable, "");
-		List<CustomActivity> customActivities = activityConverter.mapTupleToCustomActivity(tuplePage);
+		List<ActivityAdministrationDto> customActivities = activityConverter
+				.mapTupleToActivityAdministrationDto(tuplePage);
 		return PageableExecutionUtils.getPage(customActivities, pageable, tuplePage::getTotalElements);
 	}
 

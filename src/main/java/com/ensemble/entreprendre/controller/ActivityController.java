@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ensemble.entreprendre.dto.ActivityDto;
+import com.ensemble.entreprendre.dto.ActivityAdministrationDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.ActivityDtoFilter;
-import com.ensemble.entreprendre.projection.CustomActivity;
 import com.ensemble.entreprendre.service.IActivityService;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -50,7 +50,7 @@ public class ActivityController {
 			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
 					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
 	@GetMapping("/search")
-	public Page<CustomActivity> search(
+	public Page<ActivityAdministrationDto> search(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable,
 			ActivityDtoFilter filter) throws ApiException {
 
@@ -59,7 +59,6 @@ public class ActivityController {
 
 	@GetMapping
 	public Collection<ActivityDto> getAll() throws ApiException {
-
 		return this.activityService.getAll();
 	}
 

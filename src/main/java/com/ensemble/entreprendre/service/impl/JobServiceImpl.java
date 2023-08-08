@@ -15,13 +15,14 @@ import org.springframework.stereotype.Service;
 import com.ensemble.entreprendre.converter.JobConverter;
 import com.ensemble.entreprendre.domain.Job;
 import com.ensemble.entreprendre.domain.Job_;
+import com.ensemble.entreprendre.dto.JobAdministrationDto;
 import com.ensemble.entreprendre.dto.JobDto;
+import com.ensemble.entreprendre.dto.JobStatDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.exception.BusinessException;
 import com.ensemble.entreprendre.exception.TechnicalException;
 import com.ensemble.entreprendre.filter.JobDtoFilter;
-import com.ensemble.entreprendre.projection.CustomJob;
 import com.ensemble.entreprendre.repository.IJobRepository;
 import com.ensemble.entreprendre.service.IJobService;
 
@@ -41,17 +42,17 @@ public class JobServiceImpl implements IJobService {
 	}
 
 	@Override
-	public Page<CustomJob> getAllWithFilter(Pageable pageable, JobDtoFilter filter) {
+	public Page<JobAdministrationDto> getAllWithFilter(Pageable pageable, JobDtoFilter filter) {
 		if (filter != null) {
 			if (filter.getName() != null) {
 				Page<Tuple> tuplePage = this.jobRepository.findAllWithCountsByName(pageable,
 						filter.getName().toUpperCase());
-				List<CustomJob> customJobs = jobConverter.mapTupleToCustomJob(tuplePage);
+				List<JobAdministrationDto> customJobs = jobConverter.mapTupleToJobAdministrationDto(tuplePage);
 				return PageableExecutionUtils.getPage(customJobs, pageable, tuplePage::getTotalElements);
 			}
 		}
 		Page<Tuple> tuplePage = this.jobRepository.findAllWithCountsByName(pageable, "");
-		List<CustomJob> customJobs = jobConverter.mapTupleToCustomJob(tuplePage);
+		List<JobAdministrationDto> customJobs = jobConverter.mapTupleToJobAdministrationDto(tuplePage);
 		return PageableExecutionUtils.getPage(customJobs, pageable, tuplePage::getTotalElements);
 	}
 
@@ -90,5 +91,11 @@ public class JobServiceImpl implements IJobService {
 				.orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
 		this.jobRepository.delete(toDelete);
 		return this.jobConverter.entityToDto(toDelete, JobDto.class);
+	}
+
+	@Override
+	public List<JobStatDto> getJobStats() {
+		return jobConverter
+				.mapTupleToJobStatDto(jobRepository.findAllWithUserCountOrderByUserCountDesc());
 	}
 }

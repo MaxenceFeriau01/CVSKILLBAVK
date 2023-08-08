@@ -1,14 +1,16 @@
 package com.ensemble.entreprendre.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.ensemble.entreprendre.dto.JobAdministrationDto;
 import com.ensemble.entreprendre.dto.JobDto;
+import com.ensemble.entreprendre.dto.JobStatDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.JobDtoFilter;
-import com.ensemble.entreprendre.projection.CustomJob;
 
 public interface IJobService {
 
@@ -22,5 +24,7 @@ public interface IJobService {
 
 	JobDto delete(long id) throws ApiException;
 
-	Page<CustomJob> getAllWithFilter(Pageable pageable, JobDtoFilter filter);
+	List<JobStatDto> getJobStats();
+
+	Page<JobAdministrationDto> getAllWithFilter(Pageable pageable, JobDtoFilter filter);
 }

@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 
 import com.ensemble.entreprendre.domain.Activity;
 import com.ensemble.entreprendre.dto.ActivityDto;
-import com.ensemble.entreprendre.projection.CustomActivity;
+import com.ensemble.entreprendre.dto.ActivityAdministrationDto;
 
 @Component
 public class ActivityConverter extends GenericConverter<Activity, ActivityDto> {
 
-	public List<CustomActivity> mapTupleToCustomActivity(Page<Tuple> tuplePage) {
-		return tuplePage.stream().map(tuple -> new CustomActivity(
+	public List<ActivityAdministrationDto> mapTupleToActivityAdministrationDto(Page<Tuple> tuplePage) {
+		return tuplePage.stream().map(tuple -> new ActivityAdministrationDto(
 				tuple.get("id", Long.class),
 				tuple.get("name", String.class),
 				tuple.get("companyCount", Long.class),

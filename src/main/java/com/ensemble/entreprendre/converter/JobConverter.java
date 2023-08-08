@@ -9,17 +9,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.ensemble.entreprendre.domain.Job;
+import com.ensemble.entreprendre.dto.JobAdministrationDto;
 import com.ensemble.entreprendre.dto.JobDto;
-import com.ensemble.entreprendre.projection.CustomJob;
+import com.ensemble.entreprendre.dto.JobStatDto;
 
 @Component
 public class JobConverter extends GenericConverter<Job, JobDto> {
 
-    public List<CustomJob> mapTupleToCustomJob(Page<Tuple> tuplePage) {
-        return tuplePage.stream().map(tuple -> new CustomJob(
+    public List<JobAdministrationDto> mapTupleToJobAdministrationDto(Page<Tuple> tuplePage) {
+        return tuplePage.stream().map(tuple -> new JobAdministrationDto(
                 tuple.get("id", Long.class),
                 tuple.get("name", String.class),
                 tuple.get("companyCount", Long.class),
+                tuple.get("userCount", Long.class))).collect(Collectors.toList());
+    }
+
+    public List<JobStatDto> mapTupleToJobStatDto(List<Tuple> tupleList) {
+        return tupleList.stream().map(tuple -> new JobStatDto(
+                tuple.get("name", String.class),
                 tuple.get("userCount", Long.class))).collect(Collectors.toList());
     }
 

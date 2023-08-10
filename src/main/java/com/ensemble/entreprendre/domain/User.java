@@ -107,4 +107,25 @@ public class User extends FullAuditable<String> {
 		return ChronoUnit.DAYS.between(internshipStartDate, internshipEndDate);
 	}
 
+	
+	public boolean compareUserForUpdate(User other){
+		if (this == other) {
+			return true;
+		}
+		if (other == null || getClass() != other.getClass()) {
+			return false;
+		}
+		
+		return 	id.equals(other.id) && 
+			   	email.equals(other.email) &&
+			   	firstName.equals(other.firstName) &&
+			   	name.equals(other.name) &&
+			   	phone.equals(other.phone) &&
+			   	postalCode == other.postalCode &&
+			   	dateOfBirth.equals(other.dateOfBirth) &&
+			   	internshipStartDate.equals(other.internshipStartDate) &&
+			    internshipEndDate.equals(other.internshipEndDate) && 
+				internStatus.getId() == other.internStatus.getId();
+	}
+
 }

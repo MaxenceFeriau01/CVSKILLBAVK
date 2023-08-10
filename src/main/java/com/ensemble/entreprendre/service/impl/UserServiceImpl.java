@@ -275,13 +275,17 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         }
 
         Integer saveVisit = currentUser.getUpdateProfil();
-        saveVisit++;
-
+        if(!currentUser.compareUserForUpdate(newUser)){
+            saveVisit++;
+        }
+        
         newUser.setUpdateProfil(saveVisit);
 
         newUser.setFiles(files);
 
         newUser.setPassword(currentUser.getPassword());
+
+        
 
         return this.userResponseConverter.entityToDto(this.userRepository.save(newUser), UserResponseDto.class);
     }

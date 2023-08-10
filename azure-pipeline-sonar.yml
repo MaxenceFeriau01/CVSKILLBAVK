@@ -7,35 +7,66 @@ trigger:
 - develop
 - main
 
-pool:
-  name: ModisAgentV2
+stages:
+  - stage: tests
+    jobs :
+    - job: tests
+      pool: 
+        vmImage: ubuntu-latest
+      steps:
+        - script: |
+              docker run --name postgres-db -e POSTGRES_DB=entreprendre_ensemble -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:15.2
+          displayName: 'postgres install'
+        - task: Maven@3
+          inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx3072m -Dmaven.test.skip=false'
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              publishJUnitResults: true
+              goals: 'package'    
+              sonarQubeRunAnalysis: false
+        
+        - task: PublishPipelineArtifact@1
+          inputs:
+            path: $(System.DefaultWorkingDirectory)/
+            artifact: tests-EEDK-back
 
-steps:
-     
-- task: SonarQubePrepare@5
-  inputs:
-    SonarQube: 'Sonar - EEDK'
-    scannerMode: 'Other'
-    extraProperties: |
-      # Additional properties that will be passed to the scanner, 
-      # Put one key=value per line, example:
-      # sonar.exclusions=**/*.bin
-      sonar.projectKey=EntreprendreEnsemble-backend
-      sonar.projectName=EntreprendreEnsemble-backend
-      sonar.sources=src/main
-      sonar.sourceEncoding=UTF-8
-      sonar.language=java
-      sonar.binaries=target/classes
-    cliProjectName: 'EEDK-backend'
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m -Dmaven.test.skip=true'
-    publishJUnitResults: false
-    goals: 'package'    
-    sonarQubeRunAnalysis: true
-    
+  - stage: sonar
+    jobs :
+      - job : sonar
+        pool:
+          name: ModisAgentV2
+        steps:
+        - task: DownloadPipelineArtifact@2
+          inputs:
+            artifact: tests-EEDK-back
+            path: $(Build.SourcesDirectory)/
+        - task: SonarQubePrepare@5
+          inputs:
+              SonarQube: 'Sonar - EEDK'
+              scannerMode: 'Other'
+              extraProperties: |
+                # Additional properties that will be passed to the scanner, 
+                # Put one key=value per line, example:
+                # sonar.exclusions=**/*.bin
+                sonar.projectKey=EntreprendreEnsemble-backend
+                sonar.projectName=EntreprendreEnsemble-backend
+                sonar.sources=src/main
+                sonar.sourceEncoding=UTF-8
+                sonar.language=java
+                sonar.binaries=target/classes
+              cliProjectName: 'EEDK-backend'
+        - task: Maven@3
+          inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx3072m -Dmaven.test.skip=true'
+              publishJUnitResults: true
+              goals: 'package'    
+              sonarQubeRunAnalysis: true
+        - task: SonarQubePublish@5
+          inputs:
+            pollingTimeoutSec: '300'
 
-- task: SonarQubePublish@5
-  inputs:
-    pollingTimeoutSec: '300'
+        - task: sonar-buildbreaker@8
+          inputs:
+            SonarQube: 'Sonar - EEDK'

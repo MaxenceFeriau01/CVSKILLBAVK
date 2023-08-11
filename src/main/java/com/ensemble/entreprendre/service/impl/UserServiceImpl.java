@@ -275,10 +275,12 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         }
 
         Integer saveVisit = currentUser.getUpdateProfil();
-        if(!currentUser.compareUserForUpdate(newUser)){
+        if(!currentUser.compareUserForUpdate(newUser)||
+         !currentUser.filesAreEqual(currentUser.getFiles(),files)){
             saveVisit++;
         }
         
+
         newUser.setUpdateProfil(saveVisit);
 
         newUser.setFiles(files);

@@ -3,6 +3,7 @@ package com.ensemble.entreprendre.domain;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.persistence.CascadeType;
@@ -19,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.technical.FullAuditable;
 
 import lombok.AllArgsConstructor;
@@ -116,6 +118,7 @@ public class User extends FullAuditable<String> {
 			return false;
 		}
 		
+		
 		return 	id.equals(other.id) && 
 			   	email.equals(other.email) &&
 			   	firstName.equals(other.firstName) &&
@@ -126,6 +129,38 @@ public class User extends FullAuditable<String> {
 			   	internshipStartDate.equals(other.internshipStartDate) &&
 			    internshipEndDate.equals(other.internshipEndDate) && 
 				internStatus.getId() == other.internStatus.getId();
+				//filesAreEqual(files, other.files);
 	}
+	
+	public boolean filesAreEqual(Collection<FileDb> files, Collection<FileDb> otherFiles) {
+        FileDb cvFile1 = null;
+        FileDb cvFile2 = null;
+        FileDb coverLetterFile1 = null;
+        FileDb coverLetterFile2 = null;
+
+        for (FileDb file : files) {
+            if (file.getType() == FileTypeEnum.CV) {
+                cvFile1 = file;
+            } else if (file.getType() == FileTypeEnum.COVER_LETTER) {
+                coverLetterFile1 = file;
+            }
+        }
+
+        for (FileDb file : otherFiles) {
+            if (file.getType() == FileTypeEnum.CV) {
+                cvFile2 = file;
+            } else if (file.getType() == FileTypeEnum.COVER_LETTER) {
+                coverLetterFile2 = file;
+            }
+        }
+
+        if (cvFile1 == null || cvFile2 == null || coverLetterFile1 == null || coverLetterFile2 == null) {
+            return false; 
+        }
+
+        return Arrays.equals(cvFile1.getData(), cvFile2.getData())
+            && Arrays.equals(coverLetterFile1.getData(), coverLetterFile2.getData());
+    }
+	
 
 }

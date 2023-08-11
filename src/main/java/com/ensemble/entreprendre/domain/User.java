@@ -129,7 +129,6 @@ public class User extends FullAuditable<String> {
 			   	internshipStartDate.equals(other.internshipStartDate) &&
 			    internshipEndDate.equals(other.internshipEndDate) && 
 				internStatus.getId() == other.internStatus.getId();
-				//filesAreEqual(files, other.files);
 	}
 	
 	public boolean filesAreEqual(Collection<FileDb> files, Collection<FileDb> otherFiles) {

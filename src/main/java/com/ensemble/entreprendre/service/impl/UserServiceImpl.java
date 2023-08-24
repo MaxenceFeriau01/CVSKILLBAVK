@@ -182,6 +182,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             String encodedPassword = bCryptPasswordEncoder.encode(newUserDto.getPassword());
             newUser.setPassword(encodedPassword);
             newUser.setRoles(roles);
+            newUser.setUpdateProfil(0);
 
             User user = this.userRepository.save(newUser);
 

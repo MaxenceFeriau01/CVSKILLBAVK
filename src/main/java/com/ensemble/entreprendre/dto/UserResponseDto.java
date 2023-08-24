@@ -1,6 +1,7 @@
 package com.ensemble.entreprendre.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import lombok.Getter;
@@ -11,6 +12,8 @@ import lombok.Setter;
 public class UserResponseDto {
 
 	private Long id;
+
+	private LocalDateTime createdDate;
 
 	private String email;
 

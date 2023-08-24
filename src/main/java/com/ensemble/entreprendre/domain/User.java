@@ -102,7 +102,7 @@ public class User extends FullAuditable<String> {
 	@JoinTable(name = "users_jobs", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "JOB_ID", referencedColumnName = "JOB_ID"))
 	private Collection<Job> jobs;
 
-	@Column(nullable = false)
+	@Column(nullable = false,columnDefinition = "INTEGER DEFAULT 0")
 	private Integer updateProfil;
 
 	public Long getDesiredInternshipPeriodDays() {
@@ -117,7 +117,6 @@ public class User extends FullAuditable<String> {
 		if (other == null || getClass() != other.getClass()) {
 			return false;
 		}
-		
 		
 		return 	id.equals(other.id) && 
 			   	email.equals(other.email) &&

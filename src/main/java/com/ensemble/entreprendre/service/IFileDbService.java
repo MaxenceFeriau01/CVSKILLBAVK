@@ -5,5 +5,7 @@ import com.ensemble.entreprendre.exception.ApiException;
 
 public interface IFileDbService {
 
-	FileDbDto getById(long id) throws ApiException;
+	FileDbDto getById(Long id) throws ApiException;
+
+	void deleteFile(Long id) throws ApiException;
 }

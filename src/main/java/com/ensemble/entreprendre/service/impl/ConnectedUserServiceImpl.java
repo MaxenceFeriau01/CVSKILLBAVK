@@ -4,12 +4,14 @@ import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.service.IConnectedUserService;
@@ -55,4 +57,12 @@ public class ConnectedUserServiceImpl implements IConnectedUserService {
         return Arrays.stream(this.getConnectedUserRoles()).anyMatch(RoleEnum.ROLE_ADMIN.toString()::equals);
     }
 
+    @Override
+    public void isOwner(User owner) throws ApiException {
+        UserDetails userDetails = this.getConnectedUser();
+
+        if (!owner.getEmail().equals(userDetails.getUsername())) {
+            throw new AccessDeniedException("Accès interdit");
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.ensemble.entreprendre.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.exception.ApiException;
 
 public interface IConnectedUserService {
@@ -13,5 +14,7 @@ public interface IConnectedUserService {
     Boolean isAdmin() throws ApiException;
 
     Boolean isUserConnected();
+
+    void isOwner(User owner) throws ApiException;
 
 }

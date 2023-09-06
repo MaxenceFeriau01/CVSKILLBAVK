@@ -46,6 +46,9 @@ import com.ensemble.entreprendre.dto.UserStatDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.BasicDtoFilter;
+import com.ensemble.entreprendre.filter.IndividualAnalysisFilterService;
+import com.ensemble.entreprendre.filter.IndividualAnalysisUserDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
@@ -83,6 +86,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     IMailService mailService;
 
     @Autowired
+    IndividualAnalysisFilterService individualAnalysisFilterService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtTokenUtilBean jwtTokenUtilBean;
@@ -105,6 +111,20 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
                 UserResponseDto.class);
     }
 
+    @Override
+    public Page<UserResponseDto> getAllIndividualAnalysis(Pageable pageable, IndividualAnalysisUserDtoFilter filter){
+        Specification<User> specification = null;
+
+        specification = this.individualAnalysisFilterService.addCriterias(filter, specification);
+
+        if (specification == null) {
+            return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(pageable),
+                    UserResponseDto.class);
+        }
+        return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(specification, pageable),
+                UserResponseDto.class);
+    }
+      
     @Override
     public void delete(long id) throws ApiException {
         User toDelete = this.userRepository.findById(id)
@@ -360,7 +380,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         } catch (BadCredentialsException e) {
             throw new ApiException("Identifiants incorrects", HttpStatus.NOT_FOUND);
         }
-
         AuthenticationResponseDto user = this.findByEmailToAuthenticationResponseDto(email);
         user.setToken(jwtTokenUtilBean.generateToken(userDetails));
 

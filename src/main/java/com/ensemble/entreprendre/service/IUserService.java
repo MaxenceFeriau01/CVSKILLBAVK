@@ -21,6 +21,8 @@ import com.ensemble.entreprendre.dto.UserStatDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.BasicDtoFilter;
+import com.ensemble.entreprendre.filter.IndividualAnalysisUserDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 
 public interface IUserService {
@@ -39,6 +41,8 @@ public interface IUserService {
 	UserResponseDto findByEmailToUserResponseDto(String email);
 
 	Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter);
+
+	Page<UserResponseDto> getAllIndividualAnalysis(Pageable pageable, IndividualAnalysisUserDtoFilter filter);
 
 	void active(long id, boolean activated) throws ApiException;
 

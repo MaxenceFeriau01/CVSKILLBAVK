@@ -40,6 +40,8 @@ import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.dto.UserStatDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.BasicDtoFilter;
+import com.ensemble.entreprendre.filter.IndividualAnalysisUserDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IRoleRepository;
 import com.ensemble.entreprendre.service.IConnectedUserService;
@@ -205,10 +207,16 @@ public class UserController {
 			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
 			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"), })
 	@GetMapping("/stats")
-	public Page<UserStatDto> getUserStats(
+	public Page<UserResponseDto> getUserStats(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
-					User_.NAME }, direction = Sort.Direction.ASC) Pageable pageable
-			) {
-		return this.userService.getUserStats(pageable);
+					User_.NAME }, direction = Sort.Direction.ASC) Pageable pageable,
+					IndividualAnalysisUserDtoFilter filter)
+			 {
+				System.out.println("--------------------------");
+				System.out.println(filter.getFirstName());
+				System.out.println(filter.getName());
+				System.out.println(filter.getPostalCode());
+				System.out.println("--------------------------");
+		return this.userService.getAllIndividualAnalysis(pageable,filter);
 	}
 }

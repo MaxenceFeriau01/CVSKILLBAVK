@@ -26,11 +26,10 @@ public class ConnectedUserServiceImpl implements IConnectedUserService {
     @Override
     public UserDetails getConnectedUser() throws ApiException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null) {
+        Object principal = authentication.getPrincipal();
+        if (principal.equals(connectedInAnonymousValue)) {
             throw new ApiException("Utilisateur non connecté", HttpStatus.UNAUTHORIZED);
         }
-        Object principal = authentication.getPrincipal();
 
         return (UserDetails) principal;
 

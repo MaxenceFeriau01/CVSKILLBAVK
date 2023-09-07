@@ -20,6 +20,7 @@ import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.StatPeriodDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 
 public interface IUserService {
@@ -55,4 +56,6 @@ public interface IUserService {
 	List<Long> getAppliedCompanies(String email);
 
     AuthenticationResponseDto authenticate(String email, String password) throws ApiException;
+
+	Long countUserSignUpsWithPeriod(StatPeriodDtoFilter filter);
 }

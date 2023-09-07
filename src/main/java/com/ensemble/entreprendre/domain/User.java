@@ -2,7 +2,6 @@ package com.ensemble.entreprendre.domain;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.CascadeType;
@@ -88,9 +87,11 @@ public class User extends FullAuditable<String> {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<FileDb> files;
 
-	@ManyToMany
-	@JoinTable(name = "users_applied_companies", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"))
-	private Collection<Company> appliedCompanies = new ArrayList<Company>();
+	@OneToMany(mappedBy = "user")
+	private Collection<UserApplyCompany> appliedCompanies;
+
+	@OneToMany(mappedBy = "user", orphanRemoval = false)
+	private Collection<Visit> visits;
 
 	@ManyToMany
 	@JoinTable(name = "users_roles", inverseJoinColumns = @JoinColumn(name = "ROL_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_ROLE"), referencedColumnName = "ROL_ID", nullable = false, updatable = false), joinColumns = @JoinColumn(name = "USR_ID", foreignKey = @ForeignKey(name = "FK_USR_ROL_USER"), referencedColumnName = "USR_ID", nullable = false, updatable = false))

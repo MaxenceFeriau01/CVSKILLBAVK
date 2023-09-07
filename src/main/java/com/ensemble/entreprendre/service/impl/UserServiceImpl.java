@@ -45,6 +45,7 @@ import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.StatPeriodDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.security.helper.JwtTokenUtilBean;
@@ -158,7 +159,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     public List<Long> getAppliedCompanies(String email) {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
-        return user.getAppliedCompanies().stream().map(n -> n.getId()).collect(Collectors.toCollection(ArrayList::new));
+        return user.getAppliedCompanies().stream().map(n -> n.getCompany().getId()).collect(Collectors.toCollection(ArrayList::new));
 
     }
 
@@ -379,6 +380,42 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         user.setToken(jwtTokenUtilBean.generateToken(userDetails));
 
         return user;
+    }
+
+    @Override
+    public Long countUserSignUpsWithPeriod(StatPeriodDtoFilter filter) {
+        Specification<User> specification = null;
+        specification = addCountCriterias(filter, specification);
+        if (specification == null) {
+            return this.userRepository.count();
+        }
+        return this.userRepository.count(specification);
+    }
+
+    private Specification<User> addCountCriterias(StatPeriodDtoFilter filter, Specification<User> specification) {
+        if (filter != null) {
+            if (filter.getStartedAt() != null) {
+                specification = addStartedAtCriteria(filter, specification);
+            }
+            if (filter.getEndedAt() != null) {
+                specification = addEndedAtCriteria(filter, specification);
+            }
+        }
+        return specification;
+    }
+
+    private Specification<User> addStartedAtCriteria(StatPeriodDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            return criteriaBuilder.greaterThanOrEqualTo(root.get(User_.CREATED_DATE), filter.getStartedAt());
+        };
+        return ensureSpecification(origin, target);
+    }
+
+    private Specification<User> addEndedAtCriteria(StatPeriodDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            return criteriaBuilder.lessThanOrEqualTo(root.get(User_.CREATED_DATE), filter.getEndedAt());
+        };
+        return ensureSpecification(origin, target);
     }
 
 }

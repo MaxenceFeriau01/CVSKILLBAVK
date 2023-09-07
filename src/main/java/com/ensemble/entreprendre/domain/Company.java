@@ -84,8 +84,8 @@ public class Company {
 	@Column(name = "COMPANY_MINOR_ACCEPTED", nullable = false, columnDefinition = "boolean default false")
 	boolean minorAccepted;
 
-	@ManyToMany(mappedBy = "appliedCompanies")
-	private Collection<User> users;
+	@OneToMany(mappedBy = "company")
+	private Collection<UserApplyCompany> users;
 
 	@Type(type = "org.hibernate.type.BinaryType")
 	@Column(name = "COMPANY_LOGO")

@@ -32,6 +32,7 @@ import com.ensemble.entreprendre.domain.InternStatus_;
 import com.ensemble.entreprendre.domain.InternType_;
 import com.ensemble.entreprendre.domain.Job_;
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.UserApplyCompany;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.SimpleCompanyDto;
@@ -39,6 +40,7 @@ import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.CompanyDtoFilter;
 import com.ensemble.entreprendre.repository.ICompanyRepository;
+import com.ensemble.entreprendre.repository.IUserApplyCompanyRepository;
 import com.ensemble.entreprendre.repository.IUserRepository;
 import com.ensemble.entreprendre.service.IConnectedUserService;
 import com.ensemble.entreprendre.service.ICompanyService;
@@ -53,6 +55,9 @@ public class CompanyServiceImpl implements ICompanyService {
 
     @Autowired
     IUserRepository userRepository;
+
+    @Autowired
+    IUserApplyCompanyRepository userApplyCompanyRepository;
 
     @Autowired
     GenericConverter<Company, CompanyDto> companyConverter;
@@ -158,10 +163,19 @@ public class CompanyServiceImpl implements ICompanyService {
         User user = userService.findByEmail(userDetails.getUsername());
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("Cette Entreprise n'existe pas !"));
+        Boolean isAlreadyApplied = user.getAppliedCompanies().stream().anyMatch((p) -> {
+            return p.getCompany().getId() == company.getId();
+        });
+
+        if (isAlreadyApplied) {
+            throw new ApiException("Vous avez déjà postulé à cette offre de stage.");
+        }
 
         // Save the apply
-        user.getAppliedCompanies().add(company);
-        userRepository.save(user);
+        UserApplyCompany applyCompany = new UserApplyCompany();
+        applyCompany.setCompany(company);
+        applyCompany.setUser(user);
+        userApplyCompanyRepository.save(applyCompany);
 
         // ADMIN MAIL
         HashMap<String, Object> ApplyCompanyAdminTemplate = new HashMap<String, Object>();

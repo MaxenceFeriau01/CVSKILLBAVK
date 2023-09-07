@@ -41,7 +41,7 @@ public class UserAuthentication {
         User newUser = new User(null, "modis" + roleToCreate + "@modis.com", "modis", "modis",
                 bCryptPasswordEncoder.encode(PASSWORD), "0161616161", 7500, LocalDate.now(), LocalDate.now(),
                 LocalDate.now(), null,
-                null, "M.", "BAC+5", "6month", true, null, null,
+                null, "M.", "BAC+5", "6month", true, null, null, null,
                 Arrays.asList(this.roleRepository.findByRole(roleToCreate)), null);
 
         this.userRepository.save(newUser);

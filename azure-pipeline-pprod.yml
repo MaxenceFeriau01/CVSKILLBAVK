@@ -71,29 +71,3 @@ stages:
         tags: |
           $(tag)
           latest
-
-- stage: Deploy
-  jobs:
-    - job: Deploy
-      displayName: "Deploy new image on preprod server"
-      pool:
-        name: ModisAgentV3
-      steps:
-        - task: CmdLine@2
-          inputs:
-            script: |
-              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-              az login -u $(az-username) -p $(az-password)
-              mkdir -p ~/.ssh
-              touch ~/.ssh/known_hosts
-              ssh-keyscan -H $(ip-server) >> ~/.ssh/known_hosts
-              az config set extension.use_dynamic_install=yes_without_prompt
-              az ssh vm --ip $(ip-server) << EOF
-              sudo su
-              az login -u $(az-username) -p $(az-password)
-              az acr login --name $(az-container-registry)
-              docker pull $(docker-image-back-preprod)
-              docker-compose -f $(docker-compose-file-path-preprod) stop
-              docker-compose --log-level ERROR -f $(docker-compose-file-path-preprod) -p $(docker-project-name) up -d
-              EOF
-            failOnStderr: false

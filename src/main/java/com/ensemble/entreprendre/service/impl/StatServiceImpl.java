@@ -1,5 +1,6 @@
 package com.ensemble.entreprendre.service.impl;
 
+import com.ensemble.entreprendre.exception.TechnicalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,9 @@ public class StatServiceImpl implements IStatService {
 
     @Override
     public StatGeneralDto getGeneralStatistics(StatPeriodDtoFilter filter) throws ApiException {
+        if (filter.getStartedAt().isAfter(filter.getEndedAt()) || filter.getEndedAt().isBefore(filter.getStartedAt())) {
+            throw new TechnicalException("La période sélectionnée n'est pas correcte : la date de début doit être inférieure à la date de fin.");
+        }
         StatGeneralDto statGeneralDto = new StatGeneralDto();
         statGeneralDto.setNumbersUsers(userService.countUserSignUpsWithPeriod(filter));
         statGeneralDto.setNumbersVisits(visitService.countVisitsWithPeriod(filter));

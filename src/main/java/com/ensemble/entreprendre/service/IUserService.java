@@ -58,4 +58,6 @@ public interface IUserService {
     AuthenticationResponseDto authenticate(String email, String password) throws ApiException;
 
 	Long countUserSignUpsWithPeriod(StatPeriodDtoFilter filter);
+
+	void setLastModifiedDateToNow() throws ApiException;
 }

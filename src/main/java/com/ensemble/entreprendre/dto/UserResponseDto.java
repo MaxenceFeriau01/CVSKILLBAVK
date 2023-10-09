@@ -1,6 +1,7 @@
 package com.ensemble.entreprendre.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import lombok.Getter;
@@ -44,4 +45,7 @@ public class UserResponseDto {
 
 	private Collection<RoleDto> roles;
 
+	private Long profileUpdateCount;
+
+	private LocalDateTime lastModifiedDate;
 }

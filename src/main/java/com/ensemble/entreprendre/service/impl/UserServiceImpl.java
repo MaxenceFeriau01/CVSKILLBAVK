@@ -2,6 +2,7 @@ package com.ensemble.entreprendre.service.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
+import com.ensemble.entreprendre.service.IConnectedUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -79,6 +81,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Autowired
     IMailService mailService;
+
+    @Autowired
+    IConnectedUserService connectedUserService;
 
     @Autowired
     IPdfFileUtil pdfFileUtil;
@@ -282,8 +287,13 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         }
 
         newUser.setFiles(files);
-
         newUser.setPassword(currentUser.getPassword());
+
+        Long profileUpdateCount = currentUser.getProfileUpdateCount();
+        if (!currentUser.compareUserForUpdate(newUser) || !currentUser.filesAreEqual(currentUser.getFiles(), files)) {
+             profileUpdateCount++;
+        }
+        newUser.setProfileUpdateCount(profileUpdateCount);
 
         return this.userResponseConverter.entityToDto(this.userRepository.save(newUser), UserResponseDto.class);
     }
@@ -416,6 +426,18 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             return criteriaBuilder.lessThanOrEqualTo(root.get(User_.CREATED_DATE), filter.getEndedAt());
         };
         return ensureSpecification(origin, target);
+    }
+
+    @Override
+    public void setLastModifiedDateToNow() throws ApiException {
+        User currentUser = null;
+        UserDetails connectedUser = connectedUserService.getConnectedUser();
+        if (connectedUser != null) {
+            currentUser = userRepository.findByEmail(connectedUser.getUsername())
+                    .orElseThrow(() -> new ApiNotFoundException("Utilisateur non existant."));
+            currentUser.setLastModifiedDate(LocalDateTime.now());
+            userRepository.save(currentUser);
+        }
     }
 
 }

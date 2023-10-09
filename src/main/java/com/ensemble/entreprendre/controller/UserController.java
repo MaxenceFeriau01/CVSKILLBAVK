@@ -15,16 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.domain.User;
@@ -103,6 +94,16 @@ public class UserController {
 		var userDetails = connectedUserService.getConnectedUser();
 		return userService.findByEmailToUserResponseDto(userDetails.getUsername());
 
+	}
+
+	/**
+	 * Set last modified date to now for current user
+	 *
+	 * @throws ApiException
+	 */
+	@PostMapping(path = "/self/no-profile-update")
+	public void patchNoProfileUpdate() throws ApiException {
+		userService.setLastModifiedDateToNow();
 	}
 
 	/**

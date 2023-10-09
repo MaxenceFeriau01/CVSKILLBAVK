@@ -2,7 +2,9 @@ package com.ensemble.entreprendre.domain;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.technical.FullAuditable;
 
 import lombok.AllArgsConstructor;
@@ -101,8 +104,57 @@ public class User extends FullAuditable<String> {
 	@JoinTable(name = "users_jobs", joinColumns = @JoinColumn(name = "USR_ID", referencedColumnName = "USR_ID"), inverseJoinColumns = @JoinColumn(name = "JOB_ID", referencedColumnName = "JOB_ID"))
 	private Collection<Job> jobs;
 
+	@Column(nullable = false, columnDefinition = "integer default 0")
+	private Long profileUpdateCount = 0L;
+
 	public Long getDesiredInternshipPeriodDays() {
 		return ChronoUnit.DAYS.between(internshipStartDate, internshipEndDate);
 	}
 
+	public boolean compareUserForUpdate(User other){
+		if (other == null || getClass() != other.getClass()) {
+			return false;
+		} else {
+			return id.equals(other.id) &&
+					civility.equals(other.civility) &&
+					email.equals(other.email) &&
+					firstName.equals(other.firstName) &&
+					name.equals(other.name) &&
+					phone.equals(other.phone) &&
+					postalCode == other.postalCode &&
+					dateOfBirth.equals(other.dateOfBirth) &&
+					internshipStartDate.equals(other.internshipStartDate) &&
+					internshipEndDate.equals(other.internshipEndDate) &&
+                    Arrays.equals(jobs.stream().map(Job::getId).toArray(), other.jobs.stream().map(Job::getId).toArray()) &&
+					Objects.equals(internshipPeriod, other.internshipPeriod) &&
+					Objects.equals(internStatus.getId(), other.internStatus.getId()) &&
+					Objects.equals(diploma, other.diploma);
+		}
+	}
+
+	public boolean filesAreEqual(Collection<FileDb> files, Collection<FileDb> otherFiles) {
+		FileDb cvFile1 = new FileDb();
+		FileDb cvFile2 = new FileDb();
+		FileDb coverLetterFile1 = new FileDb();
+		FileDb coverLetterFile2 = new FileDb();
+
+		for (FileDb file : files) {
+			if (file.getType() == FileTypeEnum.CV) {
+				cvFile1 = file;
+			} else if (file.getType() == FileTypeEnum.COVER_LETTER) {
+				coverLetterFile1 = file;
+			}
+		}
+
+		for (FileDb file : otherFiles) {
+			if (file.getType() == FileTypeEnum.CV) {
+				cvFile2 = file;
+			} else if (file.getType() == FileTypeEnum.COVER_LETTER) {
+				coverLetterFile2 = file;
+			}
+		}
+
+        return Arrays.equals(cvFile1.getData(), cvFile2.getData()) &&
+				Arrays.equals(coverLetterFile1.getData(), coverLetterFile2.getData());
+	}
 }

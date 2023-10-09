@@ -99,4 +99,9 @@ public class StepDefinition {
         this.httpCallClient.requestPostAsMultipartFormData(endpoint, builder);
     }
 
+    @When("the client calls {string} with PUT as multipart-form-data")
+    public void the_client_calls_with_PUT_as_multipart_form_data(String endpoint) {
+        this.httpCallClient.requestPutAsMultipartFormData(endpoint, builder);
+    }
+
 }

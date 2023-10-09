@@ -73,6 +73,17 @@ public class HttpCallClient {
                 this.response = responseSpec.toEntity(JsonNode.class).block();
         }
 
+        public void requestPutAsMultipartFormData(final String url, final  MultipartBodyBuilder builder) {
+                ResponseSpec responseSpec = this.webClient.put()
+                        .uri(url)
+                        .headers(h -> h.setBearerAuth(this.jwtToken))
+                        .headers(h-> h.setContentType(MediaType.MULTIPART_FORM_DATA))
+                        .body(BodyInserters.fromMultipartData(builder.build()))
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, clientResponse -> Mono.empty());
+                this.response = responseSpec.toEntity(JsonNode.class).block();
+        }
+
         public void requestPatch(final String url, final JsonNode body) {
                 ResponseSpec responseSpec = this.webClient.patch()
                                 .uri(url)

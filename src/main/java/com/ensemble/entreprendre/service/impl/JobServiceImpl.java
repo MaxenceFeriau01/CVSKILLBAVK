@@ -3,8 +3,7 @@ package com.ensemble.entreprendre.service.impl;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.Tuple;
-
+import com.ensemble.entreprendre.dto.JobStatDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,6 @@ import com.ensemble.entreprendre.domain.Job;
 import com.ensemble.entreprendre.domain.Job_;
 import com.ensemble.entreprendre.dto.JobAdministrationDto;
 import com.ensemble.entreprendre.dto.JobDto;
-import com.ensemble.entreprendre.dto.JobStatDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.exception.BusinessException;
@@ -26,14 +24,16 @@ import com.ensemble.entreprendre.filter.JobDtoFilter;
 import com.ensemble.entreprendre.repository.IJobRepository;
 import com.ensemble.entreprendre.service.IJobService;
 
+import javax.persistence.Tuple;
+
 @Service
 public class JobServiceImpl implements IJobService {
 
 	@Autowired
-	IJobRepository jobRepository;
+	private IJobRepository jobRepository;
 
 	@Autowired
-	JobConverter jobConverter;
+	private JobConverter jobConverter;
 
 	@Override
 	public JobDto getById(long id) throws ApiException {
@@ -43,15 +43,8 @@ public class JobServiceImpl implements IJobService {
 
 	@Override
 	public Page<JobAdministrationDto> getAllWithFilter(Pageable pageable, JobDtoFilter filter) {
-		if (filter != null) {
-			if (filter.getName() != null) {
-				Page<Tuple> tuplePage = this.jobRepository.findAllWithCountsByName(pageable,
-						filter.getName().toUpperCase());
-				List<JobAdministrationDto> customJobs = jobConverter.mapTupleToJobAdministrationDto(tuplePage);
-				return PageableExecutionUtils.getPage(customJobs, pageable, tuplePage::getTotalElements);
-			}
-		}
-		Page<Tuple> tuplePage = this.jobRepository.findAllWithCountsByName(pageable, "");
+		Page<Tuple> tuplePage = this.jobRepository.findAllWithCountsByName(pageable,
+				filter.getQuery().toUpperCase());
 		List<JobAdministrationDto> customJobs = jobConverter.mapTupleToJobAdministrationDto(tuplePage);
 		return PageableExecutionUtils.getPage(customJobs, pageable, tuplePage::getTotalElements);
 	}
@@ -94,8 +87,9 @@ public class JobServiceImpl implements IJobService {
 	}
 
 	@Override
-	public List<JobStatDto> getJobStats() {
-		return jobConverter
-				.mapTupleToJobStatDto(jobRepository.findAllWithUserCountOrderByUserCountDesc());
+	public Page<JobStatDto> getJobStats(Pageable pageable, JobDtoFilter filter) {
+		Page<Tuple> tuplePage = jobRepository.findJobsWithUserCount(filter.getQuery(), filter.getOrderName(), filter.getOrderUserCount(), pageable);
+		Page<JobStatDto> customJobs = jobConverter.mapTupleToJobStatDto(tuplePage);
+		return PageableExecutionUtils.getPage(customJobs.getContent(), pageable, customJobs::getTotalElements);
 	}
 }

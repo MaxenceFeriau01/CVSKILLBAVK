@@ -6,5 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JobDtoFilter {
-	String name;
+	private String query = "";
+	private String orderName = "asc";
+	private String orderUserCount = "desc";
 }

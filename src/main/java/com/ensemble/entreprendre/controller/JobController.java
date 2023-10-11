@@ -67,10 +67,17 @@ public class JobController {
 	}
 
 	@Secured({ "ROLE_ADMIN" })
+	@ApiOperation(value = "Job getJobStats endpoint", response = JobDto.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
+			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"),
+	})
 	@GetMapping("/stats")
 	@ResponseStatus(HttpStatus.OK)
-	public List<JobStatDto> getJobStats() throws ApiException {
-		return this.jobService.getJobStats();
+	public Page<JobStatDto> getJobStats(
+			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable,
+			JobDtoFilter filter) {
+		return this.jobService.getJobStats(pageable, filter);
 	}
 
 	@GetMapping(path = "/{id}")

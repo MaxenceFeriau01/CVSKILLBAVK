@@ -1,7 +1,5 @@
 package com.ensemble.entreprendre.repository;
 
-import java.util.List;
-
 import javax.persistence.Tuple;
 
 import org.springframework.data.domain.Page;
@@ -26,11 +24,20 @@ public interface IJobRepository
 			"ORDER BY name ASC")
 	public Page<Tuple> findAllWithCountsByName(Pageable pageable, @Param("name") String name);
 
-	@Query("SELECT j.id AS id, j.name AS name, COUNT(DISTINCT u.id) AS userCount " +
+	@Query(value = "SELECT j.name AS name, COUNT(DISTINCT u.id) AS userCount " +
 			"FROM Job j " +
 			"LEFT JOIN j.users u " +
-			"GROUP BY j.id " +
-			"ORDER BY userCount DESC")
-	public List<Tuple> findAllWithUserCountOrderByUserCountDesc();
-
+			"WHERE (:name is null OR LOWER(j.name) like %:name%) " +
+			"GROUP BY j.name " +
+			"ORDER BY " +
+			"   CASE WHEN :orderUserCount IS NOT NULL AND :orderUserCount = 'asc' THEN COUNT(DISTINCT u.id) END ASC, " +
+			"   CASE WHEN :orderUserCount IS NOT NULL AND :orderUserCount = 'desc' THEN COUNT(DISTINCT u.id) END DESC, " +
+			"   CASE WHEN :orderName IS NOT NULL AND :orderName = 'asc' THEN j.name END ASC, " +
+			"   CASE WHEN :orderName IS NOT NULL AND :orderName = 'desc' THEN j.name END DESC")
+	public Page<Tuple> findJobsWithUserCount(
+			@Param("name") String name,
+			@Param("orderName") String orderName,
+			@Param("orderUserCount") String orderUserCount,
+			Pageable pageable
+	);
 }

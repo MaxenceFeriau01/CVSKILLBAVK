@@ -55,16 +55,43 @@
     Then the response should have a status code of 200
     And the response body should be
     """
-    [
-        {
-            "name": "Technicien",
-            "userCount": 0
+    {
+        "content": [
+            {
+                "name": "Juriste",
+                "userCount": 0
+            },
+            {
+                "name": "Technicien",
+                "userCount": 0
+            }
+        ],
+        "pageable": {
+            "sort": {
+                "empty": true,
+                "sorted": false,
+                "unsorted": true
+            },
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 20,
+            "unpaged": false,
+            "paged": true
         },
-        {
-            "name": "Juriste",
-            "userCount": 0
-        }
-    ]
+        "last": true,
+        "totalElements": 2,
+        "totalPages": 1,
+        "size": 20,
+        "number": 0,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "first": true,
+        "numberOfElements": 2,
+        "empty": false
+    }
     """
 
     @admin
@@ -158,16 +185,43 @@
     Then the response should have a status code of 200
     And the response body should be
     """
-    [
-        {
-            "name": "Technicien",
-            "userCount": 1
+    {
+        "content": [
+            {
+                "name": "Juriste",
+                "userCount": 1
+            },
+            {
+                "name": "Technicien",
+                "userCount": 1
+            }
+        ],
+        "pageable": {
+            "sort": {
+                "empty": true,
+                "sorted": false,
+                "unsorted": true
+            },
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 20,
+            "unpaged": false,
+            "paged": true
         },
-        {
-            "name": "Juriste",
-            "userCount": 1
-        }
-    ]
+        "last": true,
+        "totalElements": 2,
+        "totalPages": 1,
+        "size": 20,
+        "number": 0,
+        "first": true,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "numberOfElements": 2,
+        "empty": false
+    }
     """
 
     Given the client request body as multipart-form-data contains
@@ -354,14 +408,41 @@
     Then the response should have a status code of 200
     And the response body should be
     """
-    [
-        {
-            "name": "Technicien",
-            "userCount": 1
+    {
+        "content": [
+            {
+                "name": "Juriste",
+                "userCount": 1
+            },
+            {
+                "name": "Technicien",
+                "userCount": 1
+            }
+        ],
+        "pageable": {
+            "sort": {
+                "empty": true,
+                "sorted": false,
+                "unsorted": true
+            },
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 20,
+            "unpaged": false,
+            "paged": true
         },
-        {
-            "name": "Juriste",
-            "userCount": 1
-        }
-    ]
+        "last": true,
+        "totalElements": 2,
+        "totalPages": 1,
+        "size": 20,
+        "number": 0,
+        "first": true,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "numberOfElements": 2,
+        "empty": false
+    }
     """

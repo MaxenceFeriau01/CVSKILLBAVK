@@ -24,10 +24,10 @@ public class JobConverter extends GenericConverter<Job, JobDto> {
                 tuple.get("userCount", Long.class))).collect(Collectors.toList());
     }
 
-    public List<JobStatDto> mapTupleToJobStatDto(List<Tuple> tupleList) {
-        return tupleList.stream().map(tuple -> new JobStatDto(
+    public Page<JobStatDto> mapTupleToJobStatDto(Page<Tuple> tuplePage) {
+        return tuplePage.map(tuple -> new JobStatDto(
                 tuple.get("name", String.class),
-                tuple.get("userCount", Long.class))).collect(Collectors.toList());
+                tuple.get("userCount", Long.class)
+        ));
     }
-
 }

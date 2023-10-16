@@ -47,6 +47,7 @@ import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.IndividualAnalysisUserDtoFilter;
 import com.ensemble.entreprendre.filter.StatPeriodDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 import com.ensemble.entreprendre.repository.IUserRepository;
@@ -438,6 +439,89 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             currentUser.setLastModifiedDate(LocalDateTime.now());
             userRepository.save(currentUser);
         }
+    }
+    
+   public Page<UserResponseDto> getAllIndividualAnalysis(Pageable pageable,IndividualAnalysisUserDtoFilter filter){
+        Specification<User> specification = null;
+
+        specification = addCriteriasForIndividualAnalysis(filter, specification);
+
+        if (specification == null) {
+            return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(pageable),
+                    UserResponseDto.class);
+        }
+
+        return this.userResponseConverter.entitiesToDtos(this.userRepository.findAll(specification, pageable),
+                UserResponseDto.class);
+    }
+    /* Search Criterias for indivual analysis */
+    private Specification<User> addCriteriasForIndividualAnalysis(IndividualAnalysisUserDtoFilter filter, Specification<User> specification) {
+        if (filter != null) {
+
+            if (filter.getName() != null) {
+                specification = addNameCriteriaForIndividualAnalysis(filter, specification);
+            }
+            if(filter.getFirstName()!= null){
+                specification = addFirstNameCriteriaForIndividualAnalysis(filter, specification);
+            }
+            if(Integer.toString(filter.getPostalCode())!=null){
+                specification = addPostalCodeCriteriaForIndividualAnalysis(filter, specification);
+            }
+            if(filter.getInternStatus() != null) {
+                specification = addInternStatusCriteriaForIndividualAnalysis(filter, specification);
+            }
+
+        }
+        return specification;
+    }
+    private Specification<User> addNameCriteriaForIndividualAnalysis(IndividualAnalysisUserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            if (filter.getName() != null && !filter.getName().isEmpty()) {
+                return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.NAME)),
+                        "%" + filter.getName().toUpperCase() + "%");
+            }
+            else {
+                return criteriaBuilder.and();
+            }
+        };
+        return ensureSpecification(origin, target);
+    }
+    private Specification<User> addFirstNameCriteriaForIndividualAnalysis(IndividualAnalysisUserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            if (filter.getFirstName()!= null && !filter.getFirstName().isEmpty()) {
+                return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.FIRST_NAME)),
+                        "%" + filter.getFirstName().toUpperCase() + "%");
+            }
+            else {
+                return criteriaBuilder.and();
+            }
+        };
+        return ensureSpecification(origin, target);
+    }
+ 
+    private Specification<User> addPostalCodeCriteriaForIndividualAnalysis(IndividualAnalysisUserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            if (filter.getPostalCode()!= 0) {
+                return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.POSTAL_CODE)),
+                     "%" + Integer.toString(filter.getPostalCode()).toUpperCase() + "%");
+            }
+            else {
+                return criteriaBuilder.and();
+            }
+        };
+        return ensureSpecification(origin, target);
+    }
+    private Specification<User> addInternStatusCriteriaForIndividualAnalysis(IndividualAnalysisUserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            if (filter.getInternStatus()!= null ) {
+                return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.INTERN_STATUS)),
+                     "%" + filter.getInternStatus() + "%");
+            }
+            else {
+                return criteriaBuilder.and();
+            }
+        };
+        return ensureSpecification(origin, target);
     }
 
 }

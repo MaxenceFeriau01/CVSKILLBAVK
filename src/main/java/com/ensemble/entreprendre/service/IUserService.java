@@ -20,6 +20,7 @@ import com.ensemble.entreprendre.dto.UserResponseDto;
 import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
+import com.ensemble.entreprendre.filter.IndividualAnalysisUserDtoFilter;
 import com.ensemble.entreprendre.filter.StatPeriodDtoFilter;
 import com.ensemble.entreprendre.filter.UserDtoFilter;
 
@@ -60,4 +61,6 @@ public interface IUserService {
 	Long countUserSignUpsWithPeriod(StatPeriodDtoFilter filter);
 
 	void setLastModifiedDateToNow() throws ApiException;
+	
+	Page<UserResponseDto> getAllIndividualAnalysis(Pageable pageable,IndividualAnalysisUserDtoFilter filter);
 }

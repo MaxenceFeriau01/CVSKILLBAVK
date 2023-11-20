@@ -11,14 +11,14 @@
     {
         "content": [
             {
-                "id": 2,
-                "name": "Juriste",
+                "id": 1,
+                "name": "Technicien",
                 "companyCount": 0,
                 "userCount": 0
             },
             {
-                "id": 1,
-                "name": "Technicien",
+                "id": 2,
+                "name": "Juriste",
                 "companyCount": 0,
                 "userCount": 0
             }
@@ -141,14 +141,14 @@
     {
         "content": [
             {
-                "id": 2,
-                "name": "Juriste",
+                "id": 1,
+                "name": "Technicien",
                 "companyCount": 0,
                 "userCount": 1
             },
             {
-                "id": 1,
-                "name": "Technicien",
+                "id": 2,
+                "name": "Juriste",
                 "companyCount": 0,
                 "userCount": 1
             }
@@ -357,22 +357,22 @@
     }
     """
 
-        When the client calls "/jobs/search" with GET
+    When the client calls "/jobs/search" with GET
     Then the response should have a status code of 200
     And the response body should be
     """
     {
         "content": [
             {
-                "id": 2,
-                "name": "Juriste",
-                "companyCount": 0,
-                "userCount": 1
-            },
-            {
                 "id": 1,
                 "name": "Technicien",
                 "companyCount": 1,
+                "userCount": 1
+            },
+            {
+                "id": 2,
+                "name": "Juriste",
+                "companyCount": 0,
                 "userCount": 1
             }
         ],

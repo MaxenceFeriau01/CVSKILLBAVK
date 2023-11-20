@@ -43,8 +43,11 @@ public class JobServiceImpl implements IJobService {
 
 	@Override
 	public Page<JobAdministrationDto> getAllWithFilter(Pageable pageable, JobDtoFilter filter) {
-		Page<Tuple> tuplePage = this.jobRepository.findAllWithCountsByName(pageable,
-				filter.getQuery().toUpperCase());
+		Page<Tuple> tuplePage = this.jobRepository.findAllWithCountsByName(
+				pageable, filter.getQuery(),
+				filter.getOrderId(), filter.getOrderName(),
+				filter.getOrderUserCount(), filter.getOrderCompanyCount()
+		);
 		List<JobAdministrationDto> customJobs = jobConverter.mapTupleToJobAdministrationDto(tuplePage);
 		return PageableExecutionUtils.getPage(customJobs, pageable, tuplePage::getTotalElements);
 	}
@@ -88,7 +91,10 @@ public class JobServiceImpl implements IJobService {
 
 	@Override
 	public Page<JobStatDto> getJobStats(Pageable pageable, JobDtoFilter filter) {
-		Page<Tuple> tuplePage = jobRepository.findJobsWithUserCount(filter.getQuery(), filter.getOrderName(), filter.getOrderUserCount(), pageable);
+		Page<Tuple> tuplePage = jobRepository.findJobsWithUserCount(
+				pageable, filter.getQuery(),
+				filter.getOrderName(), filter.getOrderUserCount()
+		);
 		Page<JobStatDto> customJobs = jobConverter.mapTupleToJobStatDto(tuplePage);
 		return PageableExecutionUtils.getPage(customJobs.getContent(), pageable, customJobs::getTotalElements);
 	}

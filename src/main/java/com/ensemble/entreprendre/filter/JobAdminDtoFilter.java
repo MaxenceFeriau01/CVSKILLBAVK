@@ -5,10 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class JobDtoFilter {
-	private String query = "";
+public class JobAdminDtoFilter extends JobDtoFilter {
 	private String orderId = "";
-	private String orderName = "";
-	private String orderUserCount = "";
 	private String orderCompanyCount = "";
 }

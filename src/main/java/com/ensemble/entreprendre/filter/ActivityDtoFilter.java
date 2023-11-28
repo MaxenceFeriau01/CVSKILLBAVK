@@ -6,5 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ActivityDtoFilter {
-	String name;
+	private String name = "";
+	private String orderId = "";
+	private String orderName = "";
+	private String orderCompanyCount = "";
+	private String orderCompanySearchCount = "";
 }

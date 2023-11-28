@@ -8,4 +8,6 @@ import lombok.Setter;
 public class UserDtoFilter {
 	private String name;
 	private boolean activated;
+	private String sortField;
+	private String sortType;
 }

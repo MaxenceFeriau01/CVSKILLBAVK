@@ -16,11 +16,11 @@ public interface IActivityService {
 
 	Collection<ActivityDto> getAll();
 
-	ActivityDto getById(long id) throws ApiException;
+	ActivityDto getById(Long id) throws ApiException;
 
 	ActivityDto create(ActivityDto toCreate) throws ApiException;
 
 	ActivityDto update(Long id, ActivityDto updatedDto) throws ApiException;
 
-	ActivityDto delete(long id) throws ApiException;
+	ActivityDto delete(Long id) throws ApiException;
 }

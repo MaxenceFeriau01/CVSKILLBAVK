@@ -35,9 +35,8 @@ public class ActivityServiceImpl implements IActivityService {
 	ActivityConverter activityConverter;
 
 	@Override
-	public ActivityDto getById(long id) throws ApiException {
-		return this.activityConverter.entityToDto(this.activityRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !")), ActivityDto.class);
+	public ActivityDto getById(Long id) throws ApiException {
+		return this.activityConverter.entityToDto(this.findById(id), ActivityDto.class);
 	}
 
 	@Override
@@ -45,14 +44,23 @@ public class ActivityServiceImpl implements IActivityService {
 		if (filter != null) {
 			if (filter.getName() != null) {
 				Page<Tuple> tuplePage = this.activityRepository.findAllWithCountsByName(pageable,
-						filter.getName().toUpperCase());
+						filter.getName().toLowerCase(),
+						filter.getOrderId().toLowerCase(),
+						filter.getOrderName().toLowerCase(),
+						filter.getOrderCompanyCount().toLowerCase(),
+						filter.getOrderCompanySearchCount().toLowerCase());
 				List<ActivityAdministrationDto> customActivities = activityConverter
 						.mapTupleToActivityAdministrationDto(tuplePage);
 				return PageableExecutionUtils.getPage(customActivities, pageable, tuplePage::getTotalElements);
 			}
 		}
 
-		Page<Tuple> tuplePage = this.activityRepository.findAllWithCountsByName(pageable, "");
+		Page<Tuple> tuplePage = this.activityRepository.findAllWithCountsByName(pageable,
+				"",
+				"",
+				"",
+				"",
+				"");
 		List<ActivityAdministrationDto> customActivities = activityConverter
 				.mapTupleToActivityAdministrationDto(tuplePage);
 		return PageableExecutionUtils.getPage(customActivities, pageable, tuplePage::getTotalElements);
@@ -84,20 +92,22 @@ public class ActivityServiceImpl implements IActivityService {
 
 	@Override
 	public ActivityDto update(Long id, ActivityDto updatedDto) throws ApiException {
-		this.activityRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
+		this.findById(id);
 		return this.activityConverter.entityToDto(
 				this.activityRepository.save(this.activityConverter.dtoToEntity(updatedDto, Activity.class)),
 				ActivityDto.class);
 	}
 
 	@Override
-	public ActivityDto delete(long id) throws ApiException {
-		Activity toDelete = this.activityRepository.findById(id)
-				.orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
+	public ActivityDto delete(Long id) throws ApiException {
+		Activity toDelete = this.findById(id);
 
 		this.activityRepository.delete(toDelete);
 		return this.activityConverter.entityToDto(toDelete, ActivityDto.class);
 	}
 
+	private Activity findById(Long id) throws ApiException {
+		return this.activityRepository.findById(id)
+				.orElseThrow(() -> new ApiNotFoundException("Cette Activité n'existe pas !"));
+	}
 }

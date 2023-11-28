@@ -12,9 +12,12 @@ import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.Path;
 import javax.transaction.Transactional;
 
+import com.ensemble.entreprendre.domain.*;
 import com.ensemble.entreprendre.service.IConnectedUserService;
+import com.ensemble.entreprendre.util.IStringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -34,10 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
-import com.ensemble.entreprendre.domain.FileDb;
-import com.ensemble.entreprendre.domain.Role;
-import com.ensemble.entreprendre.domain.User;
-import com.ensemble.entreprendre.domain.User_;
 import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
@@ -101,6 +100,9 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Value("${max.size.after.compression}")
     Double maxSizeAfterCompression;
+
+    @Autowired
+    private IStringUtil stringUtil;
 
     @Override
     public Page<UserResponseDto> getAll(Pageable pageable, UserDtoFilter filter) {
@@ -311,8 +313,49 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
                 specification = addNameCriteria(filter, specification);
             }
 
+            if (stringUtil.isValueSet(filter.getSortField()) && filter.getSortType() != null) {
+                specification = addSortingCriteria(filter, specification);
+            }
+
         }
         return specification;
+    }
+
+    private Specification<User> addSortingCriteria(UserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            Path<Object> sortField = null;
+
+            switch (filter.getSortField()) {
+                case "activated":
+                    sortField = root.get(User_.ACTIVATED);
+                    break;
+                default:
+                case "name":
+                    sortField = root.get(User_.NAME);
+                    break;
+                case "firstName":
+                    sortField = root.get(User_.FIRST_NAME);
+                    break;
+                case "email":
+                    sortField = root.get(User_.EMAIL);
+                    break;
+                case "internStatus":
+                    sortField = root.join(User_.INTERN_STATUS).get(InternStatus_.NAME);
+                    break;
+                case "civility":
+                    sortField = root.get(User_.CIVILITY);
+                    break;
+            }
+
+            if (filter.getSortType().equalsIgnoreCase("asc")) {
+                criteriaQuery.orderBy(criteriaBuilder.asc(sortField));
+            } else {
+                criteriaQuery.orderBy(criteriaBuilder.desc(sortField));
+            }
+
+            return criteriaBuilder.and();
+        };
+        return ensureSpecification(origin, target);
     }
 
     private Specification<User> addNameCriteria(UserDtoFilter filter, Specification<User> origin) {

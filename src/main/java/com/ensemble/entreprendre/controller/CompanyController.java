@@ -89,8 +89,7 @@ public class CompanyController {
 			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"), })
 	@GetMapping("simple/search")
 	public Page<SimpleCompanyDto> getAllSimple(
-			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
-					Company_.NAME }, direction = Sort.Direction.ASC) Pageable pageable,
+			@ApiIgnore() Pageable pageable,
 			CompanyDtoFilter filter) {
 		return this.companyService.getAllSimple(pageable, filter);
 	}

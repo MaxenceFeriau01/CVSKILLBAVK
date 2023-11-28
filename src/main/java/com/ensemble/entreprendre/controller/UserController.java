@@ -60,8 +60,7 @@ public class UserController {
 			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"), })
 	@GetMapping("/search")
 	public Page<UserResponseDto> getAll(
-			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") @PageableDefault(sort = {
-					User_.NAME }, direction = Sort.Direction.ASC) Pageable pageable,
+			@ApiIgnore() Pageable pageable,
 			UserDtoFilter filter) {
 		return this.userService.getAll(pageable, filter);
 	}

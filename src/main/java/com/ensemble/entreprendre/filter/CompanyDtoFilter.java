@@ -13,4 +13,6 @@ public class CompanyDtoFilter {
 	Long statusId;
 	String name;
 	Boolean activated;
+	String sortField;
+	String sortType;
 }

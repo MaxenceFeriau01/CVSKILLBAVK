@@ -11,7 +11,10 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.Path;
 
+import com.ensemble.entreprendre.domain.*;
+import com.ensemble.entreprendre.util.IStringUtil;
 import org.apache.velocity.runtime.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,16 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.converter.GenericConverter;
-import com.ensemble.entreprendre.domain.Activity_;
-import com.ensemble.entreprendre.domain.Company;
-import com.ensemble.entreprendre.domain.Company_;
-import com.ensemble.entreprendre.domain.FileDb;
-import com.ensemble.entreprendre.domain.InternStatus;
-import com.ensemble.entreprendre.domain.InternStatus_;
-import com.ensemble.entreprendre.domain.InternType_;
-import com.ensemble.entreprendre.domain.Job_;
-import com.ensemble.entreprendre.domain.User;
-import com.ensemble.entreprendre.domain.UserApplyCompany;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.dto.CompanyDto;
 import com.ensemble.entreprendre.dto.SimpleCompanyDto;
@@ -80,6 +73,9 @@ public class CompanyServiceImpl implements ICompanyService {
     @Value("${period.internship.paid}")
     Long periodWhenInternshipIsPaid;
 
+    @Autowired
+    private IStringUtil stringUtil;
+
     @Override
     public CompanyDto getById(long id) throws ApiException {
         return this.companyConverter.entityToDto(this.companyRepository.findById(id)
@@ -119,6 +115,7 @@ public class CompanyServiceImpl implements ICompanyService {
             return this.simpleCompanyConverter.entitiesToDtos(this.companyRepository.findAll(pageable),
                     SimpleCompanyDto.class);
         }
+
         return this.simpleCompanyConverter.entitiesToDtos(this.companyRepository.findAll(specification, pageable),
                 SimpleCompanyDto.class);
     }
@@ -249,16 +246,49 @@ public class CompanyServiceImpl implements ICompanyService {
             if (filter.getActivated() != null) {
                 specification = addActivatedCriteria(filter, specification);
             }
+            if (Boolean.TRUE.equals(stringUtil.isValueSet(filter.getSortField())) && filter.getSortType() != null) {
+                specification = addSortingCriteria(filter, specification);
+            }
         }
         return specification;
     }
-
     private Specification<Company> ensureSpecification(Specification<Company> origin, Specification<Company> target) {
         if (origin == null)
             return target;
         if (target == null)
             return origin;
         return Specification.where(origin).and(target);
+    }
+
+    private Specification<Company> addSortingCriteria(CompanyDtoFilter filter, Specification<Company> origin) {
+        Specification<Company> target = (root, criteriaQuery, criteriaBuilder) -> {
+            Path<Object> sortField = null;
+
+            switch (filter.getSortField()) {
+                case "activated":
+                    sortField = root.get(Company_.ACTIVATED);
+                    break;
+                default:
+                case "name":
+                    sortField = root.get(Company_.NAME);
+                    break;
+                case "city":
+                    sortField = root.join(Company_.CITY).get(City_.NAME);
+                    break;
+                case "type":
+                    sortField = root.get(Company_.TYPE);
+                    break;
+            }
+
+            if (filter.getSortType().equalsIgnoreCase("asc")) {
+                criteriaQuery.orderBy(criteriaBuilder.asc(sortField));
+            } else {
+                criteriaQuery.orderBy(criteriaBuilder.desc(sortField));
+            }
+
+            return criteriaBuilder.and();
+        };
+        return ensureSpecification(origin, target);
     }
 
     private Specification<Company> addActivityCriteria(CompanyDtoFilter filter, Specification<Company> origin) {

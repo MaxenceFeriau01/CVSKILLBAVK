@@ -46,19 +46,18 @@ public class ActivityController {
 	@Secured({ "ROLE_ADMIN" })
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
-			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"),
-			@ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
-					+ "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
+			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20")
+	})
 	@GetMapping("/search")
 	public Page<ActivityAdministrationDto> search(
 			@ApiIgnore("Ignored because swagger ui shows the wrong params, instead they are explained in the implicit params") Pageable pageable,
-			ActivityDtoFilter filter) throws ApiException {
+			ActivityDtoFilter filter) {
 
 		return this.activityService.getAllWithFilter(pageable, filter);
 	}
 
 	@GetMapping
-	public Collection<ActivityDto> getAll() throws ApiException {
+	public Collection<ActivityDto> getAll() {
 		return this.activityService.getAll();
 	}
 

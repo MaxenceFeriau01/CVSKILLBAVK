@@ -85,7 +85,7 @@ public class User extends FullAuditable<String> {
 	private String internshipPeriod;
 
 	@Column(nullable = false, columnDefinition = "boolean default true")
-	private boolean activated = true;
+	private Boolean activated = true;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<FileDb> files;

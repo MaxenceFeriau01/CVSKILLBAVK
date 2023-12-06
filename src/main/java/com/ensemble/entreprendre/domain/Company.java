@@ -79,10 +79,10 @@ public class Company {
 	private String desiredInternsNumber;
 
 	@Column(name = "COMPANY_ACCEPTS_LONG_PAID_INTERNSHIP", nullable = false, columnDefinition = "boolean default false")
-	boolean isPaidAndLongTermInternship;
+	private Boolean isPaidAndLongTermInternship;
 
 	@Column(name = "COMPANY_MINOR_ACCEPTED", nullable = false, columnDefinition = "boolean default false")
-	boolean minorAccepted;
+	private Boolean minorAccepted;
 
 	@OneToMany(mappedBy = "company")
 	private Collection<UserApplyCompany> users;
@@ -92,7 +92,7 @@ public class Company {
 	private byte[] logo;
 
 	@Column(name = "COMPANY_ACTIVATED", nullable = false, columnDefinition = "boolean default true")
-	private boolean activated = true;
+	private Boolean activated = true;
 
 	@ManyToMany
 	@JoinTable(name = "companies_activities", joinColumns = @JoinColumn(name = "COMPANY_ID", referencedColumnName = "COMPANY_ID"), inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID"))

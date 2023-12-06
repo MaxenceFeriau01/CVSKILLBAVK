@@ -279,7 +279,7 @@
                     "id":1
                 }
             ],
-            "paidAndLongTermInternship":false,
+            "isPaidAndLongTermInternship":false,
             "desiredInternsNumber":"1 à 5"
         }
     }
@@ -353,7 +353,7 @@
                 ]
             }
         ],
-        "paidAndLongTermInternship":false
+        "isPaidAndLongTermInternship":false
     }
     """
 

@@ -109,7 +109,7 @@ Feature: Activities statistics
                     "id":1
                 }
             ],
-            "paidAndLongTermInternship":false,
+            "isPaidAndLongTermInternship":false,
             "desiredInternsNumber":"1 à 5"
         }
     }
@@ -183,7 +183,7 @@ Feature: Activities statistics
                 ]
             }
         ],
-        "paidAndLongTermInternship":false
+        "isPaidAndLongTermInternship":false
     }
     """
 
@@ -292,7 +292,7 @@ Feature: Activities statistics
                     "id":1
                 }
             ],
-            "paidAndLongTermInternship":false,
+            "isPaidAndLongTermInternship":false,
             "desiredInternsNumber":"1 à 5"
         }
     }
@@ -370,7 +370,7 @@ Feature: Activities statistics
                 ]
             }
         ],
-        "paidAndLongTermInternship":false
+        "isPaidAndLongTermInternship":false
     }
     """
 

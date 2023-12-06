@@ -39,13 +39,17 @@ public class UserResponseDto {
 
 	private InternStatusDto internStatus;
 
-	Collection<PartialFileDbDto> files;
+	private Collection<PartialFileDbDto> files;
 
-	Collection<JobDto> jobs;
+	private Collection<JobDto> jobs;
 
 	private Collection<RoleDto> roles;
 
+	private Collection<CompanySimpleDto> appliedCompanies;
+
 	private Long profileUpdateCount;
+
+	private LocalDateTime createdDate;
 
 	private LocalDateTime lastModifiedDate;
 }

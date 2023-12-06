@@ -149,7 +149,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     public AuthenticationResponseDto findByEmailToAuthenticationResponseDto(String email) {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new AccessDeniedException("Utilisateur inconnu"));
-        if (user.isActivated() == false) {
+        if (!user.getActivated()) {
             throw new AccessDeniedException("Vous ne pouvez pas vous connecter !");
         }
         return this.authenticationResponseConverter.entityToDto(user, AuthenticationResponseDto.class);
@@ -258,7 +258,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         Collection<FileDb> files = getUserFileDbs(userDto, newUser, cv, coverLetter);
         // KEEP THE ROLES
         newUser.setRoles(currentUser.getRoles());
-        newUser.setActivated(currentUser.isActivated());
+        newUser.setActivated(currentUser.getActivated());
 
         // KEEP THE OLD FILES
         for (FileDb f : currentUser.getFiles()) {
@@ -308,22 +308,47 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     private Specification<User> addCriterias(UserDtoFilter filter, Specification<User> specification) {
         if (filter != null) {
-
-            if (filter.getName() != null) {
-                specification = addNameCriteria(filter, specification);
+            if (filter.getActivated() != null) {
+                specification = addActivatedCriteria(filter, specification);
             }
 
-            if (stringUtil.isValueSet(filter.getSortField()) && filter.getSortType() != null) {
+            if (filter.getPostalCode() != null) {
+                specification = addPostalCodeCriteria(filter, specification);
+            }
+
+            if (Boolean.TRUE.equals(stringUtil.isValueSet(filter.getQuery()))) {
+                specification = addQueryCriteria(filter, specification);
+            }
+
+            if (Boolean.TRUE.equals(stringUtil.isValueSet(filter.getSortField())) && filter.getSortType() != null) {
                 specification = addSortingCriteria(filter, specification);
             }
-
         }
         return specification;
     }
 
+    private Specification<User> addQueryCriteria(UserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.or(
+                criteriaBuilder.like(criteriaBuilder.lower(root.get(User_.CIVILITY)), "%" + filter.getQuery().toLowerCase() + "%"),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get(User_.NAME)), "%" + filter.getQuery().toLowerCase() + "%"),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get(User_.FIRST_NAME)), "%" + filter.getQuery().toLowerCase() + "%"),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get(User_.EMAIL)), "%" + filter.getQuery().toLowerCase() + "%"),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get(User_.PHONE)), "%" + filter.getQuery().toLowerCase() + "%"),
+                criteriaBuilder.like(criteriaBuilder.lower(root.get(User_.DIPLOMA)), "%" + filter.getQuery().toLowerCase() + "%"),
+                criteriaBuilder.like(root.get(User_.POSTAL_CODE).as(String.class), "%" + filter.getQuery() + "%"),
+                criteriaBuilder.like(criteriaBuilder.lower(root.join(User_.INTERN_STATUS).get(InternStatus_.NAME)), "%" + filter.getQuery().toLowerCase() + "%")
+        );
+        return ensureSpecification(origin, target);
+    }
+
+    private Specification<User> addPostalCodeCriteria(UserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(User_.POSTAL_CODE), filter.getPostalCode());
+        return ensureSpecification(origin, target);
+    }
+
     private Specification<User> addSortingCriteria(UserDtoFilter filter, Specification<User> origin) {
         Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
-            Path<Object> sortField = null;
+            Path<Object> sortField;
 
             switch (filter.getSortField()) {
                 case "activated":
@@ -345,6 +370,24 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
                 case "civility":
                     sortField = root.get(User_.CIVILITY);
                     break;
+                case "phone":
+                    sortField = root.get(User_.PHONE);
+                    break;
+                case "createdDate":
+                    sortField = root.get(User_.CREATED_DATE);
+                    break;
+                case "dateOfBirth":
+                    sortField = root.get(User_.DATE_OF_BIRTH);
+                    break;
+                case "postalCode":
+                    sortField = root.get(User_.POSTAL_CODE);
+                    break;
+                case "diploma":
+                    sortField = root.get(User_.DIPLOMA);
+                    break;
+                case "profileUpdateCount":
+                    sortField = root.get(User_.PROFILE_UPDATE_COUNT);
+                    break;
             }
 
             if (filter.getSortType().equalsIgnoreCase("asc")) {
@@ -358,15 +401,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         return ensureSpecification(origin, target);
     }
 
-    private Specification<User> addNameCriteria(UserDtoFilter filter, Specification<User> origin) {
-        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
-            if (filter.getName() != null && !filter.getName().isEmpty()) {
-                return criteriaBuilder.like(criteriaBuilder.upper(root.get(User_.NAME)),
-                        "%" + filter.getName().toUpperCase() + "%");
-            } else {
-                return criteriaBuilder.and();
-            }
-        };
+    private Specification<User> addActivatedCriteria(UserDtoFilter filter, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
+                root.get(User_.ACTIVATED),
+                filter.getActivated()
+        );
         return ensureSpecification(origin, target);
     }
 

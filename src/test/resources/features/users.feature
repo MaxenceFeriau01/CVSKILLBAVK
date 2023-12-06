@@ -4,7 +4,7 @@ Feature: Users
   Scenario: Check changing "profile updating count" value
   When the client calls "/users/self" with GET
   Then the response should have a status code of 200
-  And the response body should be ignoring "lastModifiedDate"
+  And the response body should be ignoring "createdDate,lastModifiedDate"
   """
   {
     "id":1,
@@ -29,6 +29,7 @@ Feature: Users
         "role":"ROLE_USER"
       }
     ],
+    "appliedCompanies":[],
     "profileUpdateCount":0
   }
   """
@@ -75,7 +76,7 @@ Feature: Users
   Then the response should have a status code of 200
   When the client calls "/users/self" with GET
   Then the response should have a status code of 200
-  And the response body should be ignoring "lastModifiedDate"
+  And the response body should be ignoring "createdDate,lastModifiedDate"
   """
   {
     "id":1,
@@ -103,6 +104,7 @@ Feature: Users
         "role":"ROLE_USER"
       }
     ],
+    "appliedCompanies":[],
     "profileUpdateCount":1
   }
   """
@@ -143,7 +145,7 @@ Feature: Users
   Then the response should have a status code of 200
   When the client calls "/users/self" with GET
   Then the response should have a status code of 200
-  And the response body should be ignoring "lastModifiedDate"
+  And the response body should be ignoring "createdDate,lastModifiedDate"
   """
   {
     "id":1,
@@ -171,6 +173,7 @@ Feature: Users
         "role":"ROLE_USER"
       }
     ],
+    "appliedCompanies":[],
     "profileUpdateCount":1
   }
   """

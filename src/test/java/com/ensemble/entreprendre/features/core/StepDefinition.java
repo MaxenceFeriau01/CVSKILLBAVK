@@ -74,18 +74,20 @@ public class StepDefinition {
     }
 
     @And("the response body should be ignoring {string}")
-    public void the_response_body_should_be(String fieldToIgnore, String expectedResponse)
+    public void the_response_body_should_be(String fieldsToIgnore, String expectedResponse)
             throws JsonMappingException, JsonProcessingException {
         JsonNode expectedJson = this.mapper.readTree(expectedResponse);
         JsonNode responseFromApiCall = this.httpCallClient.getResponseBody();
 
-        stepService.removeKeyFromArrayNode(responseFromApiCall.findValue("content"), fieldToIgnore);
-        this.stepService.removeKeyFromJsonNode(responseFromApiCall, fieldToIgnore);
+        String[] fields = fieldsToIgnore.split(",");
+        for (String field : fields) {
+            stepService.removeKeyFromArrayNode(responseFromApiCall.findValue("content"), field);
+            this.stepService.removeKeyFromJsonNode(responseFromApiCall, field);
+        }
 
         assertEquals(expectedJson, responseFromApiCall);
     }
 
-    
     @Given("the client request body as multipart-form-data contains")
     public void the_client_request_body_contains_as_multipart_form_data(String body)
             throws JsonMappingException, JsonProcessingException {

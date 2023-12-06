@@ -54,14 +54,15 @@ public class UserController {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	@ApiOperation(value = "User getAll endpoint", response = CompanyDto.class)
+	@ApiOperation(value = "User getAll endpoint", response = UserResponseDto.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
 			@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page.", defaultValue = "20"), })
 	@GetMapping("/search")
-	public Page<UserResponseDto> getAll(
-			@ApiIgnore() Pageable pageable,
-			UserDtoFilter filter) {
+	public Page<UserResponseDto> getAll(@ApiIgnore() Pageable pageable, UserDtoFilter filter) {
+		if (filter.getExport()) {
+			return this.userService.getAll(Pageable.unpaged(), filter);
+		}
 		return this.userService.getAll(pageable, filter);
 	}
 
@@ -196,6 +197,6 @@ public class UserController {
 	public void active(@PathVariable(name = "id") long id, @RequestBody UserDtoFilter userDtoFilter)
 			throws ApiException, EntityNotFoundException, MessagingException, ParseException, IOException {
 
-		this.userService.active(id, userDtoFilter.isActivated());
+		this.userService.active(id, userDtoFilter.getActivated());
 	}
 }

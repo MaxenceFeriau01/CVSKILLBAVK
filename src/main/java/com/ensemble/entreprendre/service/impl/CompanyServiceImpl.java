@@ -131,7 +131,7 @@ public class CompanyServiceImpl implements ICompanyService {
         }
 
         Company newCompany = this.companyConverter.dtoToEntity(updatedDto, Company.class);
-        newCompany.setActivated(oldCompany.isActivated());
+        newCompany.setActivated(oldCompany.getActivated());
         newCompany.getSearchedInternsType().stream().forEach(t -> t.setCompany(newCompany));
         return this.companyConverter.entityToDto(this.companyRepository.save(newCompany), CompanyDto.class);
     }

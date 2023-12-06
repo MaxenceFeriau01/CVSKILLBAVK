@@ -59,7 +59,7 @@ Feature: Posts
                     "id":1
                 }
             ],
-            "paidAndLongTermInternship":false,
+            "isPaidAndLongTermInternship":false,
             "desiredInternsNumber":"1 à 5"
         }
     }
@@ -133,7 +133,7 @@ Feature: Posts
                 ]
             }
         ],
-        "paidAndLongTermInternship":false
+        "isPaidAndLongTermInternship":false
     }
     """
 
@@ -208,7 +208,7 @@ Feature: Posts
                     ]
                     }
                 ],
-                "paidAndLongTermInternship":false
+                "isPaidAndLongTermInternship":false
             }
         ],
         "pageable":{
@@ -297,7 +297,7 @@ Feature: Posts
                     "id":1
                 }
             ],
-            "paidAndLongTermInternship":false,
+            "isPaidAndLongTermInternship":false,
             "desiredInternsNumber":"1 à 5"
         }
     }

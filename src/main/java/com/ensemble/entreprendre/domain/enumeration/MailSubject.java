@@ -3,7 +3,7 @@ package com.ensemble.entreprendre.domain.enumeration;
 import com.ensemble.entreprendre.config.mail.MailType;
 
 public enum MailSubject {
-    Password, ResetPassword, RegistrationConfirm, ApplyCompany, ApplyCompanyAdminTemplate, AdminRegistrationConfirm;
+    Password, ResetPassword, RegistrationConfirm, ApplyCompany, ApplyCompanyAdminTemplate, AdminRegistrationConfirm, AdminCompanyContact;
 
     public MailType getTemplate() {
 
@@ -32,6 +32,10 @@ public enum MailSubject {
             case "AdminRegistrationConfirm":
                 mailType.setPath("velocity/MailNewUserAdminTemplate.vm");
                 mailType.setLabel("MailNewUserAdminTemplate");
+                break;
+            case "AdminCompanyContact":
+                mailType.setPath("velocity/AdminCompanyContactTemplate.vm");
+                mailType.setLabel("AdminCompanyContactTemplate");
                 break;
 
         }

@@ -16,6 +16,8 @@ public class Mail {
 
     private MailSubject subject;
 
+    private String from;
+
     private String recipient;
 
     private HashMap<String, Object> params;

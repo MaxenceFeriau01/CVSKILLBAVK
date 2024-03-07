@@ -85,7 +85,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/api/intern-status/for-applicant",
 						"/api/users/register", "/api/users/authenticate", "/api/users/forgot-password",
 						"/api/users/**/reset-password",
-						"/api/visits")
+						"/api/visits",
+						"/api/email/company-contact")
 				.permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

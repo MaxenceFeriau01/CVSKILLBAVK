@@ -83,6 +83,12 @@ public class CompanyController {
 		return this.companyService.getAll(pageable, filter);
 	}
 
+	@ApiOperation(value = "Company getAllExport endpoint", response = CompanyDto.class)
+	@GetMapping("/export")
+	public Page<CompanyDto> getAllExport(CompanyDtoFilter filter) throws ApiException {
+		return this.companyService.getAll(Pageable.unpaged(), filter);
+	}
+
 	@ApiOperation(value = "Company getAllSimple endpoint", response = CompanyDto.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)", defaultValue = "0"),

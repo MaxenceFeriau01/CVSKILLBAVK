@@ -1,11 +1,14 @@
 package com.ensemble.entreprendre.service.impl;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +23,8 @@ import com.ensemble.entreprendre.service.IConnectedUserService;
 import com.ensemble.entreprendre.util.IStringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -182,7 +187,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     @Override
     public void createUser(UserRequestDto newUserDto, Collection<Role> roles, MultipartFile cv,
             MultipartFile coverLetter) throws EntityNotFoundException, MessagingException, ParseException,
-            org.apache.velocity.runtime.parser.ParseException, IOException, ApiException {
+            org.apache.velocity.runtime.parser.ParseException, IOException, ApiException, URISyntaxException {
 
         Optional<User> opOldUser = this.userRepository.findByEmail(newUserDto.getEmail());
         if (opOldUser.isPresent()) {
@@ -204,8 +209,13 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             params.put("firstName", user.getFirstName());
             params.put("lastName", user.getName());
 
+            Collection<Resource> attachments = new HashSet<Resource>();
+            attachments.add(getResourceFile("CV.pdf"));
+            attachments.add(getResourceFile("CoverLetter.pdf"));
+            Optional<Collection<Resource>> opAttachments = Optional.of(attachments);
+
             this.mailService.prepareMail(MailSubject.RegistrationConfirm, "Confirmation d'inscription", user.getEmail(),
-                    params, null);
+                    params, opAttachments);
 
             Collection<User> admins = userRepository.findByRoles_Role(RoleEnum.ROLE_ADMIN);
             params.put("user", user);
@@ -304,6 +314,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     public User findByEmail(String email) throws ApiNotFoundException {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiNotFoundException("L'utilisateur n'existe pas"));
+    }
+
+    private Resource getResourceFile(String fileName) throws MalformedURLException, URISyntaxException 
+    {
+        return new UrlResource(getClass().getClassLoader().getResource("file/" + fileName).toURI());
     }
 
     private Specification<User> addCriterias(UserDtoFilter filter, Specification<User> specification) {

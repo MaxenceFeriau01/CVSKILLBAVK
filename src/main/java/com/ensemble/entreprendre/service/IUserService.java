@@ -1,6 +1,7 @@
 package com.ensemble.entreprendre.service;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +18,6 @@ import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
-import com.ensemble.entreprendre.exception.ApiAlreadyExistException;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.exception.ApiNotFoundException;
 import com.ensemble.entreprendre.filter.StatPeriodDtoFilter;
@@ -26,8 +26,8 @@ import com.ensemble.entreprendre.filter.UserDtoFilter;
 public interface IUserService {
 
 	void createUser(UserRequestDto userDto, Collection<Role> roles, MultipartFile cv, MultipartFile coverLetter)
-			throws EntityNotFoundException, ApiNotFoundException, MessagingException, ParseException,
-			ApiAlreadyExistException, org.apache.velocity.runtime.parser.ParseException, IOException, ApiException;
+			throws EntityNotFoundException, MessagingException, ParseException,
+            org.apache.velocity.runtime.parser.ParseException, IOException, ApiException, URISyntaxException;
 
 	UserResponseDto updateUser(Long id, UserRequestDto userDto, MultipartFile cv, MultipartFile coverLetter)
 			throws IOException, ApiNotFoundException, ApiException;

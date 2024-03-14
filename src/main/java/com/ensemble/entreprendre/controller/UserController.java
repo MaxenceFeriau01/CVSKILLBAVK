@@ -1,6 +1,7 @@
 package com.ensemble.entreprendre.controller;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -141,6 +142,7 @@ public class UserController {
 	 * @throws ApiException
 	 * @throws IOException
 	 * @throws org.apache.velocity.runtime.parser.ParseException
+	 * @throws URISyntaxException 
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(path = "/register")
@@ -148,7 +150,7 @@ public class UserController {
 			@RequestPart(value = "cv", required = false) MultipartFile cv,
 			@RequestPart(value = "coverLetter", required = false) MultipartFile coverLetter)
 			throws EntityNotFoundException, MessagingException, ParseException, ApiException, IOException,
-			org.apache.velocity.runtime.parser.ParseException {
+			org.apache.velocity.runtime.parser.ParseException, URISyntaxException {
 
 		UserRequestDto toCreate = objectMapper.readValue(user, UserRequestDto.class);
 

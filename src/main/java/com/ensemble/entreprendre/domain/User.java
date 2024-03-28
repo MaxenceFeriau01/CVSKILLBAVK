@@ -93,6 +93,9 @@ public class User extends FullAuditable<String> {
 	@OneToMany(mappedBy = "user")
 	private Collection<UserApplyCompany> appliedCompanies;
 
+	@OneToMany(mappedBy = "user")
+    private Collection<UserApplyEvent> appliedEvents;
+
 	@OneToMany(mappedBy = "user", orphanRemoval = false)
 	private Collection<Visit> visits;
 

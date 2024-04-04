@@ -127,6 +127,7 @@
                 }
             ],
             "internshipPeriod": "2 à 6 mois",
+            "searchSubject":"INTERNSHIP_SUBJECT",
             "diploma": "BAC + 5"  
         }
     }

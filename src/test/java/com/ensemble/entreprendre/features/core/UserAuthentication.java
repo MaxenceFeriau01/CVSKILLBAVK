@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ensemble.entreprendre.domain.User;
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
+import com.ensemble.entreprendre.domain.enumeration.SearchSubjectEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.repository.IRoleRepository;
@@ -41,7 +42,7 @@ public class UserAuthentication {
         User newUser = new User(null, "modis" + roleToCreate + "@modis.com", "modis", "modis",
                 bCryptPasswordEncoder.encode(PASSWORD), "0161616161", 7500, LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-01"),
                 LocalDate.parse("2023-01-01"), null,
-                null, "M.", "BAC+5", "6month", true, null, null, null,
+                null, "M.", "BAC+5", "6month", SearchSubjectEnum.INTERNSHIP_SUBJECT, true, null, null, null,
                 null, Arrays.asList(this.roleRepository.findByRole(roleToCreate)), null, 0L);
 
         this.userRepository.save(newUser);

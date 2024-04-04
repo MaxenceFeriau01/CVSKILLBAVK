@@ -37,6 +37,8 @@ public class UserResponseDto {
 
 	private String internshipPeriod;
 
+	private String searchSubject;
+
 	private InternStatusDto internStatus;
 
 	private Collection<PartialFileDbDto> files;

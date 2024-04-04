@@ -40,6 +40,8 @@ public class UserRequestDto {
 
 	private String internshipPeriod;
 
+	private String searchSubject;
+
 	private MultipartFile cv;
 
 	private MultipartFile coverLetter;

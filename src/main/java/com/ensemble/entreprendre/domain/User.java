@@ -9,6 +9,8 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,6 +23,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
+import com.ensemble.entreprendre.domain.enumeration.SearchSubjectEnum;
 import com.ensemble.entreprendre.domain.technical.FullAuditable;
 
 import lombok.AllArgsConstructor;
@@ -83,6 +86,10 @@ public class User extends FullAuditable<String> {
 
 	@Column(nullable = true)
 	private String internshipPeriod;
+
+	@Column(nullable = false, columnDefinition = "varchar(255) default 'INTERNSHIP_SUBJECT'")
+	@Enumerated(EnumType.STRING)
+	private SearchSubjectEnum searchSubject;
 
 	@Column(nullable = false, columnDefinition = "boolean default true")
 	private Boolean activated = true;

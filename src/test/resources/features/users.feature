@@ -20,6 +20,7 @@ Feature: Users
     "civility":"M.",
     "diploma":"BAC+5",
     "internshipPeriod":"6month",
+    "searchSubject":"INTERNSHIP_SUBJECT",
     "internStatus": null,
     "files":[],
     "jobs":[],
@@ -56,6 +57,7 @@ Feature: Users
       "civility":"M.",
       "diploma":"BAC+5",
       "internshipPeriod":"6month",
+      "searchSubject":"INTERNSHIP_SUBJECT",
       "internStatus": {
         "id": 3,
         "name": "Etudiant"
@@ -92,6 +94,7 @@ Feature: Users
     "civility":"M.",
     "diploma":"BAC+5",
     "internshipPeriod":"6month",
+    "searchSubject":"INTERNSHIP_SUBJECT",
     "internStatus": {
       "id": 3,
       "name": "Etudiant"
@@ -125,6 +128,7 @@ Feature: Users
       "civility":"M.",
       "diploma":"BAC+5",
       "internshipPeriod":"6month",
+      "searchSubject":"INTERNSHIP_SUBJECT",
       "internStatus": {
         "id": 3,
         "name": "Etudiant"
@@ -161,6 +165,7 @@ Feature: Users
     "civility":"M.",
     "diploma":"BAC+5",
     "internshipPeriod":"6month",
+    "searchSubject":"INTERNSHIP_SUBJECT",
     "internStatus": {
       "id": 3,
       "name": "Etudiant"

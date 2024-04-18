@@ -13,6 +13,7 @@ public class EventDto {
     private Boolean active = false;
     private String type;
     private String image;
+    private String website;
     private String description;
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;

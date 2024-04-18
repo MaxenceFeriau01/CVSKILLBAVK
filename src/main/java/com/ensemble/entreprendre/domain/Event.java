@@ -39,6 +39,9 @@ public class Event {
     @Column(name = "EVENT_IMAGE", columnDefinition = "TEXT", nullable = false)
     private String image;
 
+    @Column(name = "EVENT_WEBSITE", nullable = true)
+    private String website;
+
     @Column(name = "EVENT_DESCRIPTION", columnDefinition = "TEXT", nullable = true)
     private String description;
 

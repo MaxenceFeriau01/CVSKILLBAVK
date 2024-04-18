@@ -45,6 +45,7 @@ import com.ensemble.entreprendre.converter.GenericConverter;
 import com.ensemble.entreprendre.domain.enumeration.FileTypeEnum;
 import com.ensemble.entreprendre.domain.enumeration.MailSubject;
 import com.ensemble.entreprendre.domain.enumeration.RoleEnum;
+import com.ensemble.entreprendre.domain.enumeration.SearchSubjectEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
@@ -499,6 +500,16 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         return this.userRepository.count(specification);
     }
 
+    @Override
+    public Long countUserWithPeriodAndSearchSubject(StatPeriodDtoFilter filter, SearchSubjectEnum searchSubject) {
+        Specification<User> specification = null;
+        specification = addUserCountCriterias(filter, searchSubject, specification);
+        if (specification == null) {
+            return this.userRepository.count();
+        }
+        return this.userRepository.count(specification);
+    }
+
     private Specification<User> addCountCriterias(StatPeriodDtoFilter filter, Specification<User> specification) {
         if (filter != null) {
             if (filter.getStartedAt() != null) {
@@ -509,6 +520,23 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             }
         }
         return specification;
+    }
+
+    private Specification<User> addUserCountCriterias(StatPeriodDtoFilter filter, SearchSubjectEnum searchSubject, Specification<User> specification) {
+        if (filter != null) {
+            specification = addCountCriterias(filter, specification);
+            if (searchSubject != null) {
+                specification = addSearchSubjectCriteria(searchSubject, specification);
+            }
+        }
+        return specification;
+    }
+
+    private Specification<User> addSearchSubjectCriteria(SearchSubjectEnum searchSubject, Specification<User> origin) {
+        Specification<User> target = (root, criteriaQuery, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get(User_.SEARCH_SUBJECT), searchSubject);
+        };
+        return ensureSpecification(origin, target);
     }
 
     private Specification<User> addStartedAtCriteria(StatPeriodDtoFilter filter, Specification<User> origin) {
@@ -536,5 +564,4 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             userRepository.save(currentUser);
         }
     }
-
 }

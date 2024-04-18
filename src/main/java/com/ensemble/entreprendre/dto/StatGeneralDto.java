@@ -15,4 +15,8 @@ public class StatGeneralDto {
 
     private Long numbersOffers;
 
+    private Long numbersLearnWorkers;
+
+    private Long numbersInterns;
+
 }

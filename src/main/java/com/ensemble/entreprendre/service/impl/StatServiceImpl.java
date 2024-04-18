@@ -4,6 +4,7 @@ import com.ensemble.entreprendre.exception.TechnicalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ensemble.entreprendre.domain.enumeration.SearchSubjectEnum;
 import com.ensemble.entreprendre.dto.StatGeneralDto;
 import com.ensemble.entreprendre.exception.ApiException;
 import com.ensemble.entreprendre.filter.StatPeriodDtoFilter;
@@ -38,6 +39,8 @@ public class StatServiceImpl implements IStatService {
         statGeneralDto.setNumbersVisits(visitService.countVisitsWithPeriod(filter));
         statGeneralDto.setNumbersApplyings(userApplyService.countApplyingsWithPeriod(filter));
         statGeneralDto.setNumbersOffers(internTypeService.countOffersWithPeriod(filter));
+        statGeneralDto.setNumbersLearnWorkers(userService.countUserWithPeriodAndSearchSubject(filter, SearchSubjectEnum.WORK_STUDY_SUBJECT));
+        statGeneralDto.setNumbersInterns(userService.countUserWithPeriodAndSearchSubject(filter, SearchSubjectEnum.INTERNSHIP_SUBJECT));
         return statGeneralDto;
     }
 

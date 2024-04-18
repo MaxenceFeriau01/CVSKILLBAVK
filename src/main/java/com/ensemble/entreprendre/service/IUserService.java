@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ensemble.entreprendre.domain.Role;
 import com.ensemble.entreprendre.domain.User;
+import com.ensemble.entreprendre.domain.enumeration.SearchSubjectEnum;
 import com.ensemble.entreprendre.dto.AuthenticationResponseDto;
 import com.ensemble.entreprendre.dto.UserRequestDto;
 import com.ensemble.entreprendre.dto.UserResponseDto;
@@ -58,6 +59,8 @@ public interface IUserService {
     AuthenticationResponseDto authenticate(String email, String password) throws ApiException;
 
 	Long countUserSignUpsWithPeriod(StatPeriodDtoFilter filter);
+
+	Long countUserWithPeriodAndSearchSubject(StatPeriodDtoFilter filter, SearchSubjectEnum searchSubject);
 
 	void setLastModifiedDateToNow() throws ApiException;
 }

@@ -16,6 +16,8 @@ Feature: Statistics
     "numbersUsers": 0,
     "numbersApplyings": 0,
     "numbersVisits": 0,
-    "numbersOffers": 0
+    "numbersOffers": 0,
+    "numbersLearnWorkers": 0,
+    "numbersInterns": 0
   }
   """

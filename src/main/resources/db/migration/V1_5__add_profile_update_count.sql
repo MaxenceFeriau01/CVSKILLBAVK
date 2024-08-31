@@ -1,1 +1,0 @@
-ALTER TABLE users ADD COLUMN profile_update_count INTEGER DEFAULT 0 NOT NULL;

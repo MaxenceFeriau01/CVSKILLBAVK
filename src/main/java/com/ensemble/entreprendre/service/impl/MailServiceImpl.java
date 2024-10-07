@@ -43,10 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MailServiceImpl implements IMailService {
 
-    @Value("${spring.mail.from:noreply-entreprendre@ensemble.com}")
+    @Value("${spring.mail.from:noreply@jobexplorer.eedk.fr}")
     private String from;
 
-    @Value("${spring.mail.replyto:noreply-entreprendre@ensemble.com}")
+    @Value("${spring.mail.replyto:noreply@jobexplorer.eedk.fr}")
     private String replyTo;
 
     @Autowired
@@ -148,7 +148,7 @@ public class MailServiceImpl implements IMailService {
             for (User user : users) {
                 if (user.getActivated()) {
                     Mail mail = new Mail();
-                    mail.setTitle("[" + email.getCompany() + "] Demande de contact depuis la plateforme DKStages");
+                    mail.setTitle("[" + email.getCompany() + "] Demande de contact depuis la plateforme JobExplorer");
                     mail.setFrom(email.getFullName() + " <" + email.getEmail() + ">");
                     mail.setRecipient(user.getFirstName() + " " + user.getName() + "<" + user.getEmail() + ">");
                     mail.setSubject(MailSubject.AdminCompanyContact);

@@ -24,7 +24,7 @@
             <b>Bonjour $admin.getFirstName() $admin.getName(),</b>
             </br>
             </br>
-            Nous t'informons de l'inscription sur l'application <i>DKStages</i> de l'utilisateur suivant :</br>
+            Nous t'informons de l'inscription sur l'application <i>JobExplorer</i> de l'utilisateur suivant :</br>
             <ul>
                 <li>
                 Nom : $user.getFirstName() $user.getName()
@@ -40,7 +40,7 @@
             </br>
             Bien Cordialement, 
             </br>
-            L&#8217;équipe de <i>Dkstages</i>
+            L&#8217;équipe de <i>JobExplorer</i>
            
       	<article>       
     
